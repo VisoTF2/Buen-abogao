@@ -337,6 +337,13 @@
       stroke: currentColor;
     }
 
+    .articulo-contenido,
+    .nota-box,
+    .articulo-titulo-texto {
+      cursor: text;
+      caret-color: var(--accent);
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-2px); }
       to { opacity: 1; transform: translateY(0); }
@@ -641,10 +648,10 @@
     </button>
     <button type="button" data-accion="pegar" onclick="pegarDesdePortapapeles(event)">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M8 4h8v2H8z" stroke-width="1.8" stroke-linejoin="round" />
-        <rect x="5" y="6" width="14" height="14" rx="2" stroke-width="1.8" />
-        <path d="M9.5 11H12v6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-        <path d="M12 17h3" stroke-width="1.8" stroke-linecap="round" />
+        <rect x="6.5" y="5.5" width="11" height="15" rx="2" stroke-width="1.8" />
+        <path d="M9 4h6v3H9z" stroke-width="1.8" stroke-linejoin="round" />
+        <path d="M12 11v6" stroke-width="1.8" stroke-linecap="round" />
+        <path d="m9.75 14.25 2.25 2.25 2.25-2.25" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
       Pegar en el campo
     </button>
