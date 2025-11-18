@@ -267,16 +267,18 @@
     }
 
     .resaltado-busqueda-marca {
-      background: #dbeafe;
+      background: rgba(59, 130, 246, 0.15);
       color: inherit;
       padding: 0;
-      border-radius: 3px;
-      box-shadow: inset 0 -2px rgba(147, 197, 253, 0.8);
+      border-radius: 2px;
+      box-shadow: none;
+      letter-spacing: normal;
+      white-space: pre-wrap;
     }
 
     .resaltado-busqueda-marca-activa {
-      background: #a5c7ff;
-      box-shadow: inset 0 -3px rgba(59, 130, 246, 0.55);
+      background: rgba(59, 130, 246, 0.28);
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.4);
     }
 
     ::selection {
@@ -651,12 +653,13 @@ function limpiarResaltadosBusqueda() {
   indiceResultado = 0
 
   elementosMarcados.forEach(el => {
-    if (el.isContentEditable) {
+    if (el.dataset.busquedaOriginalHtml !== undefined) {
+      el.innerHTML = el.dataset.busquedaOriginalHtml
+    } else if (el.isContentEditable) {
       const plano = el.textContent
       el.textContent = plano
-    } else if (el.dataset.busquedaOriginalHtml !== undefined) {
-      el.innerHTML = el.dataset.busquedaOriginalHtml
     }
+    if (el.normalize) el.normalize()
     delete el.dataset.busquedaOriginalHtml
   })
   elementosMarcados.clear()
