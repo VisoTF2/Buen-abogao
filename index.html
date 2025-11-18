@@ -233,6 +233,13 @@
       box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
     }
 
+    .coincidencia-busqueda {
+      background: #fef08a;
+      color: inherit;
+      padding: 0 1px;
+      border-radius: 3px;
+    }
+
     .resaltado-busqueda-activo {
       outline: 3px solid #fbbf24;
       box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.45);
@@ -588,10 +595,19 @@ function cerrarBuscador() {
 }
 
 function limpiarResaltadosBusqueda() {
+  document.querySelectorAll("mark.coincidencia-busqueda").forEach(m => {
+    const text = document.createTextNode(m.textContent)
+    m.replaceWith(text)
+  })
+
   document.querySelectorAll(".articulo").forEach(a => {
     a.classList.remove("resaltado-busqueda")
     a.classList.remove("resaltado-busqueda-activo")
   })
+
+  document.querySelectorAll(".resaltado-busqueda-activo").forEach(el =>
+    el.classList.remove("resaltado-busqueda-activo")
+  )
 }
 
 function resaltarResultadoActual() {
@@ -602,8 +618,34 @@ function resaltarResultadoActual() {
   if (!resultadosBusqueda.length) return
 
   const actual = resultadosBusqueda[indiceResultado]
-  actual.classList.add("resaltado-busqueda-activo")
-  actual.scrollIntoView({ behavior: "smooth", block: "center" })
+  const articulo = actual.articulo
+
+  if (articulo && !articulo.classList.contains("abierto")) {
+    articulo.classList.add("abierto")
+
+    const nota = articulo.querySelector(".nota-box")
+    const resizer = articulo.querySelector(".nota-resizer")
+    const botonNota = articulo.querySelector(".btn-note")
+    const botonEliminarNota = articulo.querySelector(".btn-note-delete")
+
+    if (botonNota) botonNota.style.display = "inline-block"
+    if (nota && nota.value.trim() !== "") {
+      nota.style.display = "block"
+      if (resizer) resizer.style.display = "block"
+      if (botonEliminarNota) botonEliminarNota.style.display = "inline-block"
+    }
+  }
+
+  if (actual.tipo === "nota") {
+    actual.nodo.classList.add("resaltado-busqueda-activo")
+    actual.nodo.focus()
+    actual.nodo.setSelectionRange(actual.inicio, actual.fin)
+    actual.nodo.scrollIntoView({ behavior: "smooth", block: "center" })
+    return
+  }
+
+  actual.nodo.classList.add("resaltado-busqueda-activo")
+  actual.nodo.scrollIntoView({ behavior: "smooth", block: "center" })
 }
 
 function ejecutarBusqueda(termino) {
@@ -621,15 +663,13 @@ function ejecutarBusqueda(termino) {
   }
 
   document.querySelectorAll(".articulo").forEach(art => {
-    const titulo = art.querySelector(".articulo-titulo")?.textContent || ""
-    const contenido = art.querySelector(".articulo-contenido")?.textContent || ""
-    const nota = art.querySelector(".nota-box")?.value || ""
+    const titulo = art.querySelector(".articulo-titulo")
+    const contenido = art.querySelector(".articulo-contenido")
+    const nota = art.querySelector(".nota-box")
 
-    const texto = `${titulo} ${contenido} ${nota}`.toLowerCase()
-    if (texto.includes(limpio)) {
-      art.classList.add("resaltado-busqueda")
-      resultadosBusqueda.push(art)
-    }
+    marcarCoincidencias(titulo, limpio, art)
+    marcarCoincidencias(contenido, limpio, art)
+    registrarCoincidenciasNota(nota, limpio, art)
   })
 
   if (!resultadosBusqueda.length) {
@@ -639,6 +679,67 @@ function ejecutarBusqueda(termino) {
 
   info.textContent = `${resultadosBusqueda.length} resultado(s)`
   resaltarResultadoActual()
+}
+
+function marcarCoincidencias(elemento, termino, articulo) {
+  if (!elemento) return
+
+  const texto = elemento.textContent
+  const textoMin = texto.toLowerCase()
+  const largo = termino.length
+  if (!largo) return
+
+  let idx = 0
+  let hayCoincidencias = false
+  const fragment = document.createDocumentFragment()
+
+  while (true) {
+    const pos = textoMin.indexOf(termino, idx)
+    if (pos === -1) break
+
+    hayCoincidencias = true
+    fragment.appendChild(document.createTextNode(texto.slice(idx, pos)))
+
+    const mark = document.createElement("mark")
+    mark.className = "coincidencia-busqueda"
+    mark.textContent = texto.slice(pos, pos + largo)
+    fragment.appendChild(mark)
+    resultadosBusqueda.push({ tipo: "texto", nodo: mark, articulo })
+
+    idx = pos + largo
+  }
+
+  if (!hayCoincidencias) return
+
+  fragment.appendChild(document.createTextNode(texto.slice(idx)))
+  elemento.innerHTML = ""
+  elemento.appendChild(fragment)
+  articulo.classList.add("resaltado-busqueda")
+}
+
+function registrarCoincidenciasNota(nota, termino, articulo) {
+  if (!nota) return
+
+  const texto = nota.value.toLowerCase()
+  const largo = termino.length
+  if (!largo) return
+
+  let pos = texto.indexOf(termino)
+  let hayCoincidencias = false
+
+  while (pos !== -1) {
+    resultadosBusqueda.push({
+      tipo: "nota",
+      nodo: nota,
+      articulo,
+      inicio: pos,
+      fin: pos + largo
+    })
+    hayCoincidencias = true
+    pos = texto.indexOf(termino, pos + largo)
+  }
+
+  if (hayCoincidencias) articulo.classList.add("resaltado-busqueda")
 }
 
 function irAlSiguienteResultado() {
