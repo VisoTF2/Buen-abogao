@@ -150,7 +150,7 @@
       position: absolute;
       top: 18px;
       right: 18px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      background: var(--accent);
       color: white;
       border: none;
       border-radius: 10px;
@@ -159,7 +159,6 @@
       align-items: center;
       gap: 8px;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
       transition: background 0.2s ease, transform 0.15s ease;
       font-weight: 600;
       letter-spacing: 0.1px;
@@ -171,7 +170,7 @@
       stroke: currentColor;
     }
 
-    .buscador-btn:hover { background: linear-gradient(135deg, var(--accent-light), var(--accent)); }
+    .buscador-btn:hover { background: var(--accent-light); }
 
     .buscador-btn:active { transform: translateY(1px); }
 
@@ -270,13 +269,14 @@
     .resaltado-busqueda-marca {
       background: #dbeafe;
       color: inherit;
-      padding: 0 1px;
-      border-radius: 4px;
+      padding: 0;
+      border-radius: 3px;
+      box-shadow: inset 0 -2px rgba(147, 197, 253, 0.8);
     }
 
     .resaltado-busqueda-marca-activa {
       background: #a5c7ff;
-      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+      box-shadow: inset 0 -3px rgba(59, 130, 246, 0.55);
     }
 
     ::selection {
@@ -625,6 +625,7 @@ let materiaSeleccionada = null
 let resultadosBusqueda = []
 let indiceResultado = 0
 let ultimoTerminoBusqueda = ""
+const elementosMarcados = new Set()
 const buscadorInput = document.getElementById("buscadorInput")
 
 function abrirBuscador() {
@@ -649,6 +650,17 @@ function limpiarResaltadosBusqueda() {
   resultadosBusqueda = []
   indiceResultado = 0
 
+  elementosMarcados.forEach(el => {
+    if (el.isContentEditable) {
+      const plano = el.textContent
+      el.textContent = plano
+    } else if (el.dataset.busquedaOriginalHtml !== undefined) {
+      el.innerHTML = el.dataset.busquedaOriginalHtml
+    }
+    delete el.dataset.busquedaOriginalHtml
+  })
+  elementosMarcados.clear()
+
   document.querySelectorAll(".articulo").forEach(a => {
     a.classList.remove("resaltado-busqueda")
     a.classList.remove("resaltado-busqueda-activo")
@@ -657,13 +669,6 @@ function limpiarResaltadosBusqueda() {
   document.querySelectorAll(".resaltado-busqueda-activo").forEach(el =>
     el.classList.remove("resaltado-busqueda-activo")
   )
-
-  document.querySelectorAll(".resaltado-busqueda-marca, .resaltado-busqueda-marca-activa").forEach(marca => {
-    const parent = marca.parentNode
-    if (!parent) return
-    parent.replaceChild(document.createTextNode(marca.textContent), marca)
-    parent.normalize()
-  })
 }
 
 function resaltarResultadoActual(mantenerFocoBuscador = false) {
@@ -765,6 +770,11 @@ function marcarCoincidencias(elemento, termino, articulo) {
 
   const largo = termino.length
   if (!largo) return
+
+  if (elemento.dataset.busquedaOriginalHtml === undefined) {
+    elemento.dataset.busquedaOriginalHtml = elemento.innerHTML
+    elementosMarcados.add(elemento)
+  }
 
   const nodosTexto = []
   const walker = document.createTreeWalker(elemento, NodeFilter.SHOW_TEXT, {
