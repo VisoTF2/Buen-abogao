@@ -425,6 +425,12 @@
       align-items: center;
     }
 
+    .articulo-titulo-texto {
+      flex: 1;
+      display: block;
+      min-width: 0;
+    }
+
     .indicador {
       font-size: 18px;
       font-weight: bold;
@@ -750,7 +756,7 @@ function ejecutarBusqueda(termino) {
   }
 
   document.querySelectorAll(".articulo").forEach(art => {
-    const titulo = art.querySelector(".articulo-titulo")
+    const titulo = art.querySelector(".articulo-titulo-texto") || art.querySelector(".articulo-titulo")
     const contenido = art.querySelector(".articulo-contenido")
     const nota = art.querySelector(".nota-box")
 
@@ -1163,7 +1169,7 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
 
     const titulo = document.createElement("div")
     titulo.className = "articulo-titulo"
-    titulo.innerHTML = `Artículo ${a.numero} <span class="indicador">▶</span>`
+    titulo.innerHTML = `<span class="articulo-titulo-texto">Artículo ${a.numero}</span><span class="indicador">▶</span>`
     titulo.style.color = a.color
 
     const norm = document.createElement("div")
