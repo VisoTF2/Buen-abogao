@@ -331,6 +331,11 @@
       background: rgba(30, 58, 138, 0.08);
     }
 
+    .menu-contextual button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
     .menu-contextual svg {
       width: 16px;
       height: 16px;
@@ -641,15 +646,16 @@
     <h4>Acciones</h4>
     <button type="button" data-accion="copiar" onclick="copiarSeleccion(event)">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M8 8.5V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-        <rect x="4" y="8.5" width="10" height="11" rx="2" stroke-width="1.8" />
+        <rect x="6.5" y="6.5" width="11" height="11" rx="2" stroke-width="1.8" />
+        <rect x="4.5" y="4.5" width="11" height="11" rx="2" stroke-width="1.8" />
       </svg>
       Copiar selección
     </button>
     <button type="button" data-accion="pegar" onclick="pegarDesdePortapapeles(event)">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="7" y="5" width="10" height="15" rx="2.5" stroke-width="1.8" />
-        <path d="M12 10v6" stroke-width="1.8" stroke-linecap="round" />
+        <rect x="6" y="5" width="12" height="14" rx="2" stroke-width="1.8" />
+        <rect x="9" y="3" width="6" height="3" rx="1" stroke-width="1.8" />
+        <path d="M12 10v5" stroke-width="1.8" stroke-linecap="round" />
         <path d="m9.5 12.5 2.5 2.5 2.5-2.5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
       Pegar en el campo
@@ -730,10 +736,6 @@ function esCampoEditable(elem) {
 
 function mostrarMenuContextual(event) {
   ocultarMenuContextual()
-  objetivoContextual = event.target
-  const destinoEditable = esCampoEditable(objetivoContextual)
-  const botonPegar = menuContextual.querySelector('[data-accion="pegar"]')
-  if (botonPegar) botonPegar.disabled = !destinoEditable
 
   const menuWidth = menuContextual.offsetWidth || 190
   const menuHeight = menuContextual.offsetHeight || 120
@@ -760,20 +762,7 @@ async function copiarSeleccion(event) {
   if (event) event.stopPropagation()
 
   const seleccion = window.getSelection()
-  let texto = seleccion ? seleccion.toString() : ""
-
-  if (!texto && objetivoContextual) {
-    const destino = esCampoEditable(objetivoContextual)
-    if (destino) {
-      if (destino.value !== undefined) {
-        const start = destino.selectionStart ?? 0
-        const end = destino.selectionEnd ?? destino.value.length
-        texto = destino.value.substring(start, end) || destino.value
-      } else {
-        texto = destino.textContent || ""
-      }
-    }
-  }
+  const texto = seleccion && !seleccion.isCollapsed ? seleccion.toString() : ""
 
   if (!texto) {
     ocultarMenuContextual()
@@ -840,6 +829,20 @@ async function pegarDesdePortapapeles(event) {
 }
 
 document.addEventListener("contextmenu", e => {
+  const seleccion = window.getSelection()
+  const haySeleccion = seleccion && !seleccion.isCollapsed && seleccion.toString().trim() !== ""
+  const destinoEditable = esCampoEditable(e.target)
+
+  if (!haySeleccion && !destinoEditable) return
+
+  objetivoContextual = destinoEditable || null
+
+  const botonCopiar = menuContextual.querySelector('[data-accion="copiar"]')
+  if (botonCopiar) botonCopiar.disabled = !haySeleccion
+
+  const botonPegar = menuContextual.querySelector('[data-accion="pegar"]')
+  if (botonPegar) botonPegar.disabled = !destinoEditable
+
   e.preventDefault()
   mostrarMenuContextual(e)
 })
