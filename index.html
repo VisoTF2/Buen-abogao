@@ -185,6 +185,59 @@
       font-size: 13px;
     }
 
+    .buscador-flotante {
+      position: fixed;
+      top: 18px;
+      right: 22px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+      z-index: 50;
+    }
+
+    .buscador-flotante.activo {
+      display: flex;
+    }
+
+    .buscador-input {
+      min-width: 280px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 2px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 15px;
+    }
+
+    .buscador-info {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .buscador-cerrar {
+      background: none;
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px 6px;
+    }
+
+    .resaltado-busqueda {
+      outline: 2px solid #f59e0b;
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+    }
+
+    .resaltado-busqueda-activo {
+      outline: 3px solid #fbbf24;
+      box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.45);
+    }
+
 .layout {
   display: flex;
   align-items: flex-start;
@@ -456,6 +509,17 @@
     <button class="modo" onclick="toggleModo()">Modo oscuro</button>
   </header>
 
+  <div class="buscador-flotante" id="buscadorFlotante">
+    <input
+      type="text"
+      id="buscadorInput"
+      class="buscador-input"
+      placeholder="Buscar en materias y artículos"
+    >
+    <div class="buscador-info" id="buscadorInfo">Usa Enter para saltar al siguiente</div>
+    <button class="buscador-cerrar" onclick="cerrarBuscador()" aria-label="Cerrar buscador">✕</button>
+  </div>
+
   <div class="container">
 
     <div class="layout">
@@ -500,6 +564,118 @@ let codigoActual = {}
 let articulos = JSON.parse(localStorage.getItem("articulosGuardados") || "[]")
 let normativaSeleccionada = null
 let materiaSeleccionada = null
+let resultadosBusqueda = []
+let indiceResultado = 0
+let ultimoTerminoBusqueda = ""
+
+function abrirBuscador() {
+  const panel = document.getElementById("buscadorFlotante")
+  panel.classList.add("activo")
+
+  const input = document.getElementById("buscadorInput")
+  input.focus()
+  input.select()
+
+  if (ultimoTerminoBusqueda.trim() !== "") {
+    input.value = ultimoTerminoBusqueda
+    ejecutarBusqueda(ultimoTerminoBusqueda)
+  }
+}
+
+function cerrarBuscador() {
+  document.getElementById("buscadorFlotante").classList.remove("activo")
+  limpiarResaltadosBusqueda()
+}
+
+function limpiarResaltadosBusqueda() {
+  document.querySelectorAll(".articulo").forEach(a => {
+    a.classList.remove("resaltado-busqueda")
+    a.classList.remove("resaltado-busqueda-activo")
+  })
+}
+
+function resaltarResultadoActual() {
+  document.querySelectorAll(".resaltado-busqueda-activo").forEach(el =>
+    el.classList.remove("resaltado-busqueda-activo")
+  )
+
+  if (!resultadosBusqueda.length) return
+
+  const actual = resultadosBusqueda[indiceResultado]
+  actual.classList.add("resaltado-busqueda-activo")
+  actual.scrollIntoView({ behavior: "smooth", block: "center" })
+}
+
+function ejecutarBusqueda(termino) {
+  ultimoTerminoBusqueda = termino
+  const limpio = termino.trim().toLowerCase()
+  const info = document.getElementById("buscadorInfo")
+
+  limpiarResaltadosBusqueda()
+  resultadosBusqueda = []
+  indiceResultado = 0
+
+  if (!limpio) {
+    info.textContent = "Escribe una palabra clave"
+    return
+  }
+
+  document.querySelectorAll(".articulo").forEach(art => {
+    const titulo = art.querySelector(".articulo-titulo")?.textContent || ""
+    const contenido = art.querySelector(".articulo-contenido")?.textContent || ""
+    const nota = art.querySelector(".nota-box")?.value || ""
+
+    const texto = `${titulo} ${contenido} ${nota}`.toLowerCase()
+    if (texto.includes(limpio)) {
+      art.classList.add("resaltado-busqueda")
+      resultadosBusqueda.push(art)
+    }
+  })
+
+  if (!resultadosBusqueda.length) {
+    info.textContent = "Sin resultados"
+    return
+  }
+
+  info.textContent = `${resultadosBusqueda.length} resultado(s)`
+  resaltarResultadoActual()
+}
+
+function irAlSiguienteResultado() {
+  if (!resultadosBusqueda.length) return
+  indiceResultado = (indiceResultado + 1) % resultadosBusqueda.length
+  resaltarResultadoActual()
+}
+
+function reaplicarBusqueda() {
+  const panel = document.getElementById("buscadorFlotante")
+  if (panel.classList.contains("activo") && ultimoTerminoBusqueda.trim() !== "") {
+    ejecutarBusqueda(ultimoTerminoBusqueda)
+  }
+}
+
+window.addEventListener("keydown", e => {
+  const isCtrlF = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f"
+  const isF3 = e.key === "F3"
+  if (isCtrlF || isF3) {
+    e.preventDefault()
+    abrirBuscador()
+  }
+})
+
+document.getElementById("buscadorInput").addEventListener("input", e => {
+  ejecutarBusqueda(e.target.value)
+})
+
+document.getElementById("buscadorInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    e.preventDefault()
+    irAlSiguienteResultado()
+  }
+  if (e.key === "Escape") {
+    cerrarBuscador()
+  }
+})
 
 function toggleModo() {
   document.body.classList.toggle("oscuro")
@@ -657,6 +833,7 @@ function ordenarYMostrar() {
       : []
 
   mostrarArticulosDeMateria(normativaSeleccionada, materiaSeleccionada, itemsSeleccionados)
+  reaplicarBusqueda()
 }
 
 function mostrarArticulosDeMateria(normativa, materia, items) {
