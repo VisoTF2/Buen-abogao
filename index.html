@@ -146,6 +146,27 @@
       transition: 0.2s;
     }
 
+    .buscador-btn {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+      transition: background 0.2s ease, transform 0.15s ease;
+    }
+
+    .buscador-btn:hover { background: var(--accent-light); }
+
+    .buscador-btn:active { transform: scale(0.96); }
+
     .btn-primary:hover { background: var(--accent-light); }
 
     .btn-small {
@@ -538,8 +559,16 @@
       <div class="sidebarMaterias" id="sidebarMaterias"></div>
 
       <div class="mainPanel">
-        <div class="form-articulo">
+        <div class="form-articulo" style="position: relative;">
           <h2>Agregar Artículo</h2>
+          <button
+            class="buscador-btn"
+            onclick="abrirBuscador()"
+            aria-label="Abrir buscador"
+            title="Buscar (Ctrl+F o F3)"
+          >
+            🔍
+          </button>
 
           <div class="form-row">
             <div>
@@ -579,17 +608,17 @@ let materiaSeleccionada = null
 let resultadosBusqueda = []
 let indiceResultado = 0
 let ultimoTerminoBusqueda = ""
+const buscadorInput = document.getElementById("buscadorInput")
 
 function abrirBuscador() {
   const panel = document.getElementById("buscadorFlotante")
   panel.classList.add("activo")
 
-  const input = document.getElementById("buscadorInput")
-  input.focus()
-  input.select()
+  buscadorInput.focus()
+  buscadorInput.select()
 
   if (ultimoTerminoBusqueda.trim() !== "") {
-    input.value = ultimoTerminoBusqueda
+    buscadorInput.value = ultimoTerminoBusqueda
     ejecutarBusqueda(ultimoTerminoBusqueda)
   }
 }
@@ -613,7 +642,9 @@ function limpiarResaltadosBusqueda() {
   if (sel) sel.removeAllRanges()
 }
 
-function resaltarResultadoActual() {
+function resaltarResultadoActual(mantenerFocoBuscador = false) {
+  const habiaFocoEnBuscador = mantenerFocoBuscador || document.activeElement === buscadorInput
+
   document.querySelectorAll(".resaltado-busqueda-activo").forEach(el =>
     el.classList.remove("resaltado-busqueda-activo")
   )
@@ -643,9 +674,14 @@ function resaltarResultadoActual() {
 
   if (actual.tipo === "nota") {
     actual.nodo.classList.add("resaltado-busqueda-activo")
-    actual.nodo.focus()
     actual.nodo.setSelectionRange(actual.inicio, actual.fin)
     actual.nodo.scrollIntoView({ behavior: "smooth", block: "center" })
+
+    if (habiaFocoEnBuscador) {
+      buscadorInput.focus({ preventScroll: true })
+      const caret = buscadorInput.value.length
+      buscadorInput.setSelectionRange(caret, caret)
+    }
     return
   }
 
@@ -658,6 +694,12 @@ function resaltarResultadoActual() {
     if (articulo) articulo.classList.add("resaltado-busqueda-activo")
     const destino = rango.startContainer.parentElement || articulo
     if (destino) destino.scrollIntoView({ behavior: "smooth", block: "center" })
+  }
+
+  if (habiaFocoEnBuscador) {
+    buscadorInput.focus({ preventScroll: true })
+    const caret = buscadorInput.value.length
+    buscadorInput.setSelectionRange(caret, caret)
   }
 }
 
@@ -691,7 +733,7 @@ function ejecutarBusqueda(termino) {
   }
 
   info.textContent = `${resultadosBusqueda.length} resultado(s)`
-  resaltarResultadoActual()
+  resaltarResultadoActual(true)
 }
 
 function marcarCoincidencias(elemento, termino, articulo) {
@@ -769,10 +811,10 @@ function crearRangoEnNodo(elemento, inicio, fin) {
   return rango
 }
 
-function irAlSiguienteResultado() {
+function irAlSiguienteResultado(mantenerFocoBuscador = false) {
   if (!resultadosBusqueda.length) return
   indiceResultado = (indiceResultado + 1) % resultadosBusqueda.length
-  resaltarResultadoActual()
+  resaltarResultadoActual(mantenerFocoBuscador)
 }
 
 function reaplicarBusqueda() {
@@ -791,14 +833,14 @@ window.addEventListener("keydown", e => {
   }
 })
 
-document.getElementById("buscadorInput").addEventListener("input", e => {
+buscadorInput.addEventListener("input", e => {
   ejecutarBusqueda(e.target.value)
 })
 
-document.getElementById("buscadorInput").addEventListener("keydown", e => {
+buscadorInput.addEventListener("keydown", e => {
   if (e.key === "Enter") {
     e.preventDefault()
-    irAlSiguienteResultado()
+    irAlSiguienteResultado(true)
   }
   if (e.key === "Escape") {
     cerrarBuscador()
