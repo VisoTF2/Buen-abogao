@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buen abogao</title>
+
+  <style>
+    :root {
+      --bg: #eef1f5;
+      --text: #111827;
+      --card: white;
+      --border: #d1d5db;
+      --accent: #1e3a8a;
+      --accent-light: #3b5ccc;
+      --article-bg: #f8fafc;
+    }
+
+    body.oscuro {
+      --bg: #0d1117;
+      --text: #e6edf3;
+      --card: #161b22;
+      --border: #30363d;
+      --accent: #3b82f6;
+      --accent-light: #60a5fa;
+      --article-bg: #1c2128;
+    }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      transition: 0.25s ease;
+    }
+
+    header {
+      background: var(--accent);
+      color: white;
+      padding: 25px;
+      text-align: center;
+      font-size: 28px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    }
+
+    .modo {
+      margin-top: 12px;
+      background: white;
+      color: var(--accent);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    body.oscuro .modo {
+      background: #30363d;
+      color: white;
+    }
+
+ .container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 20px auto;
+  background: var(--card);
+  padding: 20px 24px;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  box-sizing: border-box; /* ← MUY IMPORTANTE */
+}
+
+    h2 {
+      margin: 0 0 16px 0;
+      padding-left: 12px;
+      border-left: 5px solid var(--accent);
+      color: var(--accent);
+      font-size: 22px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin: 18px 0 8px;
+    }
+
+    input, select {
+      padding: 14px;
+      width: 100%;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      font-size: 16px;
+      color: var(--text);
+      box-sizing: border-box;
+      transition: 0.25s ease;
+    }
+
+    input:focus,
+    textarea:focus,
+    .articulo-contenido:focus {
+      outline: none !important;
+      border-color: #000 !important;
+      box-shadow: none !important;
+    }
+
+    select:focus {
+      outline: none !important;
+      border-color: #000 !important;
+      box-shadow: none !important;
+    }
+
+    .nota-box {
+      font-family: "Segoe UI Semibold", Arial, sans-serif !important;
+      font-size: 16px;
+    }
+
+    .materia-title {
+      font-size: 21px;
+      font-weight: bold;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 6px;
+      flex: 1;
+      cursor: text;
+    }
+
+    body.oscuro .nota-box {
+      color: #fff !important;
+    }
+
+    select { appearance: none; }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      width: 100%;
+      border: none;
+      margin-top: 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-primary:hover { background: var(--accent-light); }
+
+    .btn-small {
+      background: #dc2626;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-small:hover { background: #b91c1c; }
+
+    .btn-note {
+      background: var(--accent);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+      margin-right: 10px;
+      font-size: 13px;
+      transition: 0.2s;
+    }
+
+    .btn-note-delete {
+      background: #6b7280;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      margin-top: 10px;
+      margin-right: 10px;
+      font-size: 13px;
+    }
+
+.layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.sidebarMaterias {
+  width: 260px;
+  background: var(--card);
+  padding: 14px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sidebarGroupTitle {
+  font-family: "Arial", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 10px 4px 6px;
+  color: var(--accent);
+}
+
+    .sidebarItem {
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      border-left: 6px solid var(--accent);
+      background: var(--article-bg);
+      transition: 0.15s ease;
+      font-size: 14px;
+    }
+
+    .sidebarItem:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+    }
+
+    .sidebarItem.activa {
+      background: var(--accent);
+      color: white;
+    }
+
+    .mainPanel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-articulo {
+      background: var(--card);
+      padding: 16px 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    
+.form-articulo h2 {
+  margin-top: 10px;
+}
+
+   .form-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1.2fr;
+  gap: 16px; /* Para que los tres campos respiren igual */
+  align-items: center;
+}
+    .contenidoArticulos {
+      margin-top: 10px;
+    }
+
+    .materia-wrap {
+      margin-top: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .materia-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .materia-color-input {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      background: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .materia-color-input::-webkit-color-swatch-wrapper {
+      padding: 0;
+      border-radius: 50%;
+    }
+
+    .materia-color-input::-webkit-color-swatch {
+      border: none;
+      border-radius: 50%;
+    }
+
+    .articulo {
+      background: var(--article-bg);
+      padding: 16px;
+      border-radius: 10px;
+      border-left: 6px solid var(--accent);
+      margin-top: 14px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.07);
+      cursor: pointer;
+      position: relative;
+      transition: 0.15s ease;
+    }
+
+    .articulo:hover {
+      transform: scale(1.015);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+    }
+
+    .articulo-titulo {
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .indicador {
+      font-size: 18px;
+      font-weight: bold;
+      transition: 0.25s ease;
+    }
+
+    .articulo.abierto .indicador {
+      transform: rotate(90deg);
+    }
+
+    .articulo-contenido {
+      display: none;
+      margin-top: 12px;
+      font-size: 15px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      white-space: pre-wrap;
+      line-height: 1.55;
+    }
+
+    .articulo-contenido:focus {
+      border-color: #000;
+      background: rgba(0,0,0,0.02);
+      outline: none;
+    }
+
+    .articulo.abierto .articulo-contenido { display: block; }
+
+    .nota-box {
+      display: none;
+      width: 100%;
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 8px;
+      border: 2px solid var(--border);
+      background: var(--card);
+      resize: none;
+      min-height: 70px;
+      box-sizing: border-box;
+    }
+
+.materia-title {
+  font-size: 21px;
+  font-weight: bold;
+  padding-bottom: 6px;
+  flex: 1;
+  cursor: text;
+  border-bottom: 2px solid currentColor;
+  transition: color 0.25s ease;
+}
+
+.materia-title:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border-bottom: 2px solid currentColor !important;
+}
+
+    .nota-resizer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 14px;
+      width: 100%;
+      cursor: ns-resize;
+      display: none;
+    }
+
+    #errorBox {
+      display: none;
+      background: #dc2626;
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 15px;
+      font-weight: bold;
+      text-align: center;
+    }
+/* Fuerza a que sidebar y el panel principal mantengan proporción */
+.layout {
+  align-items: stretch;
+}
+
+/* Sidebar: tamaño fijo en grandes pantallas */
+.sidebarMaterias {
+  flex-shrink: 0;
+  width: 260px;
+}
+
+/* Panel principal ocupa todo el espacio restante */
+.mainPanel {
+  min-width: 0;
+}
+
+/* Celular muy pequeño */
+@media (max-width: 600px) {
+  .layout {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+ .sidebarMaterias {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+  .mainPanel {
+    width: 100% !important;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Tablets y ventanas medianas deben mantenerse horizontales */
+@media (max-width: 900px) and (min-width: 601px) {
+  .form-row {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+  </style>
+</head>
+
+<body>
+  <header>
+    Buen abogao <br>
+    <button class="modo" onclick="toggleModo()">Modo oscuro</button>
+  </header>
+
+  <div class="container">
+
+    <div class="layout">
+      <div class="sidebarMaterias" id="sidebarMaterias"></div>
+
+      <div class="mainPanel">
+        <div class="form-articulo">
+          <h2>Agregar Artículo</h2>
+
+          <div class="form-row">
+            <div>
+              <label>Seleccionar normativa</label>
+              <select id="normativa">
+                <option value="civil">Código Civil</option>
+                <option value="penal">Código Penal</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Número del Artículo</label>
+              <input type="number" id="numeroArticulo" placeholder="Ejemplo: 128">
+            </div>
+
+            <div>
+              <label>Materia</label>
+              <input type="text" id="materiaArticulo" placeholder="Ejemplo: Sucesión">
+            </div>
+          </div>
+
+          <button class="btn-primary" onclick="agregarArticulo()">Agregar Artículo</button>
+          <div id="errorBox"></div>
+        </div>
+
+        <div class="contenidoArticulos" id="contenidoArticulos"></div>
+      </div>
+    </div>
+
+  </div>
+
+<script>
+let codigoActual = {}
+let articulos = JSON.parse(localStorage.getItem("articulosGuardados") || "[]")
+let normativaSeleccionada = null
+let materiaSeleccionada = null
+
+function toggleModo() {
+  document.body.classList.toggle("oscuro")
+}
+
+function cargarNormativa() {
+  const val = document.getElementById("normativa").value
+  const archivo = val === "civil" ? "codigo_civil_pdf.json" : "codigo_penal_pdf.json"
+
+  fetch(archivo)
+    .then(r => r.json())
+    .then(d => {
+      codigoActual = d
+      ordenarYMostrar()
+    })
+    .catch(() => mostrarError("No se pudo cargar el archivo"))
+}
+
+cargarNormativa()
+document.getElementById("normativa").addEventListener("change", cargarNormativa)
+
+function mostrarError(msg) {
+  const box = document.getElementById("errorBox")
+  box.textContent = msg
+  box.style.display = "block"
+}
+
+function obtenerColorMateria(nombre) {
+  const art = articulos.find(a => a.materia === nombre && a.color)
+  return art ? art.color : "#1e3a8a"
+}
+
+function agregarArticulo() {
+  const num = parseInt(document.getElementById("numeroArticulo").value)
+  const mat = document.getElementById("materiaArticulo").value.trim()
+
+  document.getElementById("errorBox").style.display = "none"
+
+  if (!num || !mat) return mostrarError("Debe ingresar número y materia")
+
+  const cont = codigoActual[num]
+  if (!cont) return mostrarError("Ese artículo no existe en la base")
+
+  const norm = document.getElementById("normativa").value
+
+  articulos.push({
+    id: Date.now(),
+    numero: num,
+    materia: mat,
+    contenido: cont,
+    contenidoEditado: "",
+    normativa: norm,
+    nota: "",
+    color: obtenerColorMateria(mat)
+  })
+
+  normativaSeleccionada = norm
+  materiaSeleccionada = mat
+
+  guardarLocal()
+  ordenarYMostrar()
+
+  document.getElementById("numeroArticulo").value = ""
+  document.getElementById("materiaArticulo").value = ""
+  document.getElementById("numeroArticulo").focus()
+}
+
+function ordenarYMostrar() {
+  const sidebar = document.getElementById("sidebarMaterias")
+  const contenedorArticulos = document.getElementById("contenidoArticulos")
+
+  sidebar.innerHTML = ""
+  contenedorArticulos.innerHTML = ""
+
+  const agrupado = { civil: {}, penal: {} }
+
+  articulos.forEach(a => {
+    if (!agrupado[a.normativa]) agrupado[a.normativa] = {}
+    if (!agrupado[a.normativa][a.materia]) agrupado[a.normativa][a.materia] = []
+    agrupado[a.normativa][a.materia].push(a)
+  })
+
+  const combos = []
+  let tieneSeleccionValida = false
+
+  const ordenNormativas = ["civil", "penal"]
+  ordenNormativas.forEach(norm => {
+    const materiasObj = agrupado[norm]
+    const nombresMaterias = Object.keys(materiasObj || {}).sort()
+    if (!nombresMaterias.length) return
+
+    const tituloGrupo = document.createElement("div")
+    tituloGrupo.className = "sidebarGroupTitle"
+    tituloGrupo.textContent = norm === "civil" ? "Código Civil" : "Código Penal"
+    sidebar.appendChild(tituloGrupo)
+
+    nombresMaterias.forEach(m => {
+      const item = document.createElement("div")
+      item.className = "sidebarItem"
+      item.textContent = m
+      item.dataset.normativa = norm
+      item.dataset.materia = m
+      item.style.borderLeftColor = obtenerColorMateria(m)
+
+      item.addEventListener("mousedown", e => e.preventDefault())
+
+      item.addEventListener("click", () => {
+        normativaSeleccionada = norm
+        materiaSeleccionada = m
+        sidebar.querySelectorAll(".sidebarItem").forEach(i => i.classList.remove("activa"))
+        item.classList.add("activa")
+        mostrarArticulosDeMateria(norm, m, agrupado[norm][m])
+      })
+
+      if (norm === normativaSeleccionada && m === materiaSeleccionada) {
+        item.classList.add("activa")
+        tieneSeleccionValida = true
+      }
+
+      sidebar.appendChild(item)
+      combos.push({ normativa: norm, materia: m })
+    })
+  })
+
+  if (!combos.length) {
+  // Sidebar vacío
+  sidebar.innerHTML = "<div class='sidebarGroupTitle'>Materias</div>";
+
+  // Panel principal vacío
+  contenedorArticulos.innerHTML = `
+    <h2 style="text-align:center; opacity:0.7; margin-top:40px;">
+      No hay materias aún
+    </h2>
+    <p style="text-align:center; opacity:0.5;">
+      Agrega artículos para crear automáticamente tu primera materia.
+    </p>
+  `;
+
+  return;
+}
+
+  if (!tieneSeleccionValida) {
+    normativaSeleccionada = combos[0].normativa
+    materiaSeleccionada = combos[0].materia
+  }
+
+  const activo = sidebar.querySelector(
+    `.sidebarItem[data-normativa="${normativaSeleccionada}"][data-materia="${materiaSeleccionada}"]`
+  )
+  if (activo) activo.classList.add("activa")
+
+  const itemsSeleccionados =
+    agrupado[normativaSeleccionada] && agrupado[normativaSeleccionada][materiaSeleccionada]
+      ? agrupado[normativaSeleccionada][materiaSeleccionada]
+      : []
+
+  mostrarArticulosDeMateria(normativaSeleccionada, materiaSeleccionada, itemsSeleccionados)
+}
+
+function mostrarArticulosDeMateria(normativa, materia, items) {
+  const contenedor = document.getElementById("contenidoArticulos")
+  contenedor.innerHTML = ""
+
+  const wrap = document.createElement("div")
+  wrap.className = "materia-wrap"
+
+  const tituloM = document.createElement("div")
+  tituloM.className = "materia-title"
+  tituloM.contentEditable = "true"
+  tituloM.textContent = materia
+  const colorMateria = obtenerColorMateria(materia)
+  tituloM.style.color = colorMateria
+  tituloM.style.borderBottomColor = colorMateria
+
+  // Nombre actual que se va actualizando en vivo
+  let nombreActual = materia
+
+  // Actualización en tiempo real sin perder foco
+  tituloM.addEventListener("input", () => {
+    const nuevo = tituloM.textContent.trim()
+    if (nuevo === "" || nuevo === nombreActual) return
+
+    articulos.forEach(a => {
+      if (a.materia === nombreActual && a.normativa === normativa) {
+        a.materia = nuevo
+      }
+    })
+
+    document.querySelectorAll(".sidebarItem").forEach(item => {
+      if (item.dataset.materia === nombreActual && item.dataset.normativa === normativa) {
+        item.dataset.materia = nuevo
+        item.textContent = nuevo
+      }
+    })
+
+    nombreActual = nuevo
+    materiaSeleccionada = nuevo
+    guardarLocal()
+  })
+
+  // Al salir del título se reordena todo
+  tituloM.addEventListener("blur", () => {
+    ordenarYMostrar()
+  })
+
+  const controles = document.createElement("div")
+  controles.className = "materia-controls"
+
+  const colorInput = document.createElement("input")
+  colorInput.type = "color"
+  colorInput.className = "materia-color-input"
+  colorInput.value = colorMateria
+
+  colorInput.addEventListener("click", e => e.stopPropagation())
+  colorInput.addEventListener("pointerdown", e => e.stopImmediatePropagation())
+
+  colorInput.addEventListener("input", () => {
+    const nuevoColor = colorInput.value
+    tituloM.style.color = nuevoColor
+    tituloM.style.borderBottomColor = nuevoColor
+
+    const tarjetas = contenedor.querySelectorAll(".articulo")
+    tarjetas.forEach(t => {
+      if (t.dataset.materia === nombreActual) {
+        t.style.borderLeftColor = nuevoColor
+        const tituloArt = t.querySelector(".articulo-titulo")
+        if (tituloArt) tituloArt.style.color = nuevoColor
+      }
+    })
+
+    const sidebarItems = document.querySelectorAll(".sidebarItem")
+    sidebarItems.forEach(si => {
+      if (si.dataset.materia === nombreActual) {
+        si.style.borderLeftColor = nuevoColor
+      }
+    })
+  })
+
+  colorInput.addEventListener("change", () => {
+    const nuevoColor = colorInput.value
+    articulos.forEach(a => {
+      if (a.materia === nombreActual && a.normativa === normativa) a.color = nuevoColor
+    })
+    guardarLocal()
+  })
+
+  const borrarMat = document.createElement("button")
+  borrarMat.className = "btn-small"
+  borrarMat.textContent = "Borrar materia"
+  borrarMat.onclick = () => borrarMateria(nombreActual)
+
+  controles.appendChild(colorInput)
+  controles.appendChild(borrarMat)
+
+  wrap.appendChild(tituloM)
+  wrap.appendChild(controles)
+  contenedor.appendChild(wrap)
+
+  items.sort((a, b) => a.numero - b.numero).forEach(a => {
+    const box = document.createElement("div")
+    box.className = "articulo"
+    box.style.borderLeftColor = a.color
+    box.dataset.id = a.id
+    box.dataset.materia = a.materia
+
+    const titulo = document.createElement("div")
+    titulo.className = "articulo-titulo"
+    titulo.innerHTML = `Artículo ${a.numero} <span class="indicador">▶</span>`
+    titulo.style.color = a.color
+
+    const norm = document.createElement("div")
+    norm.style.fontSize = "13px"
+    norm.style.color = "#6b7280"
+    norm.textContent = a.normativa === "civil" ? "Normativa Código Civil" : "Normativa Código Penal"
+
+    const contenido = document.createElement("div")
+    contenido.className = "articulo-contenido"
+    contenido.contentEditable = "true"
+    contenido.textContent = a.contenidoEditado || a.contenido
+
+    contenido.addEventListener("input", () => {
+      a.contenidoEditado = contenido.textContent
+      guardarLocal()
+    })
+
+    contenido.addEventListener("click", e => e.stopPropagation())
+
+    const botonNota = document.createElement("button")
+    botonNota.className = "btn-note"
+    botonNota.textContent = "Agregar nota"
+    botonNota.style.display = "none"
+
+    const botonEliminarNota = document.createElement("button")
+    botonEliminarNota.className = "btn-note-delete"
+    botonEliminarNota.textContent = "Eliminar nota"
+    botonEliminarNota.style.display = "none"
+
+    const notaBox = document.createElement("textarea")
+    notaBox.className = "nota-box"
+    notaBox.value = a.nota || ""
+
+    notaBox.addEventListener("click", e => e.stopPropagation())
+    notaBox.addEventListener("input", () => {
+      a.nota = notaBox.value
+      guardarLocal()
+      if (notaBox.value.trim() !== "") {
+        botonEliminarNota.style.display = "inline-block"
+      }
+    })
+
+    const resizer = document.createElement("div")
+    resizer.className = "nota-resizer"
+
+    resizer.addEventListener("mousedown", e => {
+      e.stopPropagation()
+      const startY = e.clientY
+      const startHeight = notaBox.offsetHeight
+
+      function mover(ev) {
+        const nueva = startHeight + (ev.clientY - startY)
+        notaBox.style.height = Math.max(nueva, 70) + "px"
+      }
+
+      function stop() {
+        window.removeEventListener("mousemove", mover)
+        window.removeEventListener("mouseup", stop)
+      }
+
+      window.addEventListener("mousemove", mover)
+      window.addEventListener("mouseup", stop)
+    })
+
+    botonNota.addEventListener("click", e => {
+      e.stopPropagation()
+      notaBox.style.display = "block"
+      resizer.style.display = "block"
+      notaBox.focus()
+    })
+
+    botonEliminarNota.addEventListener("click", e => {
+      e.stopPropagation()
+      notaBox.value = ""
+      a.nota = ""
+      guardarLocal()
+      notaBox.style.display = "none"
+      resizer.style.display = "none"
+      botonEliminarNota.style.display = "none"
+    })
+
+    if (a.nota && a.nota.trim() !== "") {
+      notaBox.style.display = "block"
+      resizer.style.display = "block"
+      botonEliminarNota.style.display = "inline-block"
+    }
+
+    const botonBorrar = document.createElement("button")
+    botonBorrar.className = "btn-small"
+    botonBorrar.textContent = "Eliminar artículo"
+    botonBorrar.style.marginTop = "16px"
+    botonBorrar.addEventListener("click", e => {
+      e.stopPropagation()
+      borrarArticulo(a.id)
+    })
+
+    box.appendChild(titulo)
+    box.appendChild(norm)
+    box.appendChild(contenido)
+    box.appendChild(botonNota)
+    box.appendChild(botonEliminarNota)
+    box.appendChild(notaBox)
+    box.appendChild(resizer)
+    box.appendChild(botonBorrar)
+
+    box.addEventListener("click", () => {
+      const abierta = box.classList.toggle("abierto")
+
+      if (abierta) {
+        botonNota.style.display = "inline-block"
+        if (a.nota && a.nota.trim() !== "") {
+          notaBox.style.display = "block"
+          resizer.style.display = "block"
+          botonEliminarNota.style.display = "inline-block"
+        }
+      } else {
+        botonNota.style.display = "none"
+        if (!a.nota || a.nota.trim() === "") {
+          notaBox.style.display = "none"
+          resizer.style.display = "none"
+          botonEliminarNota.style.display = "none"
+        }
+      }
+    })
+
+    contenedor.appendChild(box)
+  })
+}
+
+function guardarLocal() {
+  localStorage.setItem("articulosGuardados", JSON.stringify(articulos))
+}
+
+function borrarArticulo(id) {
+  articulos = articulos.filter(a => a.id !== id)
+  guardarLocal()
+  ordenarYMostrar()
+}
+
+function borrarMateria(nombre) {
+  articulos = articulos.filter(a => a.materia !== nombre)
+  guardarLocal()
+  normativaSeleccionada = null
+  materiaSeleccionada = null
+  ordenarYMostrar()
+}
+
+ordenarYMostrar()
+</script>
+</body>
+</html>
