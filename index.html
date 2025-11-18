@@ -150,22 +150,30 @@
       position: absolute;
       top: 18px;
       right: 18px;
-      background: var(--accent);
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
       color: white;
       border: none;
-      border-radius: 50%;
-      width: 38px;
-      height: 38px;
-      display: grid;
-      place-items: center;
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       cursor: pointer;
       box-shadow: 0 4px 10px rgba(0,0,0,0.12);
       transition: background 0.2s ease, transform 0.15s ease;
+      font-weight: 600;
+      letter-spacing: 0.1px;
     }
 
-    .buscador-btn:hover { background: var(--accent-light); }
+    .buscador-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+    }
 
-    .buscador-btn:active { transform: scale(0.96); }
+    .buscador-btn:hover { background: linear-gradient(135deg, var(--accent-light), var(--accent)); }
+
+    .buscador-btn:active { transform: translateY(1px); }
 
     .btn-primary:hover { background: var(--accent-light); }
 
@@ -259,11 +267,16 @@
       box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.45);
     }
 
-    .coincidencia-busqueda {
+    .resaltado-busqueda-marca {
       background: #dbeafe;
       color: inherit;
-      padding: 0;
-      border-radius: 3px;
+      padding: 0 1px;
+      border-radius: 4px;
+    }
+
+    .resaltado-busqueda-marca-activa {
+      background: #a5c7ff;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
     }
 
     ::selection {
@@ -567,7 +580,11 @@
             aria-label="Abrir buscador"
             title="Buscar (Ctrl+F o F3)"
           >
-            🔍
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M10.5 4.5a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z" stroke-width="2" stroke-linecap="round" />
+              <path d="M15 15l4 4" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <span>Buscar</span>
           </button>
 
           <div class="form-row">
@@ -629,6 +646,9 @@ function cerrarBuscador() {
 }
 
 function limpiarResaltadosBusqueda() {
+  resultadosBusqueda = []
+  indiceResultado = 0
+
   document.querySelectorAll(".articulo").forEach(a => {
     a.classList.remove("resaltado-busqueda")
     a.classList.remove("resaltado-busqueda-activo")
@@ -638,8 +658,12 @@ function limpiarResaltadosBusqueda() {
     el.classList.remove("resaltado-busqueda-activo")
   )
 
-  const sel = window.getSelection()
-  if (sel) sel.removeAllRanges()
+  document.querySelectorAll(".resaltado-busqueda-marca, .resaltado-busqueda-marca-activa").forEach(marca => {
+    const parent = marca.parentNode
+    if (!parent) return
+    parent.replaceChild(document.createTextNode(marca.textContent), marca)
+    parent.normalize()
+  })
 }
 
 function resaltarResultadoActual(mantenerFocoBuscador = false) {
@@ -647,6 +671,10 @@ function resaltarResultadoActual(mantenerFocoBuscador = false) {
 
   document.querySelectorAll(".resaltado-busqueda-activo").forEach(el =>
     el.classList.remove("resaltado-busqueda-activo")
+  )
+
+  document.querySelectorAll(".resaltado-busqueda-marca-activa").forEach(el =>
+    el.classList.remove("resaltado-busqueda-marca-activa")
   )
 
   if (!resultadosBusqueda.length) return
@@ -685,15 +713,11 @@ function resaltarResultadoActual(mantenerFocoBuscador = false) {
     return
   }
 
-  const rango = crearRangoEnNodo(actual.nodo, actual.inicio, actual.fin)
-  const seleccion = window.getSelection()
-
-  if (seleccion && rango) {
-    seleccion.removeAllRanges()
-    seleccion.addRange(rango)
+  if (actual.tipo === "marca" && actual.nodo) {
+    actual.nodo.classList.add("resaltado-busqueda-marca-activa")
     if (articulo) articulo.classList.add("resaltado-busqueda-activo")
-    const destino = rango.startContainer.parentElement || articulo
-    if (destino) destino.scrollIntoView({ behavior: "smooth", block: "center" })
+    const destino = actual.nodo.closest(".articulo") || actual.nodo
+    destino.scrollIntoView({ behavior: "smooth", block: "center" })
   }
 
   if (habiaFocoEnBuscador) {
@@ -739,18 +763,61 @@ function ejecutarBusqueda(termino) {
 function marcarCoincidencias(elemento, termino, articulo) {
   if (!elemento) return
 
-  const textoMin = elemento.textContent.toLowerCase()
   const largo = termino.length
   if (!largo) return
 
-  let pos = textoMin.indexOf(termino)
+  const nodosTexto = []
+  const walker = document.createTreeWalker(elemento, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      if (!node.textContent.trim()) return NodeFilter.FILTER_REJECT
+      if (node.parentElement && node.parentElement.closest(".resaltado-busqueda-marca")) {
+        return NodeFilter.FILTER_REJECT
+      }
+      return NodeFilter.FILTER_ACCEPT
+    }
+  })
+
+  let nodo = walker.nextNode()
+  while (nodo) {
+    nodosTexto.push(nodo)
+    nodo = walker.nextNode()
+  }
+
   let hayCoincidencias = false
 
-  while (pos !== -1) {
+  nodosTexto.forEach(textNode => {
+    const textoOriginal = textNode.textContent
+    const textoMin = textoOriginal.toLowerCase()
+    let indice = textoMin.indexOf(termino)
+    if (indice === -1) return
+
     hayCoincidencias = true
-    resultadosBusqueda.push({ tipo: "texto", nodo: elemento, articulo, inicio: pos, fin: pos + largo })
-    pos = textoMin.indexOf(termino, pos + largo)
-  }
+    const frag = document.createDocumentFragment()
+    let ultimoCorte = 0
+
+    while (indice !== -1) {
+      if (indice > ultimoCorte) {
+        frag.appendChild(document.createTextNode(textoOriginal.slice(ultimoCorte, indice)))
+      }
+
+      const marca = document.createElement("span")
+      marca.className = "resaltado-busqueda-marca"
+      marca.textContent = textoOriginal.slice(indice, indice + largo)
+      resultadosBusqueda.push({ tipo: "marca", nodo: marca, articulo })
+      frag.appendChild(marca)
+
+      ultimoCorte = indice + largo
+      indice = textoMin.indexOf(termino, ultimoCorte)
+    }
+
+    if (ultimoCorte < textoOriginal.length) {
+      frag.appendChild(document.createTextNode(textoOriginal.slice(ultimoCorte)))
+    }
+
+    if (textNode.parentNode) {
+      textNode.parentNode.replaceChild(frag, textNode)
+    }
+  })
 
   if (hayCoincidencias) articulo.classList.add("resaltado-busqueda")
 }
@@ -778,37 +845,6 @@ function registrarCoincidenciasNota(nota, termino, articulo) {
   }
 
   if (hayCoincidencias) articulo.classList.add("resaltado-busqueda")
-}
-
-function crearRangoEnNodo(elemento, inicio, fin) {
-  const walker = document.createTreeWalker(elemento, NodeFilter.SHOW_TEXT, null)
-  let nodo = walker.nextNode()
-  let offset = 0
-  let inicioNodo = null
-  let finNodo = null
-
-  while (nodo) {
-    const siguienteOffset = offset + nodo.textContent.length
-
-    if (!inicioNodo && inicio <= siguienteOffset) {
-      inicioNodo = { nodo, pos: inicio - offset }
-    }
-
-    if (!finNodo && fin <= siguienteOffset) {
-      finNodo = { nodo, pos: fin - offset }
-      break
-    }
-
-    offset = siguienteOffset
-    nodo = walker.nextNode()
-  }
-
-  if (!inicioNodo || !finNodo) return null
-
-  const rango = document.createRange()
-  rango.setStart(inicioNodo.nodo, inicioNodo.pos)
-  rango.setEnd(finNodo.nodo, finNodo.pos)
-  return rango
 }
 
 function irAlSiguienteResultado(mantenerFocoBuscador = false) {
