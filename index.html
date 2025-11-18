@@ -229,20 +229,25 @@
     }
 
     .resaltado-busqueda {
-      outline: 2px solid #f59e0b;
-      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
-    }
-
-    .coincidencia-busqueda {
-      background: #fef08a;
-      color: inherit;
-      padding: 0 1px;
-      border-radius: 3px;
+      outline: 2px solid #93c5fd;
+      box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.35);
     }
 
     .resaltado-busqueda-activo {
-      outline: 3px solid #fbbf24;
-      box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.45);
+      outline: 3px solid #2563eb;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.45);
+    }
+
+    .coincidencia-busqueda {
+      background: #dbeafe;
+      color: inherit;
+      padding: 0;
+      border-radius: 3px;
+    }
+
+    ::selection {
+      background: #bfdbfe;
+      color: inherit;
     }
 
 .layout {
@@ -595,11 +600,6 @@ function cerrarBuscador() {
 }
 
 function limpiarResaltadosBusqueda() {
-  document.querySelectorAll("mark.coincidencia-busqueda").forEach(m => {
-    const text = document.createTextNode(m.textContent)
-    m.replaceWith(text)
-  })
-
   document.querySelectorAll(".articulo").forEach(a => {
     a.classList.remove("resaltado-busqueda")
     a.classList.remove("resaltado-busqueda-activo")
@@ -608,6 +608,9 @@ function limpiarResaltadosBusqueda() {
   document.querySelectorAll(".resaltado-busqueda-activo").forEach(el =>
     el.classList.remove("resaltado-busqueda-activo")
   )
+
+  const sel = window.getSelection()
+  if (sel) sel.removeAllRanges()
 }
 
 function resaltarResultadoActual() {
@@ -636,6 +639,8 @@ function resaltarResultadoActual() {
     }
   }
 
+  if (articulo) articulo.classList.add("resaltado-busqueda")
+
   if (actual.tipo === "nota") {
     actual.nodo.classList.add("resaltado-busqueda-activo")
     actual.nodo.focus()
@@ -644,8 +649,16 @@ function resaltarResultadoActual() {
     return
   }
 
-  actual.nodo.classList.add("resaltado-busqueda-activo")
-  actual.nodo.scrollIntoView({ behavior: "smooth", block: "center" })
+  const rango = crearRangoEnNodo(actual.nodo, actual.inicio, actual.fin)
+  const seleccion = window.getSelection()
+
+  if (seleccion && rango) {
+    seleccion.removeAllRanges()
+    seleccion.addRange(rango)
+    if (articulo) articulo.classList.add("resaltado-busqueda-activo")
+    const destino = rango.startContainer.parentElement || articulo
+    if (destino) destino.scrollIntoView({ behavior: "smooth", block: "center" })
+  }
 }
 
 function ejecutarBusqueda(termino) {
@@ -684,37 +697,20 @@ function ejecutarBusqueda(termino) {
 function marcarCoincidencias(elemento, termino, articulo) {
   if (!elemento) return
 
-  const texto = elemento.textContent
-  const textoMin = texto.toLowerCase()
+  const textoMin = elemento.textContent.toLowerCase()
   const largo = termino.length
   if (!largo) return
 
-  let idx = 0
+  let pos = textoMin.indexOf(termino)
   let hayCoincidencias = false
-  const fragment = document.createDocumentFragment()
 
-  while (true) {
-    const pos = textoMin.indexOf(termino, idx)
-    if (pos === -1) break
-
+  while (pos !== -1) {
     hayCoincidencias = true
-    fragment.appendChild(document.createTextNode(texto.slice(idx, pos)))
-
-    const mark = document.createElement("mark")
-    mark.className = "coincidencia-busqueda"
-    mark.textContent = texto.slice(pos, pos + largo)
-    fragment.appendChild(mark)
-    resultadosBusqueda.push({ tipo: "texto", nodo: mark, articulo })
-
-    idx = pos + largo
+    resultadosBusqueda.push({ tipo: "texto", nodo: elemento, articulo, inicio: pos, fin: pos + largo })
+    pos = textoMin.indexOf(termino, pos + largo)
   }
 
-  if (!hayCoincidencias) return
-
-  fragment.appendChild(document.createTextNode(texto.slice(idx)))
-  elemento.innerHTML = ""
-  elemento.appendChild(fragment)
-  articulo.classList.add("resaltado-busqueda")
+  if (hayCoincidencias) articulo.classList.add("resaltado-busqueda")
 }
 
 function registrarCoincidenciasNota(nota, termino, articulo) {
@@ -740,6 +736,37 @@ function registrarCoincidenciasNota(nota, termino, articulo) {
   }
 
   if (hayCoincidencias) articulo.classList.add("resaltado-busqueda")
+}
+
+function crearRangoEnNodo(elemento, inicio, fin) {
+  const walker = document.createTreeWalker(elemento, NodeFilter.SHOW_TEXT, null)
+  let nodo = walker.nextNode()
+  let offset = 0
+  let inicioNodo = null
+  let finNodo = null
+
+  while (nodo) {
+    const siguienteOffset = offset + nodo.textContent.length
+
+    if (!inicioNodo && inicio <= siguienteOffset) {
+      inicioNodo = { nodo, pos: inicio - offset }
+    }
+
+    if (!finNodo && fin <= siguienteOffset) {
+      finNodo = { nodo, pos: fin - offset }
+      break
+    }
+
+    offset = siguienteOffset
+    nodo = walker.nextNode()
+  }
+
+  if (!inicioNodo || !finNodo) return null
+
+  const rango = document.createRange()
+  rango.setStart(inicioNodo.nodo, inicioNodo.pos)
+  rango.setEnd(finNodo.nodo, finNodo.pos)
+  return rango
 }
 
 function irAlSiguienteResultado() {
