@@ -14,6 +14,7 @@
       --accent: #1e3a8a;
       --accent-light: #3b5ccc;
       --article-bg: #f8fafc;
+      --focus-stroke: #000;
     }
 
     body.oscuro {
@@ -24,6 +25,7 @@
       --accent: #3b82f6;
       --accent-light: #60a5fa;
       --article-bg: #1c2128;
+      --focus-stroke: #fff;
     }
 
     body {
@@ -102,13 +104,13 @@
     textarea:focus,
     .articulo-contenido:focus {
       outline: none !important;
-      border-color: #000 !important;
+      border-color: var(--focus-stroke) !important;
       box-shadow: none !important;
     }
 
     select:focus {
       outline: none !important;
-      border-color: #000 !important;
+      border-color: var(--focus-stroke) !important;
       box-shadow: none !important;
     }
 
@@ -120,10 +122,11 @@
     .materia-title {
       font-size: 21px;
       font-weight: bold;
-      border-bottom: 2px solid var(--border);
+      border-bottom: 2px solid var(--materia-underline, var(--accent));
       padding-bottom: 6px;
       flex: 1;
       cursor: text;
+      caret-color: var(--focus-stroke) !important;
     }
 
     body.oscuro .nota-box {
@@ -346,7 +349,7 @@
     .nota-box,
     .articulo-titulo-texto {
       cursor: text;
-      caret-color: #000;
+      caret-color: var(--focus-stroke) !important;
     }
 
     @keyframes fadeIn {
@@ -470,14 +473,26 @@
 
     .articulo {
       background: var(--article-bg);
-      padding: 16px;
+      padding: 16px 16px 16px 22px;
       border-radius: 10px;
-      border-left: 6px solid var(--accent);
       margin-top: 14px;
       box-shadow: 0 3px 8px rgba(0,0,0,0.07);
       cursor: pointer;
       position: relative;
       transition: 0.15s ease;
+      overflow: hidden;
+      border-left: none;
+    }
+
+    .articulo::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 10px;
+      background: var(--articulo-color, var(--accent));
+      border-radius: 12px;
     }
 
     .articulo:hover {
@@ -494,10 +509,21 @@
     }
 
     .articulo-titulo-texto {
-      flex: 0 1 auto;
+      flex: 0 0 auto;
       display: inline-flex;
       align-items: center;
-      min-width: auto;
+      width: fit-content;
+      min-width: max-content;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      transition: color 0.2s ease;
+    }
+
+    .articulo-titulo-texto:focus {
+      outline: none !important;
+      border: none !important;
+      box-shadow: none !important;
     }
 
     .indicador {
@@ -505,6 +531,7 @@
       font-weight: bold;
       transition: 0.25s ease;
       margin-left: auto;
+      color: var(--articulo-color, var(--accent));
     }
 
     .articulo.abierto .indicador {
@@ -523,7 +550,7 @@
     }
 
     .articulo-contenido:focus {
-      border-color: #000;
+      border-color: var(--focus-stroke);
       background: rgba(0,0,0,0.02);
       outline: none;
     }
@@ -549,14 +576,15 @@
   padding-bottom: 6px;
   flex: 1;
   cursor: text;
-  border-bottom: 2px solid currentColor;
+  border-bottom: 2px solid var(--materia-underline, var(--accent));
   transition: color 0.25s ease;
+  caret-color: var(--focus-stroke) !important;
 }
 
 .materia-title:focus {
   outline: none !important;
   box-shadow: none !important;
-  border-bottom: 2px solid currentColor !important;
+  border-bottom: 2px solid var(--materia-underline, var(--accent)) !important;
 }
 
     .nota-resizer {
@@ -1178,7 +1206,8 @@ function agregarArticulo() {
     contenidoEditado: "",
     normativa: norm,
     nota: "",
-    color: obtenerColorMateria(mat)
+    color: obtenerColorMateria(mat),
+    tituloPersonalizado: ""
   })
 
   normativaSeleccionada = norm
@@ -1298,7 +1327,7 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
   tituloM.textContent = materia
   const colorMateria = obtenerColorMateria(materia)
   tituloM.style.color = colorMateria
-  tituloM.style.borderBottomColor = colorMateria
+  tituloM.style.setProperty("--materia-underline", colorMateria)
 
   // Nombre actual que se va actualizando en vivo
   let nombreActual = materia
@@ -1345,12 +1374,13 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
   colorInput.addEventListener("input", () => {
     const nuevoColor = colorInput.value
     tituloM.style.color = nuevoColor
-    tituloM.style.borderBottomColor = nuevoColor
+    tituloM.style.setProperty("--materia-underline", nuevoColor)
 
     const tarjetas = contenedor.querySelectorAll(".articulo")
     tarjetas.forEach(t => {
       if (t.dataset.materia === nombreActual) {
         t.style.borderLeftColor = nuevoColor
+        t.style.setProperty("--articulo-color", nuevoColor)
         const tituloArt = t.querySelector(".articulo-titulo")
         if (tituloArt) tituloArt.style.color = nuevoColor
       }
@@ -1388,13 +1418,44 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
     const box = document.createElement("div")
     box.className = "articulo"
     box.style.borderLeftColor = a.color
+    box.style.setProperty("--articulo-color", a.color)
     box.dataset.id = a.id
     box.dataset.materia = a.materia
 
     const titulo = document.createElement("div")
     titulo.className = "articulo-titulo"
-    titulo.innerHTML = `<span class="articulo-titulo-texto">Artículo ${a.numero}</span><span class="indicador">▶</span>`
     titulo.style.color = a.color
+
+    const tituloEditable = document.createElement("span")
+    tituloEditable.className = "articulo-titulo-texto"
+    tituloEditable.contentEditable = "true"
+    tituloEditable.textContent =
+      a.tituloPersonalizado && a.tituloPersonalizado.trim()
+        ? a.tituloPersonalizado
+        : `Artículo ${a.numero}`
+
+    tituloEditable.addEventListener("click", e => e.stopPropagation())
+
+    tituloEditable.addEventListener("input", () => {
+      const nuevo = tituloEditable.textContent.trim()
+      a.tituloPersonalizado = nuevo
+      guardarLocal()
+    })
+
+    tituloEditable.addEventListener("blur", () => {
+      if (!tituloEditable.textContent.trim()) {
+        a.tituloPersonalizado = ""
+        tituloEditable.textContent = `Artículo ${a.numero}`
+        guardarLocal()
+      }
+    })
+
+    const indicador = document.createElement("span")
+    indicador.className = "indicador"
+    indicador.textContent = "▶"
+
+    titulo.appendChild(tituloEditable)
+    titulo.appendChild(indicador)
 
     const norm = document.createElement("div")
     norm.style.fontSize = "13px"
