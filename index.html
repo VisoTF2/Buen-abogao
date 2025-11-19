@@ -510,10 +510,23 @@
 
 <script>
 let codigoActual = {}
-let articulos = JSON.parse(localStorage.getItem("articulosGuardados") || "[]")
+let articulos = []
+
+try {
+  const guardados = localStorage.getItem("articulosGuardados")
+  articulos = guardados ? JSON.parse(guardados) : []
+  if (!Array.isArray(articulos)) {
+    console.warn("Los artículos guardados no tienen el formato esperado, se reinicia la lista.")
+    articulos = []
+  }
+} catch (error) {
+  console.error("No se pudieron leer los artículos guardados, se usará una lista vacía.", error)
+  articulos = []
+}
+
 articulos = articulos.map(a => ({
   ...a,
-  tituloPersonalizado: a.tituloPersonalizado || ""
+  tituloPersonalizado: typeof a.tituloPersonalizado === "string" ? a.tituloPersonalizado : ""
 }))
 let normativaSeleccionada = null
 let materiaSeleccionada = null
