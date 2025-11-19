@@ -499,15 +499,17 @@
       display: inline-flex;
       align-items: center;
       min-width: auto;
-      border: 2px solid transparent;
-      border-radius: 8px;
-      padding: 0 4px;
-      transition: border-color 0.2s ease;
+      border: none;
+      border-bottom: 2px solid transparent;
+      border-radius: 0;
+      padding: 0;
+      transition: border-bottom-color 0.2s ease;
     }
 
     .articulo-titulo-texto:focus {
       outline: none !important;
-      border-color: #000 !important;
+      border: none !important;
+      border-bottom: 2px solid #000 !important;
       box-shadow: none !important;
     }
 
