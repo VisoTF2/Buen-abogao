@@ -1178,7 +1178,8 @@ function agregarArticulo() {
     contenidoEditado: "",
     normativa: norm,
     nota: "",
-    color: obtenerColorMateria(mat)
+    color: obtenerColorMateria(mat),
+    tituloPersonalizado: ""
   })
 
   normativaSeleccionada = norm
@@ -1393,8 +1394,38 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
 
     const titulo = document.createElement("div")
     titulo.className = "articulo-titulo"
-    titulo.innerHTML = `<span class="articulo-titulo-texto">Artículo ${a.numero}</span><span class="indicador">▶</span>`
     titulo.style.color = a.color
+
+    const tituloEditable = document.createElement("span")
+    tituloEditable.className = "articulo-titulo-texto"
+    tituloEditable.contentEditable = "true"
+    tituloEditable.textContent =
+      a.tituloPersonalizado && a.tituloPersonalizado.trim()
+        ? a.tituloPersonalizado
+        : `Artículo ${a.numero}`
+
+    tituloEditable.addEventListener("click", e => e.stopPropagation())
+
+    tituloEditable.addEventListener("input", () => {
+      const nuevo = tituloEditable.textContent.trim()
+      a.tituloPersonalizado = nuevo
+      guardarLocal()
+    })
+
+    tituloEditable.addEventListener("blur", () => {
+      if (!tituloEditable.textContent.trim()) {
+        a.tituloPersonalizado = ""
+        tituloEditable.textContent = `Artículo ${a.numero}`
+        guardarLocal()
+      }
+    })
+
+    const indicador = document.createElement("span")
+    indicador.className = "indicador"
+    indicador.textContent = "▶"
+
+    titulo.appendChild(tituloEditable)
+    titulo.appendChild(indicador)
 
     const norm = document.createElement("div")
     norm.style.fontSize = "13px"
