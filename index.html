@@ -14,6 +14,7 @@
       --accent: #1e3a8a;
       --accent-light: #3b5ccc;
       --article-bg: #f8fafc;
+      --focus-stroke: #000;
     }
 
     body.oscuro {
@@ -24,6 +25,7 @@
       --accent: #3b82f6;
       --accent-light: #60a5fa;
       --article-bg: #1c2128;
+      --focus-stroke: #fff;
     }
 
     body {
@@ -102,13 +104,13 @@
     textarea:focus,
     .articulo-contenido:focus {
       outline: none !important;
-      border-color: #000 !important;
+      border-color: var(--focus-stroke) !important;
       box-shadow: none !important;
     }
 
     select:focus {
       outline: none !important;
-      border-color: #000 !important;
+      border-color: var(--focus-stroke) !important;
       box-shadow: none !important;
     }
 
@@ -120,11 +122,11 @@
     .materia-title {
       font-size: 21px;
       font-weight: bold;
-      border-bottom: 2px solid #000;
+      border-bottom: 2px solid var(--materia-underline, var(--accent));
       padding-bottom: 6px;
       flex: 1;
       cursor: text;
-      caret-color: #000 !important;
+      caret-color: var(--focus-stroke) !important;
     }
 
     body.oscuro .nota-box {
@@ -347,7 +349,7 @@
     .nota-box,
     .articulo-titulo-texto {
       cursor: text;
-      caret-color: #000 !important;
+      caret-color: var(--focus-stroke) !important;
     }
 
     @keyframes fadeIn {
@@ -474,11 +476,26 @@
       padding: 16px;
       border-radius: 10px;
       border-left: 6px solid var(--accent);
+      border-bottom: 4px solid transparent;
       margin-top: 14px;
       box-shadow: 0 3px 8px rgba(0,0,0,0.07);
       cursor: pointer;
       position: relative;
       transition: 0.15s ease;
+      --articulo-bar: var(--accent);
+    }
+
+    .articulo::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -2px;
+      height: 4px;
+      background: var(--articulo-bar);
+      border-radius: 0 0 8px 8px;
+      pointer-events: none;
+      transition: background 0.15s ease;
     }
 
     .articulo:hover {
@@ -535,7 +552,7 @@
     }
 
     .articulo-contenido:focus {
-      border-color: #000;
+      border-color: var(--focus-stroke);
       background: rgba(0,0,0,0.02);
       outline: none;
     }
@@ -561,15 +578,15 @@
   padding-bottom: 6px;
   flex: 1;
   cursor: text;
-  border-bottom: 2px solid #000;
+  border-bottom: 2px solid var(--materia-underline, var(--accent));
   transition: color 0.25s ease;
-  caret-color: #000 !important;
+  caret-color: var(--focus-stroke) !important;
 }
 
 .materia-title:focus {
   outline: none !important;
   box-shadow: none !important;
-  border-bottom: 2px solid #000 !important;
+  border-bottom: 2px solid var(--materia-underline, var(--accent)) !important;
 }
 
     .nota-resizer {
@@ -1312,6 +1329,7 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
   tituloM.textContent = materia
   const colorMateria = obtenerColorMateria(materia)
   tituloM.style.color = colorMateria
+  tituloM.style.setProperty("--materia-underline", colorMateria)
 
   // Nombre actual que se va actualizando en vivo
   let nombreActual = materia
@@ -1358,11 +1376,13 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
   colorInput.addEventListener("input", () => {
     const nuevoColor = colorInput.value
     tituloM.style.color = nuevoColor
+    tituloM.style.setProperty("--materia-underline", nuevoColor)
 
     const tarjetas = contenedor.querySelectorAll(".articulo")
     tarjetas.forEach(t => {
       if (t.dataset.materia === nombreActual) {
         t.style.borderLeftColor = nuevoColor
+        t.style.setProperty("--articulo-bar", nuevoColor)
         const tituloArt = t.querySelector(".articulo-titulo")
         if (tituloArt) tituloArt.style.color = nuevoColor
       }
@@ -1400,6 +1420,7 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
     const box = document.createElement("div")
     box.className = "articulo"
     box.style.borderLeftColor = a.color
+    box.style.setProperty("--articulo-bar", a.color)
     box.dataset.id = a.id
     box.dataset.materia = a.materia
 
