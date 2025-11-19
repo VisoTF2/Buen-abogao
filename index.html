@@ -482,21 +482,7 @@
       cursor: pointer;
       position: relative;
       transition: 0.15s ease;
-      --articulo-bar: var(--accent);
       overflow: hidden;
-    }
-
-    .articulo::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 4px;
-      background: var(--articulo-bar);
-      border-radius: 0 0 10px 10px;
-      pointer-events: none;
-      transition: background 0.15s ease;
     }
 
     .articulo:hover {
@@ -1383,7 +1369,6 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
     tarjetas.forEach(t => {
       if (t.dataset.materia === nombreActual) {
         t.style.borderLeftColor = nuevoColor
-        t.style.setProperty("--articulo-bar", nuevoColor)
         const tituloArt = t.querySelector(".articulo-titulo")
         if (tituloArt) tituloArt.style.color = nuevoColor
       }
@@ -1421,7 +1406,6 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
     const box = document.createElement("div")
     box.className = "articulo"
     box.style.borderLeftColor = a.color
-    box.style.setProperty("--articulo-bar", a.color)
     box.dataset.id = a.id
     box.dataset.materia = a.materia
 
