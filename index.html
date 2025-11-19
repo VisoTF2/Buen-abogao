@@ -1318,6 +1318,7 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
   tituloM.textContent = materia
   const colorMateria = obtenerColorMateria(materia)
   tituloM.style.color = colorMateria
+  tituloM.style.setProperty("--materia-underline", colorMateria)
 
   // Nombre actual que se va actualizando en vivo
   let nombreActual = materia
@@ -1364,6 +1365,7 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
   colorInput.addEventListener("input", () => {
     const nuevoColor = colorInput.value
     tituloM.style.color = nuevoColor
+    tituloM.style.setProperty("--materia-underline", nuevoColor)
 
     const tarjetas = contenedor.querySelectorAll(".articulo")
     tarjetas.forEach(t => {
