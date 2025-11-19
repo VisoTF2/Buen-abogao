@@ -497,7 +497,16 @@
       flex: 0 1 auto;
       display: inline-flex;
       align-items: center;
-      min-width: auto;
+      min-width: 0;
+    }
+
+    .articulo-titulo-texto[contenteditable="true"] {
+      border-bottom: 1px dashed transparent;
+    }
+
+    .articulo-titulo-texto[contenteditable="true"]:focus {
+      outline: none;
+      border-bottom-color: currentColor;
     }
 
     .indicador {
@@ -718,6 +727,10 @@
 <script>
 let codigoActual = {}
 let articulos = JSON.parse(localStorage.getItem("articulosGuardados") || "[]")
+  .map(a => ({
+    ...a,
+    tituloPersonalizado: a.tituloPersonalizado || ""
+  }))
 let normativaSeleccionada = null
 let materiaSeleccionada = null
 let resultadosBusqueda = []
@@ -727,6 +740,17 @@ const elementosMarcados = new Set()
 const buscadorInput = document.getElementById("buscadorInput")
 const menuContextual = document.getElementById("menuContextual")
 let objetivoContextual = null
+let accionandoMenuContextual = false
+
+menuContextual.addEventListener("mousedown", e => e.stopPropagation())
+menuContextual.addEventListener("click", e => e.stopPropagation())
+
+function marcarAccionContextualTemporal() {
+  accionandoMenuContextual = true
+  setTimeout(() => {
+    accionandoMenuContextual = false
+  }, 0)
+}
 
 function esCampoEditable(elem) {
   if (!elem) return null
@@ -761,7 +785,12 @@ function ocultarMenuContextual() {
 }
 
 async function copiarSeleccion(event) {
-  if (event) event.stopPropagation()
+  if (event) {
+    event.stopPropagation()
+    event.preventDefault()
+  }
+
+  marcarAccionContextualTemporal()
 
   const seleccion = window.getSelection()
   const texto = seleccion && !seleccion.isCollapsed ? seleccion.toString() : ""
@@ -786,7 +815,12 @@ async function copiarSeleccion(event) {
 }
 
 async function pegarDesdePortapapeles(event) {
-  if (event) event.stopPropagation()
+  if (event) {
+    event.stopPropagation()
+    event.preventDefault()
+  }
+
+  marcarAccionContextualTemporal()
   const destino = esCampoEditable(objetivoContextual)
   if (!destino) {
     ocultarMenuContextual()
@@ -1178,7 +1212,8 @@ function agregarArticulo() {
     contenidoEditado: "",
     normativa: norm,
     nota: "",
-    color: obtenerColorMateria(mat)
+    color: obtenerColorMateria(mat),
+    tituloPersonalizado: ""
   })
 
   normativaSeleccionada = norm
@@ -1393,8 +1428,54 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
 
     const titulo = document.createElement("div")
     titulo.className = "articulo-titulo"
-    titulo.innerHTML = `<span class="articulo-titulo-texto">Artículo ${a.numero}</span><span class="indicador">▶</span>`
     titulo.style.color = a.color
+
+    const tituloBase = `Artículo ${a.numero}`
+    const tituloTexto = document.createElement("span")
+    tituloTexto.className = "articulo-titulo-texto"
+    tituloTexto.contentEditable = "true"
+    const tituloPersonalizadoValido =
+      typeof a.tituloPersonalizado === "string" && a.tituloPersonalizado.trim() !== ""
+    tituloTexto.textContent = tituloPersonalizadoValido ? a.tituloPersonalizado : tituloBase
+
+    tituloTexto.addEventListener("click", e => e.stopPropagation())
+    tituloTexto.addEventListener("mousedown", e => e.stopPropagation())
+    tituloTexto.addEventListener("keydown", e => {
+      e.stopPropagation()
+      if (e.key === "Enter") {
+        e.preventDefault()
+        tituloTexto.blur()
+      }
+    })
+
+    tituloTexto.addEventListener("paste", e => {
+      e.preventDefault()
+      const texto = (e.clipboardData || window.clipboardData).getData("text/plain")
+      document.execCommand("insertText", false, texto)
+    })
+
+    tituloTexto.addEventListener("input", () => {
+      a.tituloPersonalizado = tituloTexto.textContent
+    })
+
+    tituloTexto.addEventListener("blur", () => {
+      const limpio = tituloTexto.textContent.trim()
+      if (!limpio) {
+        a.tituloPersonalizado = ""
+        tituloTexto.textContent = tituloBase
+      } else {
+        a.tituloPersonalizado = limpio
+        tituloTexto.textContent = limpio
+      }
+      guardarLocal()
+    })
+
+    const indicador = document.createElement("span")
+    indicador.className = "indicador"
+    indicador.textContent = "▶"
+
+    titulo.appendChild(tituloTexto)
+    titulo.appendChild(indicador)
 
     const norm = document.createElement("div")
     norm.style.fontSize = "13px"
@@ -1411,7 +1492,9 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
       guardarLocal()
     })
 
-    contenido.addEventListener("click", e => e.stopPropagation())
+    ["click", "mousedown", "mouseup"].forEach(evento => {
+      contenido.addEventListener(evento, e => e.stopPropagation())
+    })
 
     const botonNota = document.createElement("button")
     botonNota.className = "btn-note"
@@ -1427,7 +1510,9 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
     notaBox.className = "nota-box"
     notaBox.value = a.nota || ""
 
-    notaBox.addEventListener("click", e => e.stopPropagation())
+    ["click", "mousedown", "mouseup"].forEach(evento => {
+      notaBox.addEventListener(evento, e => e.stopPropagation())
+    })
     notaBox.addEventListener("input", () => {
       a.nota = notaBox.value
       guardarLocal()
@@ -1500,6 +1585,7 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
     box.appendChild(botonBorrar)
 
     box.addEventListener("click", () => {
+      if (accionandoMenuContextual) return
       const abierta = box.classList.toggle("abierto")
 
       if (abierta) {
