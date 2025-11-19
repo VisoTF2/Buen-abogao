@@ -146,34 +146,6 @@
       transition: 0.2s;
     }
 
-    .buscador-btn {
-      position: absolute;
-      top: 18px;
-      right: 18px;
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 12px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: background 0.2s ease, transform 0.15s ease;
-      font-weight: 600;
-      letter-spacing: 0.1px;
-    }
-
-    .buscador-btn svg {
-      width: 16px;
-      height: 16px;
-      stroke: currentColor;
-    }
-
-    .buscador-btn:hover { background: var(--accent-light); }
-
-    .buscador-btn:active { transform: translateY(1px); }
-
     .btn-primary:hover { background: var(--accent-light); }
 
     .btn-small {
@@ -211,147 +183,6 @@
       margin-top: 10px;
       margin-right: 10px;
       font-size: 13px;
-    }
-
-    .buscador-flotante {
-      position: fixed;
-      top: 18px;
-      right: 22px;
-      display: none;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
-      z-index: 50;
-    }
-
-    .buscador-flotante.activo {
-      display: flex;
-    }
-
-    .buscador-input {
-      min-width: 280px;
-      padding: 10px 12px;
-      border-radius: 8px;
-      border: 2px solid var(--border);
-      background: var(--card);
-      color: var(--text);
-      font-size: 15px;
-    }
-
-    .buscador-info {
-      font-size: 13px;
-      color: #6b7280;
-    }
-
-    .buscador-cerrar {
-      background: none;
-      border: none;
-      color: var(--text);
-      cursor: pointer;
-      font-size: 18px;
-      padding: 4px 6px;
-    }
-
-    .resaltado-busqueda {
-      outline: 2px solid #facc15;
-      box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.35);
-    }
-
-    .resaltado-busqueda-activo {
-      outline: 3px solid #eab308;
-      box-shadow: 0 0 0 5px rgba(234, 179, 8, 0.45);
-    }
-
-    .resaltado-busqueda-marca {
-      background: rgba(254, 240, 138, 0.9);
-      color: inherit;
-      padding: 0;
-      border-radius: 2px;
-      box-shadow: none;
-      letter-spacing: normal;
-      white-space: pre-wrap;
-    }
-
-    .resaltado-busqueda-marca-activa {
-      background: rgba(253, 224, 71, 0.95);
-      box-shadow: 0 0 0 1px rgba(234, 179, 8, 0.65);
-    }
-
-    ::selection {
-      background: #fef08a;
-      color: inherit;
-    }
-
-    .menu-contextual {
-      position: fixed;
-      z-index: 9999;
-      background: var(--card);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-      padding: 8px;
-      display: none;
-      min-width: 180px;
-    }
-
-    .menu-contextual.visible {
-      display: block;
-      animation: fadeIn 0.1s ease;
-    }
-
-    .menu-contextual h4 {
-      margin: 4px 8px 8px;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-      opacity: 0.7;
-    }
-
-    .menu-contextual button {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 12px;
-      border: none;
-      border-radius: 8px;
-      background: transparent;
-      color: inherit;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s ease;
-    }
-
-    .menu-contextual button:hover {
-      background: rgba(30, 58, 138, 0.08);
-    }
-
-    .menu-contextual button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
-    .menu-contextual svg {
-      width: 16px;
-      height: 16px;
-      stroke: currentColor;
-    }
-
-    .articulo-contenido,
-    .nota-box,
-    .articulo-titulo-texto {
-      cursor: text;
-      caret-color: #000;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-2px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
 .layout {
@@ -489,22 +320,27 @@
       font-size: 18px;
       font-weight: bold;
       display: flex;
+      justify-content: space-between;
       align-items: center;
       gap: 10px;
     }
 
     .articulo-titulo-texto {
-      flex: 0 1 auto;
-      display: inline-flex;
-      align-items: center;
-      min-width: auto;
+      flex: 1;
+      margin-right: 6px;
+      cursor: text;
+      outline: none;
+      min-width: 0;
+    }
+
+    .articulo-titulo-texto:focus {
+      border-bottom: 1px dashed currentColor;
     }
 
     .indicador {
       font-size: 18px;
       font-weight: bold;
       transition: 0.25s ease;
-      margin-left: auto;
     }
 
     .articulo.abierto .indicador {
@@ -633,57 +469,14 @@
     <button class="modo" onclick="toggleModo()">Modo oscuro</button>
   </header>
 
-  <div class="buscador-flotante" id="buscadorFlotante">
-    <input
-      type="text"
-      id="buscadorInput"
-      class="buscador-input"
-      placeholder="Buscar en materias y artículos"
-    >
-    <div class="buscador-info" id="buscadorInfo">Usa Enter para saltar al siguiente</div>
-    <button class="buscador-cerrar" onclick="cerrarBuscador()" aria-label="Cerrar buscador">✕</button>
-  </div>
-
-  <div class="menu-contextual" id="menuContextual" role="menu">
-    <h4>Acciones</h4>
-    <button type="button" data-accion="copiar" onclick="copiarSeleccion(event)">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="6.5" y="6.5" width="11" height="11" rx="2" stroke-width="1.8" />
-        <rect x="4.5" y="4.5" width="11" height="11" rx="2" stroke-width="1.8" />
-      </svg>
-      Copiar selección
-    </button>
-    <button type="button" data-accion="pegar" onclick="pegarDesdePortapapeles(event)">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="6" y="5" width="12" height="14" rx="2" stroke-width="1.8" />
-        <rect x="9" y="3" width="6" height="3" rx="1" stroke-width="1.8" />
-        <path d="M12 10v5" stroke-width="1.8" stroke-linecap="round" />
-        <path d="m9.5 12.5 2.5 2.5 2.5-2.5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-      Pegar en el campo
-    </button>
-  </div>
-
   <div class="container">
 
     <div class="layout">
       <div class="sidebarMaterias" id="sidebarMaterias"></div>
 
       <div class="mainPanel">
-        <div class="form-articulo" style="position: relative;">
+        <div class="form-articulo">
           <h2>Agregar Artículo</h2>
-          <button
-            class="buscador-btn"
-            onclick="abrirBuscador()"
-            aria-label="Abrir buscador"
-            title="Buscar (Ctrl+F o F3)"
-          >
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M10.5 4.5a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z" stroke-width="2" stroke-linecap="round" />
-              <path d="M15 15l4 4" stroke-width="2" stroke-linecap="round" />
-            </svg>
-            <span>Buscar</span>
-          </button>
 
           <div class="form-row">
             <div>
@@ -717,414 +510,26 @@
 
 <script>
 let codigoActual = {}
-let articulos = JSON.parse(localStorage.getItem("articulosGuardados") || "[]")
+let articulos = []
+
+try {
+  const guardados = localStorage.getItem("articulosGuardados")
+  articulos = guardados ? JSON.parse(guardados) : []
+  if (!Array.isArray(articulos)) {
+    console.warn("Los artículos guardados no tienen el formato esperado, se reinicia la lista.")
+    articulos = []
+  }
+} catch (error) {
+  console.error("No se pudieron leer los artículos guardados, se usará una lista vacía.", error)
+  articulos = []
+}
+
+articulos = articulos.map(a => ({
+  ...a,
+  tituloPersonalizado: typeof a.tituloPersonalizado === "string" ? a.tituloPersonalizado : ""
+}))
 let normativaSeleccionada = null
 let materiaSeleccionada = null
-let resultadosBusqueda = []
-let indiceResultado = 0
-let ultimoTerminoBusqueda = ""
-const elementosMarcados = new Set()
-const buscadorInput = document.getElementById("buscadorInput")
-const menuContextual = document.getElementById("menuContextual")
-let objetivoContextual = null
-
-function esCampoEditable(elem) {
-  if (!elem) return null
-  const destino = elem.closest(
-    "input, textarea, [contenteditable=\"true\"], .articulo-contenido, .nota-box"
-  )
-  return destino || (elem.isContentEditable ? elem : null)
-}
-
-function mostrarMenuContextual(event) {
-  ocultarMenuContextual()
-
-  const menuWidth = menuContextual.offsetWidth || 190
-  const menuHeight = menuContextual.offsetHeight || 120
-  const margen = 8
-  let x = event.clientX
-  let y = event.clientY
-
-  if (x + menuWidth > window.innerWidth) x = window.innerWidth - menuWidth - margen
-  if (y + menuHeight > window.innerHeight) y = window.innerHeight - menuHeight - margen
-  x = Math.max(margen, x)
-  y = Math.max(margen, y)
-
-  menuContextual.style.left = `${x}px`
-  menuContextual.style.top = `${y}px`
-  menuContextual.classList.add("visible")
-}
-
-function ocultarMenuContextual() {
-  menuContextual.classList.remove("visible")
-  objetivoContextual = null
-}
-
-async function copiarSeleccion(event) {
-  if (event) event.stopPropagation()
-
-  const seleccion = window.getSelection()
-  const texto = seleccion && !seleccion.isCollapsed ? seleccion.toString() : ""
-
-  if (!texto) {
-    ocultarMenuContextual()
-    return
-  }
-
-  try {
-    await navigator.clipboard.writeText(texto)
-  } catch (err) {
-    const aux = document.createElement("textarea")
-    aux.value = texto
-    document.body.appendChild(aux)
-    aux.select()
-    document.execCommand("copy")
-    aux.remove()
-  }
-
-  ocultarMenuContextual()
-}
-
-async function pegarDesdePortapapeles(event) {
-  if (event) event.stopPropagation()
-  const destino = esCampoEditable(objetivoContextual)
-  if (!destino) {
-    ocultarMenuContextual()
-    return
-  }
-
-  try {
-    const texto = await navigator.clipboard.readText()
-    if (!texto) {
-      ocultarMenuContextual()
-      return
-    }
-
-    if (destino.tagName === "INPUT" || destino.tagName === "TEXTAREA") {
-      destino.focus({ preventScroll: true })
-      const start = destino.selectionStart ?? destino.value.length
-      const end = destino.selectionEnd ?? start
-      destino.value = destino.value.slice(0, start) + texto + destino.value.slice(end)
-      const pos = start + texto.length
-      destino.setSelectionRange(pos, pos)
-      destino.dispatchEvent(new Event("input", { bubbles: true }))
-    } else if (destino.isContentEditable) {
-      destino.focus({ preventScroll: true })
-      const sel = window.getSelection()
-      let range = sel.rangeCount ? sel.getRangeAt(0) : null
-      if (!range || !destino.contains(range.startContainer)) {
-        range = document.createRange()
-        range.selectNodeContents(destino)
-        range.collapse(false)
-        sel.removeAllRanges()
-        sel.addRange(range)
-      }
-
-      document.execCommand("insertText", false, texto)
-      destino.dispatchEvent(new Event("input", { bubbles: true }))
-    }
-  } catch (err) {
-    console.error("No se pudo pegar desde el portapapeles", err)
-  }
-
-  ocultarMenuContextual()
-}
-
-document.addEventListener("contextmenu", e => {
-  const seleccion = window.getSelection()
-  const haySeleccion = seleccion && !seleccion.isCollapsed && seleccion.toString().trim() !== ""
-  const destinoEditable = esCampoEditable(e.target)
-
-  if (!haySeleccion && !destinoEditable) return
-
-  objetivoContextual = destinoEditable || null
-
-  const botonCopiar = menuContextual.querySelector('[data-accion="copiar"]')
-  if (botonCopiar) botonCopiar.disabled = !haySeleccion
-
-  const botonPegar = menuContextual.querySelector('[data-accion="pegar"]')
-  if (botonPegar) botonPegar.disabled = !destinoEditable
-
-  e.preventDefault()
-  mostrarMenuContextual(e)
-})
-
-document.addEventListener("click", e => {
-  if (!menuContextual.contains(e.target)) ocultarMenuContextual()
-})
-
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape") ocultarMenuContextual()
-})
-
-window.addEventListener("resize", ocultarMenuContextual)
-window.addEventListener("scroll", ocultarMenuContextual, true)
-
-function abrirBuscador() {
-  const panel = document.getElementById("buscadorFlotante")
-  panel.classList.add("activo")
-
-  buscadorInput.focus()
-  buscadorInput.select()
-
-  if (ultimoTerminoBusqueda.trim() !== "") {
-    buscadorInput.value = ultimoTerminoBusqueda
-    ejecutarBusqueda(ultimoTerminoBusqueda)
-  }
-}
-
-function cerrarBuscador() {
-  document.getElementById("buscadorFlotante").classList.remove("activo")
-  limpiarResaltadosBusqueda()
-}
-
-function limpiarResaltadosBusqueda() {
-  resultadosBusqueda = []
-  indiceResultado = 0
-
-  elementosMarcados.forEach(el => {
-    if (el.dataset.busquedaOriginalHtml !== undefined) {
-      el.innerHTML = el.dataset.busquedaOriginalHtml
-    } else if (el.isContentEditable) {
-      const plano = el.textContent
-      el.textContent = plano
-    }
-    if (el.normalize) el.normalize()
-    delete el.dataset.busquedaOriginalHtml
-  })
-  elementosMarcados.clear()
-
-  document.querySelectorAll(".articulo").forEach(a => {
-    a.classList.remove("resaltado-busqueda")
-    a.classList.remove("resaltado-busqueda-activo")
-  })
-
-  document.querySelectorAll(".resaltado-busqueda-activo").forEach(el =>
-    el.classList.remove("resaltado-busqueda-activo")
-  )
-}
-
-function resaltarResultadoActual(mantenerFocoBuscador = false) {
-  const habiaFocoEnBuscador = mantenerFocoBuscador || document.activeElement === buscadorInput
-
-  document.querySelectorAll(".resaltado-busqueda-activo").forEach(el =>
-    el.classList.remove("resaltado-busqueda-activo")
-  )
-
-  document.querySelectorAll(".resaltado-busqueda-marca-activa").forEach(el =>
-    el.classList.remove("resaltado-busqueda-marca-activa")
-  )
-
-  if (!resultadosBusqueda.length) return
-
-  const actual = resultadosBusqueda[indiceResultado]
-  const articulo = actual.articulo
-
-  if (articulo && !articulo.classList.contains("abierto")) {
-    articulo.classList.add("abierto")
-
-    const nota = articulo.querySelector(".nota-box")
-    const resizer = articulo.querySelector(".nota-resizer")
-    const botonNota = articulo.querySelector(".btn-note")
-    const botonEliminarNota = articulo.querySelector(".btn-note-delete")
-
-    if (botonNota) botonNota.style.display = "inline-block"
-    if (nota && nota.value.trim() !== "") {
-      nota.style.display = "block"
-      if (resizer) resizer.style.display = "block"
-      if (botonEliminarNota) botonEliminarNota.style.display = "inline-block"
-    }
-  }
-
-  if (articulo) articulo.classList.add("resaltado-busqueda")
-
-  if (actual.tipo === "nota") {
-    actual.nodo.classList.add("resaltado-busqueda-activo")
-    actual.nodo.setSelectionRange(actual.inicio, actual.fin)
-    actual.nodo.scrollIntoView({ behavior: "smooth", block: "center" })
-
-    if (habiaFocoEnBuscador) {
-      buscadorInput.focus({ preventScroll: true })
-      const caret = buscadorInput.value.length
-      buscadorInput.setSelectionRange(caret, caret)
-    }
-    return
-  }
-
-  if (actual.tipo === "marca" && actual.nodo) {
-    actual.nodo.classList.add("resaltado-busqueda-marca-activa")
-    if (articulo) articulo.classList.add("resaltado-busqueda-activo")
-    const destino = actual.nodo.closest(".articulo") || actual.nodo
-    destino.scrollIntoView({ behavior: "smooth", block: "center" })
-  }
-
-  if (habiaFocoEnBuscador) {
-    buscadorInput.focus({ preventScroll: true })
-    const caret = buscadorInput.value.length
-    buscadorInput.setSelectionRange(caret, caret)
-  }
-}
-
-function ejecutarBusqueda(termino) {
-  ultimoTerminoBusqueda = termino
-  const limpio = termino.trim().toLowerCase()
-  const info = document.getElementById("buscadorInfo")
-
-  limpiarResaltadosBusqueda()
-  resultadosBusqueda = []
-  indiceResultado = 0
-
-  if (!limpio) {
-    info.textContent = "Escribe una palabra clave"
-    return
-  }
-
-  document.querySelectorAll(".articulo").forEach(art => {
-    const titulo = art.querySelector(".articulo-titulo-texto") || art.querySelector(".articulo-titulo")
-    const contenido = art.querySelector(".articulo-contenido")
-    const nota = art.querySelector(".nota-box")
-
-    marcarCoincidencias(titulo, limpio, art)
-    marcarCoincidencias(contenido, limpio, art)
-    registrarCoincidenciasNota(nota, limpio, art)
-  })
-
-  if (!resultadosBusqueda.length) {
-    info.textContent = "Sin resultados"
-    return
-  }
-
-  info.textContent = `${resultadosBusqueda.length} resultado(s)`
-  resaltarResultadoActual(true)
-}
-
-function marcarCoincidencias(elemento, termino, articulo) {
-  if (!elemento) return
-
-  const largo = termino.length
-  if (!largo) return
-
-  if (elemento.dataset.busquedaOriginalHtml === undefined) {
-    elemento.dataset.busquedaOriginalHtml = elemento.innerHTML
-    elementosMarcados.add(elemento)
-  }
-
-  const nodosTexto = []
-  const walker = document.createTreeWalker(elemento, NodeFilter.SHOW_TEXT, {
-    acceptNode(node) {
-      if (!node.textContent.trim()) return NodeFilter.FILTER_REJECT
-      if (node.parentElement && node.parentElement.closest(".resaltado-busqueda-marca")) {
-        return NodeFilter.FILTER_REJECT
-      }
-      return NodeFilter.FILTER_ACCEPT
-    }
-  })
-
-  let nodo = walker.nextNode()
-  while (nodo) {
-    nodosTexto.push(nodo)
-    nodo = walker.nextNode()
-  }
-
-  let hayCoincidencias = false
-
-  nodosTexto.forEach(textNode => {
-    const textoOriginal = textNode.textContent
-    const textoMin = textoOriginal.toLowerCase()
-    let indice = textoMin.indexOf(termino)
-    if (indice === -1) return
-
-    hayCoincidencias = true
-    const frag = document.createDocumentFragment()
-    let ultimoCorte = 0
-
-    while (indice !== -1) {
-      if (indice > ultimoCorte) {
-        frag.appendChild(document.createTextNode(textoOriginal.slice(ultimoCorte, indice)))
-      }
-
-      const marca = document.createElement("span")
-      marca.className = "resaltado-busqueda-marca"
-      marca.textContent = textoOriginal.slice(indice, indice + largo)
-      resultadosBusqueda.push({ tipo: "marca", nodo: marca, articulo })
-      frag.appendChild(marca)
-
-      ultimoCorte = indice + largo
-      indice = textoMin.indexOf(termino, ultimoCorte)
-    }
-
-    if (ultimoCorte < textoOriginal.length) {
-      frag.appendChild(document.createTextNode(textoOriginal.slice(ultimoCorte)))
-    }
-
-    if (textNode.parentNode) {
-      textNode.parentNode.replaceChild(frag, textNode)
-    }
-  })
-
-  if (hayCoincidencias) articulo.classList.add("resaltado-busqueda")
-}
-
-function registrarCoincidenciasNota(nota, termino, articulo) {
-  if (!nota) return
-
-  const texto = nota.value.toLowerCase()
-  const largo = termino.length
-  if (!largo) return
-
-  let pos = texto.indexOf(termino)
-  let hayCoincidencias = false
-
-  while (pos !== -1) {
-    resultadosBusqueda.push({
-      tipo: "nota",
-      nodo: nota,
-      articulo,
-      inicio: pos,
-      fin: pos + largo
-    })
-    hayCoincidencias = true
-    pos = texto.indexOf(termino, pos + largo)
-  }
-
-  if (hayCoincidencias) articulo.classList.add("resaltado-busqueda")
-}
-
-function irAlSiguienteResultado(mantenerFocoBuscador = false) {
-  if (!resultadosBusqueda.length) return
-  indiceResultado = (indiceResultado + 1) % resultadosBusqueda.length
-  resaltarResultadoActual(mantenerFocoBuscador)
-}
-
-function reaplicarBusqueda() {
-  const panel = document.getElementById("buscadorFlotante")
-  if (panel.classList.contains("activo") && ultimoTerminoBusqueda.trim() !== "") {
-    ejecutarBusqueda(ultimoTerminoBusqueda)
-  }
-}
-
-window.addEventListener("keydown", e => {
-  const isCtrlF = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "f"
-  const isF3 = e.key === "F3"
-  if (isCtrlF || isF3) {
-    e.preventDefault()
-    abrirBuscador()
-  }
-})
-
-buscadorInput.addEventListener("input", e => {
-  ejecutarBusqueda(e.target.value)
-})
-
-buscadorInput.addEventListener("keydown", e => {
-  if (e.key === "Enter") {
-    e.preventDefault()
-    irAlSiguienteResultado(true)
-  }
-  if (e.key === "Escape") {
-    cerrarBuscador()
-  }
-})
 
 function toggleModo() {
   document.body.classList.toggle("oscuro")
@@ -1178,7 +583,8 @@ function agregarArticulo() {
     contenidoEditado: "",
     normativa: norm,
     nota: "",
-    color: obtenerColorMateria(mat)
+    color: obtenerColorMateria(mat),
+    tituloPersonalizado: ""
   })
 
   normativaSeleccionada = norm
@@ -1282,7 +688,6 @@ function ordenarYMostrar() {
       : []
 
   mostrarArticulosDeMateria(normativaSeleccionada, materiaSeleccionada, itemsSeleccionados)
-  reaplicarBusqueda()
 }
 
 function mostrarArticulosDeMateria(normativa, materia, items) {
@@ -1393,8 +798,58 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
 
     const titulo = document.createElement("div")
     titulo.className = "articulo-titulo"
-    titulo.innerHTML = `<span class="articulo-titulo-texto">Artículo ${a.numero}</span><span class="indicador">▶</span>`
     titulo.style.color = a.color
+
+    const tituloEditable = document.createElement("span")
+    tituloEditable.className = "articulo-titulo-texto"
+    tituloEditable.contentEditable = "true"
+    const textoBaseArticulo = `Artículo ${a.numero}`
+
+    const aplicarTextoTitulo = () => {
+      tituloEditable.textContent = (a.tituloPersonalizado && a.tituloPersonalizado.trim())
+        ? a.tituloPersonalizado.trim()
+        : textoBaseArticulo
+    }
+
+    aplicarTextoTitulo()
+
+    const detenerProp = e => e.stopPropagation()
+    const eventosBloqueoTitulo = ["pointerdown", "pointerup", "click", "dblclick"]
+    eventosBloqueoTitulo.forEach(evt => {
+      tituloEditable.addEventListener(evt, detenerProp)
+    })
+
+    tituloEditable.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault()
+        tituloEditable.blur()
+      }
+    })
+
+    tituloEditable.addEventListener("input", () => {
+      const nuevoTitulo = tituloEditable.textContent.trim()
+      if (!nuevoTitulo || nuevoTitulo === textoBaseArticulo) {
+        a.tituloPersonalizado = ""
+      } else {
+        a.tituloPersonalizado = nuevoTitulo
+      }
+      guardarLocal()
+    })
+
+    tituloEditable.addEventListener("blur", () => {
+      if (!tituloEditable.textContent.trim()) {
+        a.tituloPersonalizado = ""
+        aplicarTextoTitulo()
+      }
+      guardarLocal()
+    })
+
+    const indicador = document.createElement("span")
+    indicador.className = "indicador"
+    indicador.textContent = "▶"
+
+    titulo.appendChild(tituloEditable)
+    titulo.appendChild(indicador)
 
     const norm = document.createElement("div")
     norm.style.fontSize = "13px"
@@ -1411,7 +866,10 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
       guardarLocal()
     })
 
-    contenido.addEventListener("click", e => e.stopPropagation())
+    const detenerCaja = e => e.stopPropagation()
+    contenido.addEventListener("click", detenerCaja)
+    contenido.addEventListener("pointerdown", detenerCaja)
+    contenido.addEventListener("pointerup", detenerCaja)
 
     const botonNota = document.createElement("button")
     botonNota.className = "btn-note"
@@ -1427,7 +885,9 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
     notaBox.className = "nota-box"
     notaBox.value = a.nota || ""
 
-    notaBox.addEventListener("click", e => e.stopPropagation())
+    notaBox.addEventListener("click", detenerCaja)
+    notaBox.addEventListener("pointerdown", detenerCaja)
+    notaBox.addEventListener("pointerup", detenerCaja)
     notaBox.addEventListener("input", () => {
       a.nota = notaBox.value
       guardarLocal()
