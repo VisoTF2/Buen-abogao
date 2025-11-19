@@ -17,6 +17,8 @@
       --focus-contrast: #000;
       --focus-surface: rgba(0, 0, 0, 0.02);
       --materia-underline: #000;
+      --selection-bg: #dbeafe;
+      --selection-text: #0f172a;
     }
 
     body.oscuro {
@@ -30,6 +32,8 @@
       --focus-contrast: #fff;
       --focus-surface: rgba(255, 255, 255, 0.08);
       --materia-underline: #e6edf3;
+      --selection-bg: rgba(96, 165, 250, 0.32);
+      --selection-text: #e6edf3;
     }
 
     body {
@@ -289,8 +293,8 @@
     }
 
     ::selection {
-      background: #fef08a;
-      color: inherit;
+      background: var(--selection-bg);
+      color: var(--selection-text);
     }
 
     .menu-contextual {
