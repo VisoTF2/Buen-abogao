@@ -120,7 +120,7 @@
     .materia-title {
       font-size: 21px;
       font-weight: bold;
-      border-bottom: 2px solid var(--border);
+      border-bottom: 2px solid #000;
       padding-bottom: 6px;
       flex: 1;
       cursor: text;
@@ -549,14 +549,14 @@
   padding-bottom: 6px;
   flex: 1;
   cursor: text;
-  border-bottom: 2px solid currentColor;
+  border-bottom: 2px solid #000;
   transition: color 0.25s ease;
 }
 
 .materia-title:focus {
   outline: none !important;
   box-shadow: none !important;
-  border-bottom: 2px solid currentColor !important;
+  border-bottom: 2px solid #000 !important;
 }
 
     .nota-resizer {
@@ -1299,7 +1299,6 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
   tituloM.textContent = materia
   const colorMateria = obtenerColorMateria(materia)
   tituloM.style.color = colorMateria
-  tituloM.style.borderBottomColor = colorMateria
 
   // Nombre actual que se va actualizando en vivo
   let nombreActual = materia
@@ -1346,7 +1345,6 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
   colorInput.addEventListener("input", () => {
     const nuevoColor = colorInput.value
     tituloM.style.color = nuevoColor
-    tituloM.style.borderBottomColor = nuevoColor
 
     const tarjetas = contenedor.querySelectorAll(".articulo")
     tarjetas.forEach(t => {
