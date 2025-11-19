@@ -324,6 +324,18 @@
       align-items: center;
     }
 
+    .articulo-nombre {
+      flex: 1;
+      cursor: text;
+      outline: none;
+      border-bottom: 1px solid transparent;
+      padding-right: 8px;
+    }
+
+    .articulo-nombre:focus {
+      border-bottom-color: currentColor;
+    }
+
     .indicador {
       font-size: 18px;
       font-weight: bold;
@@ -767,8 +779,40 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
 
     const titulo = document.createElement("div")
     titulo.className = "articulo-titulo"
-    titulo.innerHTML = `Artículo ${a.numero} <span class="indicador">▶</span>`
     titulo.style.color = a.color
+
+    const nombreArticulo = document.createElement("span")
+    nombreArticulo.className = "articulo-nombre"
+    nombreArticulo.contentEditable = "true"
+    nombreArticulo.textContent = a.tituloPersonalizado || `Artículo ${a.numero}`
+
+    const indicador = document.createElement("span")
+    indicador.className = "indicador"
+    indicador.textContent = "▶"
+
+    const actualizarTitulo = () => {
+      const texto = nombreArticulo.textContent.trim()
+      if (!texto) {
+        nombreArticulo.textContent = `Artículo ${a.numero}`
+        delete a.tituloPersonalizado
+      } else {
+        a.tituloPersonalizado = texto
+      }
+      guardarLocal()
+    }
+
+    nombreArticulo.addEventListener("pointerdown", e => e.stopPropagation())
+    nombreArticulo.addEventListener("click", e => e.stopPropagation())
+    nombreArticulo.addEventListener("dblclick", e => e.stopPropagation())
+    nombreArticulo.addEventListener("input", () => {
+      if (nombreArticulo.textContent.trim() === "") return
+      a.tituloPersonalizado = nombreArticulo.textContent
+      guardarLocal()
+    })
+    nombreArticulo.addEventListener("blur", actualizarTitulo)
+
+    titulo.appendChild(nombreArticulo)
+    titulo.appendChild(indicador)
 
     const norm = document.createElement("div")
     norm.style.fontSize = "13px"
@@ -873,7 +917,7 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
     box.appendChild(resizer)
     box.appendChild(botonBorrar)
 
-    box.addEventListener("click", () => {
+    const alternarCaja = () => {
       const abierta = box.classList.toggle("abierto")
 
       if (abierta) {
@@ -891,6 +935,13 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
           botonEliminarNota.style.display = "none"
         }
       }
+    }
+
+    box.addEventListener("click", e => {
+      if (e.target.closest(".articulo-contenido") || e.target.closest(".nota-box")) {
+        return
+      }
+      alternarCaja()
     })
 
     contenedor.appendChild(box)
