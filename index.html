@@ -741,6 +741,85 @@ const buscadorInput = document.getElementById("buscadorInput")
 const menuContextual = document.getElementById("menuContextual")
 let objetivoContextual = null
 let accionandoMenuContextual = false
+const cacheCodigos = new Map()
+
+const rutasBaseJSON = (() => {
+  const datasetBody = document.body && document.body.dataset ? document.body.dataset : {}
+  const baseConfigurada = (datasetBody.jsonBase || "").trim()
+  const baseRemota = (datasetBody.jsonRemoto || "").trim()
+  const extras = (datasetBody.jsonExtras || "")
+    .split(",")
+    .map(p => p.trim())
+    .filter(Boolean)
+
+  const candidatas = [
+    baseConfigurada,
+    "",
+    "./",
+    "/",
+    "./data/",
+    "./datos/",
+    "./json/",
+    "./assets/",
+    "./assets/json/",
+    "../",
+    "../data/",
+    "../json/"
+  ]
+
+  if (baseRemota) candidatas.push(baseRemota)
+  extras.forEach(p => candidatas.push(p))
+
+  const normalizadas = new Set()
+
+  candidatas.forEach(base => {
+    if (base === null || base === undefined) return
+    const limpia = base.trim()
+    if (!limpia && limpia !== "") return
+
+    if (/^https?:/i.test(limpia)) {
+      normalizadas.add(limpia.endsWith("/") ? limpia : `${limpia}/`)
+    } else if (limpia === "/") {
+      normalizadas.add("/")
+    } else {
+      const ajustada = limpia.endsWith("/") || limpia === "" ? limpia : `${limpia}/`
+      normalizadas.add(ajustada)
+    }
+  })
+
+  return Array.from(normalizadas)
+})()
+
+function construirUrlJSON(base, archivo) {
+  if (!base) return archivo
+  if (base === "/") return `/${archivo}`
+  return `${base}${archivo}`
+}
+
+async function cargarJSONConFallback(archivo) {
+  if (cacheCodigos.has(archivo)) return cacheCodigos.get(archivo)
+
+  const intentos = new Set()
+
+  for (const base of rutasBaseJSON) {
+    const url = construirUrlJSON(base, archivo)
+    if (intentos.has(url)) continue
+    intentos.add(url)
+
+    try {
+      const resp = await fetch(url, { cache: "no-cache" })
+      if (!resp.ok) continue
+
+      const data = await resp.json()
+      cacheCodigos.set(archivo, data)
+      return data
+    } catch (err) {
+      console.warn(`No se pudo leer ${url}`, err)
+    }
+  }
+
+  throw new Error(`No se pudo cargar ${archivo}`)
+}
 
 menuContextual.addEventListener("mousedown", e => e.stopPropagation())
 menuContextual.addEventListener("click", e => e.stopPropagation())
@@ -1164,17 +1243,23 @@ function toggleModo() {
   document.body.classList.toggle("oscuro")
 }
 
-function cargarNormativa() {
-  const val = document.getElementById("normativa").value
+async function cargarNormativa() {
+  const selector = document.getElementById("normativa")
+  if (!selector) return
+
+  const val = selector.value
   const archivo = val === "civil" ? "codigo_civil_pdf.json" : "codigo_penal_pdf.json"
 
-  fetch(archivo)
-    .then(r => r.json())
-    .then(d => {
-      codigoActual = d
-      ordenarYMostrar()
-    })
-    .catch(() => mostrarError("No se pudo cargar el archivo"))
+  mostrarError("")
+
+  try {
+    const datos = await cargarJSONConFallback(archivo)
+    codigoActual = datos || {}
+    ordenarYMostrar()
+  } catch (error) {
+    console.error(`No se pudo cargar ${archivo}`, error)
+    mostrarError("No se pudo cargar el archivo de artículos. Verifica que los JSON estén disponibles.")
+  }
 }
 
 cargarNormativa()
@@ -1182,6 +1267,14 @@ document.getElementById("normativa").addEventListener("change", cargarNormativa)
 
 function mostrarError(msg) {
   const box = document.getElementById("errorBox")
+  if (!box) return
+
+  if (!msg) {
+    box.textContent = ""
+    box.style.display = "none"
+    return
+  }
+
   box.textContent = msg
   box.style.display = "block"
 }
@@ -1195,7 +1288,7 @@ function agregarArticulo() {
   const num = parseInt(document.getElementById("numeroArticulo").value)
   const mat = document.getElementById("materiaArticulo").value.trim()
 
-  document.getElementById("errorBox").style.display = "none"
+  mostrarError("")
 
   if (!num || !mat) return mostrarError("Debe ingresar número y materia")
 
