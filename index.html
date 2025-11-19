@@ -120,10 +120,11 @@
     .materia-title {
       font-size: 21px;
       font-weight: bold;
-      border-bottom: 2px solid var(--border);
+      border-bottom: 2px solid #000;
       padding-bottom: 6px;
       flex: 1;
       cursor: text;
+      caret-color: #000 !important;
     }
 
     body.oscuro .nota-box {
@@ -346,7 +347,7 @@
     .nota-box,
     .articulo-titulo-texto {
       cursor: text;
-      caret-color: #000;
+      caret-color: #000 !important;
     }
 
     @keyframes fadeIn {
@@ -494,10 +495,21 @@
     }
 
     .articulo-titulo-texto {
-      flex: 0 1 auto;
+      flex: 0 0 auto;
       display: inline-flex;
       align-items: center;
-      min-width: auto;
+      width: fit-content;
+      min-width: max-content;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+      transition: color 0.2s ease;
+    }
+
+    .articulo-titulo-texto:focus {
+      outline: none !important;
+      border: none !important;
+      box-shadow: none !important;
     }
 
     .indicador {
@@ -549,14 +561,15 @@
   padding-bottom: 6px;
   flex: 1;
   cursor: text;
-  border-bottom: 2px solid currentColor;
+  border-bottom: 2px solid #000;
   transition: color 0.25s ease;
+  caret-color: #000 !important;
 }
 
 .materia-title:focus {
   outline: none !important;
   box-shadow: none !important;
-  border-bottom: 2px solid currentColor !important;
+  border-bottom: 2px solid #000 !important;
 }
 
     .nota-resizer {
@@ -1178,7 +1191,8 @@ function agregarArticulo() {
     contenidoEditado: "",
     normativa: norm,
     nota: "",
-    color: obtenerColorMateria(mat)
+    color: obtenerColorMateria(mat),
+    tituloPersonalizado: ""
   })
 
   normativaSeleccionada = norm
@@ -1298,7 +1312,6 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
   tituloM.textContent = materia
   const colorMateria = obtenerColorMateria(materia)
   tituloM.style.color = colorMateria
-  tituloM.style.borderBottomColor = colorMateria
 
   // Nombre actual que se va actualizando en vivo
   let nombreActual = materia
@@ -1345,7 +1358,6 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
   colorInput.addEventListener("input", () => {
     const nuevoColor = colorInput.value
     tituloM.style.color = nuevoColor
-    tituloM.style.borderBottomColor = nuevoColor
 
     const tarjetas = contenedor.querySelectorAll(".articulo")
     tarjetas.forEach(t => {
@@ -1393,8 +1405,38 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
 
     const titulo = document.createElement("div")
     titulo.className = "articulo-titulo"
-    titulo.innerHTML = `<span class="articulo-titulo-texto">Artículo ${a.numero}</span><span class="indicador">▶</span>`
     titulo.style.color = a.color
+
+    const tituloEditable = document.createElement("span")
+    tituloEditable.className = "articulo-titulo-texto"
+    tituloEditable.contentEditable = "true"
+    tituloEditable.textContent =
+      a.tituloPersonalizado && a.tituloPersonalizado.trim()
+        ? a.tituloPersonalizado
+        : `Artículo ${a.numero}`
+
+    tituloEditable.addEventListener("click", e => e.stopPropagation())
+
+    tituloEditable.addEventListener("input", () => {
+      const nuevo = tituloEditable.textContent.trim()
+      a.tituloPersonalizado = nuevo
+      guardarLocal()
+    })
+
+    tituloEditable.addEventListener("blur", () => {
+      if (!tituloEditable.textContent.trim()) {
+        a.tituloPersonalizado = ""
+        tituloEditable.textContent = `Artículo ${a.numero}`
+        guardarLocal()
+      }
+    })
+
+    const indicador = document.createElement("span")
+    indicador.className = "indicador"
+    indicador.textContent = "▶"
+
+    titulo.appendChild(tituloEditable)
+    titulo.appendChild(indicador)
 
     const norm = document.createElement("div")
     norm.style.fontSize = "13px"
