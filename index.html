@@ -64,6 +64,12 @@
       touch-action: pan-y;
     }
 
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
     .zoom-canvas {
       transform: scale(var(--zoom-scale));
       transform-origin: top center;
@@ -726,6 +732,7 @@
   display: flex;
   align-items: flex-start;
   gap: 20px;
+  height: 100%;
 }
 
 .sidebarMaterias {
@@ -737,6 +744,9 @@
   overflow-y: auto;
   border: 1px solid var(--border);
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
 }
 
 .sidebarGroupTitle {
@@ -792,6 +802,7 @@
       gap: 16px;
       align-self: stretch;
       min-height: 100%;
+      height: 100%;
     }
 
     .form-articulo {
