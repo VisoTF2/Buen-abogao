@@ -264,6 +264,8 @@
       border-radius: 14px;
       background: linear-gradient(135deg, rgba(30,58,138,0.06), rgba(30,58,138,0.01));
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
     }
 
     .documentos-head {
@@ -1308,6 +1310,7 @@ function renderDocumentos() {
     vacio.className = "documentos-vacio"
     vacio.textContent = "Aún no hay documentos cargados."
     listaDocumentos.appendChild(vacio)
+    sincronizarAlturaDocumentos()
     return
   }
 
@@ -1349,6 +1352,8 @@ function renderDocumentos() {
     item.appendChild(acciones)
     listaDocumentos.appendChild(item)
   })
+
+  sincronizarAlturaDocumentos()
 }
 
 function eliminarDocumento(id) {
@@ -1517,6 +1522,26 @@ function mostrarMenuContextual(event) {
 function ocultarMenuContextual() {
   menuContextual.classList.remove("visible")
   objetivoContextual = null
+}
+
+function sincronizarAlturaDocumentos() {
+  const sidebar = document.getElementById("sidebarMaterias")
+  const panelDocumentos = document.querySelector(".documentos-panel")
+
+  if (!sidebar || !panelDocumentos) return
+
+  const apilado = window.matchMedia("(max-width: 900px)").matches
+
+  if (apilado) {
+    panelDocumentos.style.minHeight = ""
+    return
+  }
+
+  const alturaSidebar = sidebar.getBoundingClientRect().height
+  const alturaPanel = panelDocumentos.getBoundingClientRect().height
+  const alturaObjetivo = Math.max(alturaSidebar, alturaPanel)
+
+  panelDocumentos.style.minHeight = `${alturaObjetivo}px`
 }
 
 function aplicarOrdenDesdeDOM(contenedorLista, normativa, materia) {
@@ -2290,6 +2315,7 @@ function ordenarYMostrar() {
 
   mostrarArticulosDeMateria(normativaSeleccionada, materiaSeleccionada, itemsSeleccionados)
   reaplicarBusqueda()
+  sincronizarAlturaDocumentos()
 }
 
 function mostrarArticulosDeMateria(normativa, materia, items) {
@@ -2600,6 +2626,8 @@ function borrarMateria(nombre, normativa = null) {
 
 renderDocumentos()
 ordenarYMostrar()
+sincronizarAlturaDocumentos()
+window.addEventListener("resize", sincronizarAlturaDocumentos)
 </script>
 </body>
 </html>
