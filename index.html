@@ -59,11 +59,14 @@
     }
 
     .app-root {
+      min-height: 100vh;
+      touch-action: pan-y;
+    }
+
+    .zoom-canvas {
       transform: scale(var(--zoom-scale));
       transform-origin: top center;
       transition: transform 0.18s ease;
-      min-height: 100vh;
-      touch-action: pan-y;
     }
 
     header {
@@ -736,6 +739,8 @@
     <button class="modo" onclick="toggleModo()">Modo oscuro</button>
   </header>
 
+  <div class="zoom-canvas">
+
   <div class="buscador-flotante" id="buscadorFlotante">
     <input
       type="text"
@@ -815,6 +820,8 @@
         <div class="contenidoArticulos" id="contenidoArticulos"></div>
       </div>
     </div>
+
+  </div>
 
   </div>
 
