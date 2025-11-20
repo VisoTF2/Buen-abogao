@@ -443,10 +443,6 @@
       color: var(--text);
     }
 
-    #zoomInBtn {
-      display: none;
-    }
-
     .zoom-value {
       min-width: 58px;
       text-align: center;
@@ -872,7 +868,6 @@
 <div class="zoom-panel" aria-label="Controles de zoom">
   <button class="zoom-btn" id="zoomOutBtn" title="Alejar (Ctrl + -)" aria-label="Alejar">−</button>
   <div class="zoom-value" id="zoomValue">100%</div>
-  <button class="zoom-btn" id="zoomInBtn" title="Acercar (Ctrl + +)" aria-label="Acercar">+</button>
 </div>
 
 <script>
@@ -889,7 +884,6 @@ const buscadorInput = document.getElementById("buscadorInput")
 const menuContextual = document.getElementById("menuContextual")
 let objetivoContextual = null
 const zoomValue = document.getElementById("zoomValue")
-const zoomInBtn = document.getElementById("zoomInBtn")
 const zoomOutBtn = document.getElementById("zoomOutBtn")
 const appRoot = document.getElementById("appRoot")
 
@@ -961,7 +955,6 @@ function siguienteOrdenPara(normativa, materia) {
 
 function actualizarEstadoZoom() {
   if (zoomValue) zoomValue.textContent = `${Math.round(zoomActual * 100)}%`
-  if (zoomInBtn) zoomInBtn.disabled = zoomActual >= MAX_ZOOM - 0.001
   if (zoomOutBtn) zoomOutBtn.disabled = zoomActual <= MIN_ZOOM + 0.001
 }
 
@@ -1257,8 +1250,7 @@ document.addEventListener("keydown", e => {
 window.addEventListener("resize", ocultarMenuContextual)
 window.addEventListener("scroll", ocultarMenuContextual, true)
 
-if (zoomInBtn && zoomOutBtn) {
-  zoomInBtn.addEventListener("click", () => aplicarZoom(zoomActual + ZOOM_STEP))
+if (zoomOutBtn) {
   zoomOutBtn.addEventListener("click", () => aplicarZoom(zoomActual - ZOOM_STEP))
 }
 
