@@ -1012,6 +1012,25 @@ function activarArrastreMateria(item, lista, normativa) {
 function activarArrastreArticulo(box, normativa, materia) {
   box.draggable = true
 
+  const bloquearSiEditable = e => {
+    if (esCampoEditable(e.target)) {
+      box.draggable = false
+    } else {
+      box.draggable = true
+    }
+  }
+
+  const restaurarArrastre = () => {
+    if (!box.draggable) box.draggable = true
+  }
+
+  box.addEventListener("mousedown", bloquearSiEditable)
+  box.addEventListener("touchstart", bloquearSiEditable)
+  box.addEventListener("mouseup", restaurarArrastre)
+  box.addEventListener("mouseleave", restaurarArrastre)
+  box.addEventListener("touchend", restaurarArrastre)
+  box.addEventListener("touchcancel", restaurarArrastre)
+
   box.addEventListener("dragstart", e => {
     if (esCampoEditable(e.target)) {
       box.draggable = false
