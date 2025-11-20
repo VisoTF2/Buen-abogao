@@ -25,6 +25,7 @@
       --search-highlight-glow-active: rgba(96, 165, 250, 0.45);
       --search-highlight-mark: #dbeafe;
       --search-highlight-mark-active: #bfdbfe;
+      --zoom-scale: 1;
     }
 
     body.oscuro {
@@ -55,6 +56,14 @@
       background: var(--bg);
       color: var(--text);
       transition: 0.25s ease;
+    }
+
+    .app-root {
+      transform: scale(var(--zoom-scale));
+      transform-origin: top center;
+      transition: transform 0.18s ease;
+      min-height: 100vh;
+      touch-action: pan-y;
     }
 
     header {
@@ -373,6 +382,65 @@
       caret-color: var(--focus-contrast) !important;
     }
 
+    .zoom-panel {
+      position: fixed;
+      right: 22px;
+      bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      z-index: 60;
+      font-weight: 600;
+    }
+
+    .zoom-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--accent);
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .zoom-btn:hover {
+      background: var(--accent-light);
+    }
+
+    .zoom-btn:active {
+      transform: translateY(1px);
+    }
+
+    .zoom-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+      background: var(--border);
+      color: var(--text);
+    }
+
+    .zoom-value {
+      min-width: 58px;
+      text-align: center;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: var(--article-bg);
+      border: 1px solid var(--border);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-2px); }
       to { opacity: 1; transform: translateY(0); }
@@ -662,6 +730,7 @@
 </head>
 
 <body>
+  <div class="app-root" id="appRoot">
   <header>
     Buen abogao <br>
     <button class="modo" onclick="toggleModo()">Modo oscuro</button>
@@ -749,6 +818,14 @@
 
   </div>
 
+  </div>
+
+<div class="zoom-panel" aria-label="Controles de zoom">
+  <button class="zoom-btn" id="zoomOutBtn" title="Alejar (Ctrl + -)" aria-label="Alejar">−</button>
+  <div class="zoom-value" id="zoomValue">100%</div>
+  <button class="zoom-btn" id="zoomInBtn" title="Acercar (Ctrl + +)" aria-label="Acercar">+</button>
+</div>
+
 <script>
 let codigoActual = {}
 let articulos = JSON.parse(localStorage.getItem("articulosGuardados") || "[]")
@@ -761,6 +838,38 @@ const elementosMarcados = new Set()
 const buscadorInput = document.getElementById("buscadorInput")
 const menuContextual = document.getElementById("menuContextual")
 let objetivoContextual = null
+const zoomValue = document.getElementById("zoomValue")
+const zoomInBtn = document.getElementById("zoomInBtn")
+const zoomOutBtn = document.getElementById("zoomOutBtn")
+const appRoot = document.getElementById("appRoot")
+
+const ZOOM_STEP = 0.05
+const MIN_ZOOM = 0.85
+const MAX_ZOOM = 1.25
+let zoomActual = 1
+let pinchStartDistance = null
+let pinchStartZoom = 1
+
+function actualizarEstadoZoom() {
+  if (zoomValue) zoomValue.textContent = `${Math.round(zoomActual * 100)}%`
+  if (zoomInBtn) zoomInBtn.disabled = zoomActual >= MAX_ZOOM - 0.001
+  if (zoomOutBtn) zoomOutBtn.disabled = zoomActual <= MIN_ZOOM + 0.001
+}
+
+function aplicarZoom(nivel) {
+  const limitado = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, nivel))
+  zoomActual = limitado
+  document.documentElement.style.setProperty("--zoom-scale", limitado.toFixed(3))
+  actualizarEstadoZoom()
+}
+
+function distanciaEntreToques(touches) {
+  if (touches.length < 2) return 0
+  const [a, b] = touches
+  const dx = a.clientX - b.clientX
+  const dy = a.clientY - b.clientY
+  return Math.hypot(dx, dy)
+}
 
 function esCampoEditable(elem) {
   if (!elem) return null
@@ -893,6 +1002,71 @@ document.addEventListener("keydown", e => {
 
 window.addEventListener("resize", ocultarMenuContextual)
 window.addEventListener("scroll", ocultarMenuContextual, true)
+
+if (zoomInBtn && zoomOutBtn) {
+  zoomInBtn.addEventListener("click", () => aplicarZoom(zoomActual + ZOOM_STEP))
+  zoomOutBtn.addEventListener("click", () => aplicarZoom(zoomActual - ZOOM_STEP))
+}
+
+document.addEventListener(
+  "wheel",
+  e => {
+    if (!e.ctrlKey) return
+    e.preventDefault()
+    const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP
+    aplicarZoom(zoomActual + delta)
+  },
+  { passive: false }
+)
+
+document.addEventListener("keydown", e => {
+  const ctrl = e.ctrlKey || e.metaKey
+  if (!ctrl) return
+
+  if (e.key === "+" || e.key === "=") {
+    e.preventDefault()
+    aplicarZoom(zoomActual + ZOOM_STEP)
+  } else if (e.key === "-" || e.key === "_") {
+    e.preventDefault()
+    aplicarZoom(zoomActual - ZOOM_STEP)
+  } else if (e.key === "0") {
+    e.preventDefault()
+    aplicarZoom(1)
+  }
+})
+
+if (appRoot) {
+  appRoot.addEventListener("touchstart", e => {
+    if (e.touches.length === 2) {
+      pinchStartDistance = distanciaEntreToques(e.touches)
+      pinchStartZoom = zoomActual
+    }
+  })
+
+  appRoot.addEventListener(
+    "touchmove",
+    e => {
+      if (e.touches.length === 2 && pinchStartDistance) {
+        e.preventDefault()
+        const nuevaDistancia = distanciaEntreToques(e.touches)
+        const factor = pinchStartDistance ? nuevaDistancia / pinchStartDistance : 1
+        aplicarZoom(pinchStartZoom * factor)
+      }
+    },
+    { passive: false }
+  )
+
+  const limpiarPinch = e => {
+    if (e.touches && e.touches.length >= 2) return
+    pinchStartDistance = null
+    pinchStartZoom = zoomActual
+  }
+
+  appRoot.addEventListener("touchend", limpiarPinch)
+  appRoot.addEventListener("touchcancel", limpiarPinch)
+}
+
+aplicarZoom(zoomActual)
 
 function abrirBuscador() {
   const panel = document.getElementById("buscadorFlotante")
