@@ -56,6 +56,7 @@
       background: var(--bg);
       color: var(--text);
       transition: 0.25s ease;
+      overflow-x: hidden;
     }
 
     .app-root {
@@ -215,14 +216,25 @@
 
     .btn-primary:hover { background: var(--accent-light); }
 
+    .btn-small,
+    .btn-note,
+    .btn-note-delete {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 120px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
     .btn-small {
       background: #dc2626;
       color: white;
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      transition: 0.2s;
     }
 
     .btn-small:hover { background: #b91c1c; }
@@ -230,74 +242,352 @@
     .btn-note {
       background: var(--accent);
       color: white;
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
       margin-top: 10px;
       margin-right: 10px;
-      font-size: 13px;
-      transition: 0.2s;
     }
+
+    .btn-note:hover { background: var(--accent-light); }
 
     .btn-note-delete {
       background: #6b7280;
       color: white;
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
       margin-top: 10px;
       margin-right: 10px;
+    }
+
+    .btn-note-delete:hover { background: #4b5563; }
+
+    .documentos-panel {
+      margin: 18px 0 28px;
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(30,58,138,0.06), rgba(30,58,138,0.01));
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .documentos-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .documentos-title {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .documentos-title h3 {
+      margin: 0;
+      font-size: 19px;
+      color: var(--accent);
+    }
+
+    .documentos-title span {
+      font-size: 14px;
+      color: #4b5563;
+    }
+
+    body.oscuro .documentos-title span { color: #e5e7eb; }
+
+    .documentos-acciones {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .documentos-btn {
+      background: var(--accent);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s ease, transform 0.12s ease;
+    }
+
+    .documentos-btn:hover { background: var(--accent-light); }
+
+    .documentos-btn:active { transform: translateY(1px); }
+
+    .documentos-btn.arrastrando {
+      background: var(--accent-light);
+      box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+    }
+
+    .documentos-hint {
       font-size: 13px;
+      color: #4b5563;
+      padding: 10px 12px;
+      background: rgba(30, 58, 138, 0.06);
+      border: 1px solid rgba(30, 58, 138, 0.12);
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    body.oscuro .documentos-hint {
+      color: #e5e7eb;
+      background: rgba(96, 165, 250, 0.12);
+      border-color: rgba(96, 165, 250, 0.22);
+    }
+
+    .documentos-body {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .documentos-lista {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 160px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .documento-item {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--article-bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .documento-item strong {
+      font-size: 14px;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .documento-item small {
+      color: #6b7280;
+    }
+
+    body.oscuro .documento-item small { color: #d1d5db; }
+
+    .documento-ver {
+      background: white;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease;
+      flex-shrink: 0;
+    }
+
+    .documento-ver:hover {
+      background: rgba(30, 58, 138, 0.08);
+      border-color: var(--accent-light);
+    }
+
+    .documento-ver:active { transform: translateY(1px); }
+
+    body.oscuro .documento-ver { background: #111827; }
+
+    .documentos-preview {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      min-height: 260px;
+      padding: 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .documentos-preview h4 {
+      margin: 0;
+      font-size: 15px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .documentos-vacio {
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    body.oscuro .documentos-vacio { color: #d1d5db; }
+
+    .documento-iframe {
+      width: 100%;
+      height: 420px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--article-bg);
+    }
+
+    .documento-texto {
+      white-space: pre-wrap;
+      line-height: 1.6;
+      font-size: 14px;
+      color: var(--text);
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--article-bg);
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .documento-alerta {
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(220, 38, 38, 0.08);
+      border: 1px solid rgba(220, 38, 38, 0.18);
+      color: #991b1b;
+      font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+      .documentos-body {
+        grid-template-columns: 1fr;
+      }
+
+      .documento-iframe,
+      .documento-texto {
+        height: 320px;
+        max-height: 320px;
+      }
     }
 
     .buscador-flotante {
-      position: absolute;
-      top: 66px;
-      right: 18px;
+      position: relative;
       display: none;
       align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      background: var(--card);
+      gap: 12px;
+      padding: 14px 16px;
+      background: linear-gradient(120deg, rgba(30, 58, 138, 0.06), rgba(30, 58, 138, 0.02));
       border: 1px solid var(--border);
-      border-radius: 10px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+      border-radius: 12px;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.12);
       z-index: 20;
-      width: min(520px, calc(100% - 48px));
-      justify-content: space-between;
+      width: 100%;
+      margin-top: 14px;
+      justify-content: flex-start;
       flex-wrap: wrap;
+      box-sizing: border-box;
     }
 
     .buscador-flotante.activo {
       display: flex;
     }
 
+    .buscador-campo {
+      flex: 1 1 320px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: var(--card);
+      border-radius: 12px;
+      border: 2px solid var(--border);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+      box-sizing: border-box;
+    }
+
+    .buscador-icon {
+      width: 18px;
+      height: 18px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
     .buscador-input {
       min-width: 220px;
-      flex: 1 1 220px;
-      padding: 10px 12px;
+      flex: 1 1 auto;
+      padding: 4px 0 4px 6px;
       border-radius: 8px;
-      border: 2px solid var(--border);
-      background: var(--card);
+      border: none;
+      background: transparent;
       color: var(--text);
       font-size: 15px;
+      caret-color: var(--accent);
+    }
+
+    .buscador-input::placeholder {
+      color: rgba(17, 24, 39, 0.55);
+    }
+
+    body.oscuro .buscador-input::placeholder {
+      color: rgba(229, 231, 235, 0.7);
+    }
+
+    .buscador-input:focus {
+      outline: none;
+      box-shadow: none;
     }
 
     .buscador-info {
       font-size: 13px;
-      color: #6b7280;
+      color: #4b5563;
       white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(30, 58, 138, 0.06);
+      border: 1px solid rgba(30, 58, 138, 0.12);
+      font-weight: 600;
+    }
+
+    body.oscuro .buscador-info {
+      color: #e5e7eb;
+      background: rgba(96, 165, 250, 0.12);
+      border-color: rgba(96, 165, 250, 0.22);
     }
 
     .buscador-cerrar {
-      background: none;
-      border: none;
+      background: white;
+      border: 1px solid var(--border);
       color: var(--text);
       cursor: pointer;
-      font-size: 18px;
-      padding: 4px 6px;
+      font-size: 16px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease;
+    }
+
+    body.oscuro .buscador-cerrar {
+      background: #111827;
+    }
+
+    .buscador-cerrar:hover {
+      background: rgba(30, 58, 138, 0.08);
+      border-color: var(--accent-light);
+    }
+
+    .buscador-cerrar:active {
+      transform: translateY(1px);
     }
 
     .resaltado-busqueda {
@@ -394,65 +684,6 @@
       caret-color: var(--focus-contrast) !important;
     }
 
-    .zoom-panel {
-      position: fixed;
-      right: 22px;
-      bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 12px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-      z-index: 60;
-      font-weight: 600;
-    }
-
-    .zoom-btn {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--accent);
-      color: white;
-      font-size: 18px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.1s ease, background 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .zoom-btn:hover {
-      background: var(--accent-light);
-    }
-
-    .zoom-btn:active {
-      transform: translateY(1px);
-    }
-
-    .zoom-btn:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-      transform: none;
-      background: var(--border);
-      color: var(--text);
-    }
-
-    .zoom-value {
-      min-width: 58px;
-      text-align: center;
-      padding: 6px 10px;
-      border-radius: 10px;
-      background: var(--article-bg);
-      border: 1px solid var(--border);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-      color: var(--text);
-    }
-
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-2px); }
       to { opacity: 1; transform: translateY(0); }
@@ -489,7 +720,7 @@
       padding: 10px 12px;
       margin-bottom: 8px;
       border-radius: 8px;
-      cursor: pointer;
+      cursor: grab;
       font-weight: 600;
       border-left: 6px solid var(--accent);
       background: var(--article-bg);
@@ -505,6 +736,20 @@
     .sidebarItem.activa {
       background: var(--accent);
       color: white;
+    }
+
+    .sidebarItem:active {
+      cursor: grabbing;
+    }
+
+    .sidebarItem.arrastrando {
+      opacity: 0.9;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.14);
+    }
+
+    .sidebarGroupList {
+      display: flex;
+      flex-direction: column;
     }
 
     .mainPanel {
@@ -579,7 +824,7 @@
       border-left: 6px solid var(--accent);
       margin-top: 14px;
       box-shadow: 0 3px 8px rgba(0,0,0,0.07);
-      cursor: pointer;
+      cursor: grab;
       position: relative;
       transition: 0.15s ease;
     }
@@ -587,6 +832,15 @@
     .articulo:hover {
       transform: scale(1.015);
       box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+    }
+
+    .articulo:active {
+      cursor: grabbing;
+    }
+
+    .articulo.arrastrando {
+      opacity: 0.9;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
     }
 
     .articulo-titulo {
@@ -781,6 +1035,37 @@
       <div class="sidebarMaterias" id="sidebarMaterias"></div>
 
       <div class="mainPanel">
+        <div class="documentos-panel">
+          <div class="documentos-head">
+            <div class="documentos-title">
+              <h3>Subir documentos</h3>
+              <span>Adjunta archivos PDF o Word y visualízalos sin salir de la página.</span>
+            </div>
+            <div class="documentos-acciones">
+              <input
+                type="file"
+                id="documentoInput"
+                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                hidden
+              >
+              <button class="documentos-btn" onclick="document.getElementById('documentoInput').click()" type="button">
+                📄 Seleccionar archivo
+              </button>
+              <div class="documentos-hint">Puedes arrastrar el archivo sobre el botón o tocar para elegir.</div>
+            </div>
+          </div>
+
+          <div class="documentos-body">
+            <div class="documentos-lista" id="listaDocumentos">
+              <div class="documentos-vacio">Aún no hay documentos cargados.</div>
+            </div>
+            <div class="documentos-preview" id="visorDocumentos">
+              <h4>Vista previa</h4>
+              <div class="documentos-vacio">Selecciona un documento para verlo aquí mismo.</div>
+            </div>
+          </div>
+        </div>
+
         <div class="form-articulo" style="position: relative;">
           <h2>Agregar Artículo</h2>
           <button
@@ -796,13 +1081,19 @@
             <span>Buscar</span>
           </button>
 
-          <div class="buscador-flotante" id="buscadorFlotante">
-            <input
-              type="text"
-              id="buscadorInput"
-              class="buscador-input"
-              placeholder="Buscar en materias y artículos"
-            >
+          <div class="buscador-flotante" id="buscadorFlotante" role="search">
+            <div class="buscador-campo">
+              <svg class="buscador-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M10.5 4.5a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <path d="M15 15l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              </svg>
+              <input
+                type="text"
+                id="buscadorInput"
+                class="buscador-input"
+                placeholder="Buscar en materias y artículos"
+              >
+            </div>
             <div class="buscador-info" id="buscadorInfo">Usa Enter para saltar al siguiente</div>
             <button class="buscador-cerrar" onclick="cerrarBuscador()" aria-label="Cerrar buscador">✕</button>
           </div>
@@ -841,28 +1132,25 @@
 
   </div>
 
-<div class="zoom-panel" aria-label="Controles de zoom">
-  <button class="zoom-btn" id="zoomOutBtn" title="Alejar (Ctrl + -)" aria-label="Alejar">−</button>
-  <div class="zoom-value" id="zoomValue">100%</div>
-  <button class="zoom-btn" id="zoomInBtn" title="Acercar (Ctrl + +)" aria-label="Acercar">+</button>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
 let codigoActual = {}
 let articulos = JSON.parse(localStorage.getItem("articulosGuardados") || "[]")
+let materiasOrden = JSON.parse(localStorage.getItem("materiasOrden") || "{}")
 let normativaSeleccionada = null
 let materiaSeleccionada = null
 let resultadosBusqueda = []
 let indiceResultado = 0
 let ultimoTerminoBusqueda = ""
+let documentosCargados = []
 const elementosMarcados = new Set()
 const buscadorInput = document.getElementById("buscadorInput")
 const menuContextual = document.getElementById("menuContextual")
 let objetivoContextual = null
-const zoomValue = document.getElementById("zoomValue")
-const zoomInBtn = document.getElementById("zoomInBtn")
-const zoomOutBtn = document.getElementById("zoomOutBtn")
 const appRoot = document.getElementById("appRoot")
+const documentoInput = document.getElementById("documentoInput")
+const listaDocumentos = document.getElementById("listaDocumentos")
+const visorDocumentos = document.getElementById("visorDocumentos")
 
 const ZOOM_STEP = 0.05
 const MIN_ZOOM = 1.00
@@ -870,18 +1158,268 @@ const MAX_ZOOM = 1.25
 let zoomActual = 1
 let pinchStartDistance = null
 let pinchStartZoom = 1
+let articuloArrastradoId = null
+let materiaArrastrada = null
 
-function actualizarEstadoZoom() {
-  if (zoomValue) zoomValue.textContent = `${Math.round(zoomActual * 100)}%`
-  if (zoomInBtn) zoomInBtn.disabled = zoomActual >= MAX_ZOOM - 0.001
-  if (zoomOutBtn) zoomOutBtn.disabled = zoomActual <= MIN_ZOOM + 0.001
+documentoInput?.addEventListener("change", e => {
+  const archivo = e.target.files?.[0]
+  if (archivo) {
+    procesarDocumento(archivo)
+  }
+  e.target.value = ""
+})
+
+const botonDocumentos = document.querySelector(".documentos-btn")
+
+if (botonDocumentos) {
+  ;["dragenter", "dragover"].forEach(evento => {
+    botonDocumentos.addEventListener(evento, e => {
+      e.preventDefault()
+      e.stopPropagation()
+      botonDocumentos.classList.add("arrastrando")
+    })
+  })
+
+  ;["dragleave", "drop"].forEach(evento => {
+    botonDocumentos.addEventListener(evento, e => {
+      e.preventDefault()
+      e.stopPropagation()
+      botonDocumentos.classList.remove("arrastrando")
+    })
+  })
+
+  botonDocumentos.addEventListener("drop", e => {
+    const archivo = e.dataTransfer?.files?.[0]
+    if (archivo) procesarDocumento(archivo)
+  })
+}
+
+function obtenerExtension(nombre = "") {
+  const partes = nombre.split(".")
+  return partes.length > 1 ? partes.pop().toLowerCase() : ""
+}
+
+async function procesarDocumento(archivo) {
+  const extension = obtenerExtension(archivo.name)
+  const id = `${Date.now()}-${Math.random().toString(16).slice(2)}`
+  const base = {
+    id,
+    nombre: archivo.name,
+    extension,
+    url: "",
+    texto: "",
+    mensaje: ""
+  }
+
+  try {
+    if (extension === "pdf") {
+      base.url = URL.createObjectURL(archivo)
+    } else if (extension === "docx") {
+      base.texto = await extraerTextoDocx(archivo)
+    } else if (extension === "doc") {
+      base.mensaje = "Vista previa limitada: descárgalo para abrirlo."
+      base.url = URL.createObjectURL(archivo)
+    } else {
+      base.mensaje = "Formato no soportado para vista previa."
+      base.url = URL.createObjectURL(archivo)
+    }
+
+    documentosCargados = [base, ...documentosCargados.filter(d => d.nombre !== base.nombre)]
+    renderDocumentos()
+    mostrarDocumento(base.id)
+  } catch (err) {
+    console.error("No se pudo procesar el documento", err)
+    base.mensaje = "No se pudo leer el documento."
+    documentosCargados = [base, ...documentosCargados]
+    renderDocumentos()
+    mostrarDocumento(base.id)
+  }
+}
+
+async function extraerTextoDocx(archivo) {
+  if (typeof JSZip === "undefined") {
+    throw new Error("JSZip no está disponible para leer .docx")
+  }
+
+  const buffer = await archivo.arrayBuffer()
+  const zip = await JSZip.loadAsync(buffer)
+  const documento = zip.file("word/document.xml")
+
+  if (!documento) {
+    throw new Error("El archivo no contiene texto legible")
+  }
+
+  const xml = await documento.async("text")
+  const parser = new DOMParser()
+  const dom = parser.parseFromString(xml, "application/xml")
+  const parrafos = Array.from(dom.getElementsByTagName("w:p"))
+
+  const texto = parrafos
+    .map(p => {
+      const runs = p.getElementsByTagName("w:t")
+      let acumulado = ""
+      for (let i = 0; i < runs.length; i++) {
+        acumulado += runs[i].textContent
+      }
+      return acumulado.trim()
+    })
+    .filter(Boolean)
+    .join("\n\n")
+
+  return texto || "No se encontró texto en el documento"
+}
+
+function renderDocumentos() {
+  if (!listaDocumentos) return
+
+  listaDocumentos.innerHTML = ""
+
+  if (!documentosCargados.length) {
+    const vacio = document.createElement("div")
+    vacio.className = "documentos-vacio"
+    vacio.textContent = "Aún no hay documentos cargados."
+    listaDocumentos.appendChild(vacio)
+    return
+  }
+
+  documentosCargados.forEach(doc => {
+    const item = document.createElement("div")
+    item.className = "documento-item"
+
+    const info = document.createElement("div")
+    info.style.flex = "1"
+
+    const nombre = document.createElement("strong")
+    nombre.textContent = doc.nombre
+
+    const tipo = document.createElement("div")
+    tipo.innerHTML = `<small>${doc.extension ? doc.extension.toUpperCase() : "Archivo"}</small>`
+
+    info.appendChild(nombre)
+    info.appendChild(tipo)
+
+    const ver = document.createElement("button")
+    ver.className = "documento-ver"
+    ver.type = "button"
+    ver.textContent = "Ver"
+    ver.addEventListener("click", () => mostrarDocumento(doc.id))
+
+    item.appendChild(info)
+    item.appendChild(ver)
+    listaDocumentos.appendChild(item)
+  })
+}
+
+function mostrarDocumento(id) {
+  if (!visorDocumentos) return
+
+  const doc = documentosCargados.find(d => d.id === id)
+  visorDocumentos.innerHTML = ""
+
+  const titulo = document.createElement("h4")
+  titulo.textContent = doc ? doc.nombre : "Vista previa"
+  visorDocumentos.appendChild(titulo)
+
+  if (!doc) {
+    const vacio = document.createElement("div")
+    vacio.className = "documentos-vacio"
+    vacio.textContent = "Selecciona un documento para verlo aquí."
+    visorDocumentos.appendChild(vacio)
+    return
+  }
+
+  if (doc.extension === "pdf" && doc.url) {
+    const iframe = document.createElement("iframe")
+    iframe.className = "documento-iframe"
+    iframe.src = doc.url
+    iframe.title = `Vista previa de ${doc.nombre}`
+    visorDocumentos.appendChild(iframe)
+  } else if (doc.extension === "docx" && doc.texto) {
+    const texto = document.createElement("div")
+    texto.className = "documento-texto"
+    texto.textContent = doc.texto
+    visorDocumentos.appendChild(texto)
+  } else {
+    const alerta = document.createElement("div")
+    alerta.className = "documento-alerta"
+    alerta.textContent = doc.mensaje || "No se pudo generar vista previa."
+    visorDocumentos.appendChild(alerta)
+  }
+
+  if (doc.url) {
+    const descarga = document.createElement("a")
+    descarga.href = doc.url
+    descarga.download = doc.nombre
+    descarga.textContent = "Descargar original"
+    descarga.style.fontWeight = "700"
+    descarga.style.color = "var(--accent)"
+    descarga.style.textDecoration = "none"
+    descarga.style.marginTop = "6px"
+    visorDocumentos.appendChild(descarga)
+  }
+}
+
+function valorOrdenArticulo(a) {
+  if (typeof a.orden === "number") return a.orden
+  if (typeof a.numero === "number") return a.numero
+  return 0
+}
+
+function guardarOrdenMaterias() {
+  localStorage.setItem("materiasOrden", JSON.stringify(materiasOrden))
+}
+
+function siguienteOrdenMateria(normativa) {
+  const ordenes = materiasOrden[normativa]
+    ? Object.values(materiasOrden[normativa]).filter(n => typeof n === "number")
+    : []
+
+  if (!ordenes.length) return 1
+  return Math.max(...ordenes) + 1
+}
+
+function asegurarOrdenMateria(normativa, materia) {
+  if (!materiasOrden[normativa]) materiasOrden[normativa] = {}
+  if (typeof materiasOrden[normativa][materia] !== "number") {
+    materiasOrden[normativa][materia] = siguienteOrdenMateria(normativa)
+    guardarOrdenMaterias()
+  }
+}
+
+function ordenarMaterias(nombres, normativa) {
+  nombres.forEach(nombre => asegurarOrdenMateria(normativa, nombre))
+  return [...nombres].sort(
+    (a, b) => (materiasOrden[normativa][a] ?? 0) - (materiasOrden[normativa][b] ?? 0)
+  )
+}
+
+function aplicarOrdenMateriasDesdeDOM(lista, normativa) {
+  if (!lista) return
+  const items = Array.from(lista.querySelectorAll(".sidebarItem"))
+  if (!items.length) return
+
+  if (!materiasOrden[normativa]) materiasOrden[normativa] = {}
+
+  items.forEach((item, index) => {
+    materiasOrden[normativa][item.dataset.materia] = index + 1
+  })
+
+  guardarOrdenMaterias()
+}
+
+function siguienteOrdenPara(normativa, materia) {
+  const ordenes = articulos
+    .filter(a => a.normativa === normativa && a.materia === materia)
+    .map(valorOrdenArticulo)
+
+  if (!ordenes.length) return 1
+  return Math.max(...ordenes) + 1
 }
 
 function aplicarZoom(nivel) {
   const limitado = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, nivel))
   zoomActual = limitado
   document.documentElement.style.setProperty("--zoom-scale", limitado.toFixed(3))
-  actualizarEstadoZoom()
 }
 
 function distanciaEntreToques(touches) {
@@ -922,6 +1460,179 @@ function mostrarMenuContextual(event) {
 function ocultarMenuContextual() {
   menuContextual.classList.remove("visible")
   objetivoContextual = null
+}
+
+function aplicarOrdenDesdeDOM(contenedorLista, normativa, materia) {
+  if (!contenedorLista) return
+
+  const idsEnOrden = Array.from(contenedorLista.querySelectorAll(".articulo"))
+    .map(el => Number(el.dataset.id))
+    .filter(Boolean)
+
+  idsEnOrden.forEach((id, index) => {
+    const art = articulos.find(a => a.id === id)
+    if (art && art.normativa === normativa && art.materia === materia) {
+      art.orden = index + 1
+    }
+  })
+
+  guardarLocal()
+  ordenarYMostrar()
+}
+
+function activarArrastreMateria(item, lista, normativa) {
+  item.draggable = true
+
+  item.addEventListener("dragstart", e => {
+    materiaArrastrada = item.dataset.materia
+    item.classList.add("arrastrando")
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = "move"
+      e.dataTransfer.setData("text/plain", materiaArrastrada)
+    }
+  })
+
+  item.addEventListener("dragover", e => {
+    e.preventDefault()
+    if (e.dataTransfer) e.dataTransfer.dropEffect = "move"
+    if (!materiaArrastrada || item.dataset.materia === materiaArrastrada) return
+
+    const rect = item.getBoundingClientRect()
+    const margenCambio = Math.max(10, rect.height * 0.35)
+    const limiteArriba = rect.top + margenCambio
+    const limiteAbajo = rect.bottom - margenCambio
+    const posicionY = e.clientY
+
+    let moverDespues = null
+    if (posicionY <= limiteArriba) {
+      moverDespues = false
+    } else if (posicionY >= limiteAbajo) {
+      moverDespues = true
+    } else {
+      return
+    }
+
+    const arrastrandoElem = lista.querySelector(
+      `.sidebarItem[data-materia="${materiaArrastrada}"][data-normativa="${normativa}"]`
+    )
+
+    if (!arrastrandoElem || arrastrandoElem === item) return
+
+    if (moverDespues) {
+      lista.insertBefore(arrastrandoElem, item.nextSibling)
+    } else {
+      lista.insertBefore(arrastrandoElem, item)
+    }
+  })
+
+  item.addEventListener("drop", e => e.preventDefault())
+
+  item.addEventListener("dragend", () => {
+    item.classList.remove("arrastrando")
+    aplicarOrdenMateriasDesdeDOM(lista, normativa)
+    materiaArrastrada = null
+  })
+}
+
+function activarArrastreArticulo(box, normativa, materia) {
+  box.draggable = true
+
+  const bloquearSiEditable = e => {
+    if (esCampoEditable(e.target)) {
+      box.draggable = false
+    } else {
+      box.draggable = true
+    }
+  }
+
+  const restaurarArrastre = () => {
+    if (!box.draggable) box.draggable = true
+  }
+
+  box.addEventListener("mousedown", bloquearSiEditable)
+  box.addEventListener("touchstart", bloquearSiEditable)
+  box.addEventListener("mouseup", restaurarArrastre)
+  box.addEventListener("mouseleave", restaurarArrastre)
+  box.addEventListener("touchend", restaurarArrastre)
+  box.addEventListener("touchcancel", restaurarArrastre)
+
+  box.addEventListener("dragstart", e => {
+    if (esCampoEditable(e.target)) {
+      box.draggable = false
+      setTimeout(() => {
+        box.draggable = true
+      }, 0)
+      e.preventDefault()
+      return
+    }
+
+    articuloArrastradoId = box.dataset.id
+    box.classList.add("arrastrando")
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = "move"
+      e.dataTransfer.setData("text/plain", box.dataset.id)
+    }
+  })
+
+  box.addEventListener("dragenter", () => {
+    if (box.dataset.id === articuloArrastradoId) return
+    box.classList.add("drag-over")
+  })
+
+  box.addEventListener("dragleave", () => {
+    box.classList.remove("drag-over")
+  })
+
+  box.addEventListener("dragover", e => {
+    e.preventDefault()
+    if (e.dataTransfer) e.dataTransfer.dropEffect = "move"
+
+    const objetivo = e.currentTarget
+    if (!articuloArrastradoId || objetivo.dataset.id === articuloArrastradoId) return
+
+    const rect = objetivo.getBoundingClientRect()
+    const margenCambio = Math.max(12, rect.height * 0.28)
+    const antesLimite = rect.top + margenCambio
+    const despuesLimite = rect.bottom - margenCambio
+    const posicionY = e.clientY
+
+    // Solo reordenar cuando el puntero se acerca a los bordes para que
+    // el cambio ocurra antes y con menos fricción.
+    let desplazarDespues = null
+    if (posicionY <= antesLimite) {
+      desplazarDespues = false
+    } else if (posicionY >= despuesLimite) {
+      desplazarDespues = true
+    } else {
+      return
+    }
+
+    const contenedor = objetivo.parentElement
+    const arrastrandoElem = contenedor.querySelector(
+      `.articulo[data-id="${articuloArrastradoId}"]`
+    )
+
+    if (!arrastrandoElem || arrastrandoElem === objetivo) return
+
+    if (desplazarDespues) {
+      contenedor.insertBefore(arrastrandoElem, objetivo.nextSibling)
+    } else {
+      contenedor.insertBefore(arrastrandoElem, objetivo)
+    }
+  })
+
+  box.addEventListener("drop", e => {
+    e.preventDefault()
+    box.classList.remove("drag-over")
+  })
+
+  box.addEventListener("dragend", () => {
+    box.classList.remove("arrastrando")
+    box.classList.remove("drag-over")
+    const contenedor = box.parentElement
+    aplicarOrdenDesdeDOM(contenedor, normativa, materia)
+    articuloArrastradoId = null
+  })
 }
 
 async function copiarSeleccion(event) {
@@ -1023,11 +1734,6 @@ document.addEventListener("keydown", e => {
 
 window.addEventListener("resize", ocultarMenuContextual)
 window.addEventListener("scroll", ocultarMenuContextual, true)
-
-if (zoomInBtn && zoomOutBtn) {
-  zoomInBtn.addEventListener("click", () => aplicarZoom(zoomActual + ZOOM_STEP))
-  zoomOutBtn.addEventListener("click", () => aplicarZoom(zoomActual - ZOOM_STEP))
-}
 
 document.addEventListener(
   "wheel",
@@ -1399,6 +2105,8 @@ function agregarArticulo() {
 
   const norm = document.getElementById("normativa").value
 
+  asegurarOrdenMateria(norm, mat)
+
   articulos.push({
     id: Date.now(),
     numero: num,
@@ -1408,7 +2116,8 @@ function agregarArticulo() {
     normativa: norm,
     nota: "",
     color: obtenerColorMateria(mat),
-    tituloPersonalizado: ""
+    tituloPersonalizado: "",
+    orden: siguienteOrdenPara(norm, mat)
   })
 
   normativaSeleccionada = norm
@@ -1443,23 +2152,30 @@ function ordenarYMostrar() {
   const ordenNormativas = ["civil", "penal"]
   ordenNormativas.forEach(norm => {
     const materiasObj = agrupado[norm]
-    const nombresMaterias = Object.keys(materiasObj || {}).sort()
+    const nombresMaterias = Object.keys(materiasObj || {})
     if (!nombresMaterias.length) return
+
+    const grupo = document.createElement("div")
+    grupo.className = "sidebarGroup"
 
     const tituloGrupo = document.createElement("div")
     tituloGrupo.className = "sidebarGroupTitle"
     tituloGrupo.textContent = norm === "civil" ? "Código Civil" : "Código Penal"
-    sidebar.appendChild(tituloGrupo)
+    grupo.appendChild(tituloGrupo)
 
-    nombresMaterias.forEach(m => {
+    const listaMaterias = document.createElement("div")
+    listaMaterias.className = "sidebarGroupList"
+    grupo.appendChild(listaMaterias)
+
+    const nombresOrdenados = ordenarMaterias(nombresMaterias, norm)
+
+    nombresOrdenados.forEach(m => {
       const item = document.createElement("div")
       item.className = "sidebarItem"
       item.textContent = m
       item.dataset.normativa = norm
       item.dataset.materia = m
       item.style.borderLeftColor = obtenerColorMateria(m)
-
-      item.addEventListener("mousedown", e => e.preventDefault())
 
       item.addEventListener("click", () => {
         normativaSeleccionada = norm
@@ -1474,9 +2190,13 @@ function ordenarYMostrar() {
         tieneSeleccionValida = true
       }
 
-      sidebar.appendChild(item)
+      activarArrastreMateria(item, listaMaterias, norm)
+
+      listaMaterias.appendChild(item)
       combos.push({ normativa: norm, materia: m })
     })
+
+    sidebar.appendChild(grupo)
   })
 
   if (!combos.length) {
@@ -1551,6 +2271,15 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
       }
     })
 
+    if (
+      materiasOrden[normativa] &&
+      typeof materiasOrden[normativa][nombreActual] === "number"
+    ) {
+      materiasOrden[normativa][nuevo] = materiasOrden[normativa][nombreActual]
+      delete materiasOrden[normativa][nombreActual]
+      guardarOrdenMaterias()
+    }
+
     nombreActual = nuevo
     materiaSeleccionada = nuevo
     guardarLocal()
@@ -1605,7 +2334,7 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
   const borrarMat = document.createElement("button")
   borrarMat.className = "btn-small"
   borrarMat.textContent = "Borrar materia"
-  borrarMat.onclick = () => borrarMateria(nombreActual)
+  borrarMat.onclick = () => borrarMateria(nombreActual, normativa)
 
   controles.appendChild(colorInput)
   controles.appendChild(borrarMat)
@@ -1614,7 +2343,9 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
   wrap.appendChild(controles)
   contenedor.appendChild(wrap)
 
-  items.sort((a, b) => a.numero - b.numero).forEach(a => {
+  const listaOrdenada = [...items].sort((a, b) => valorOrdenArticulo(a) - valorOrdenArticulo(b))
+
+  listaOrdenada.forEach(a => {
     const box = document.createElement("div")
     box.className = "articulo"
     box.style.borderLeftColor = a.color
@@ -1779,6 +2510,8 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
       }
     })
 
+    activarArrastreArticulo(box, normativa, materia)
+
     contenedor.appendChild(box)
   })
 }
@@ -1793,14 +2526,22 @@ function borrarArticulo(id) {
   ordenarYMostrar()
 }
 
-function borrarMateria(nombre) {
-  articulos = articulos.filter(a => a.materia !== nombre)
+function borrarMateria(nombre, normativa = null) {
+  articulos = articulos.filter(a => {
+    if (normativa) return a.materia !== nombre || a.normativa !== normativa
+    return a.materia !== nombre
+  })
+  if (normativa && materiasOrden[normativa]) {
+    delete materiasOrden[normativa][nombre]
+    guardarOrdenMaterias()
+  }
   guardarLocal()
   normativaSeleccionada = null
   materiaSeleccionada = null
   ordenarYMostrar()
 }
 
+renderDocumentos()
 ordenarYMostrar()
 </script>
 </body>
