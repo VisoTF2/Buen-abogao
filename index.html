@@ -56,17 +56,28 @@
       background: var(--bg);
       color: var(--text);
       transition: 0.25s ease;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    html {
+      width: 100%;
+      overflow-x: hidden;
     }
 
     .app-root {
       min-height: 100vh;
       touch-action: pan-y;
+      overflow-x: hidden;
     }
 
     .zoom-canvas {
       transform: scale(var(--zoom-scale));
       transform-origin: top center;
       transition: transform 0.18s ease;
+      display: flex;
+      justify-content: center;
+      width: 100%;
     }
 
     header {
