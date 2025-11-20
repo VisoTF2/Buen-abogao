@@ -490,7 +490,7 @@
       padding: 10px 12px;
       margin-bottom: 8px;
       border-radius: 8px;
-      cursor: pointer;
+      cursor: grab;
       font-weight: 600;
       border-left: 6px solid var(--accent);
       background: var(--article-bg);
@@ -506,6 +506,20 @@
     .sidebarItem.activa {
       background: var(--accent);
       color: white;
+    }
+
+    .sidebarItem:active {
+      cursor: grabbing;
+    }
+
+    .sidebarItem.arrastrando {
+      opacity: 0.9;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.14);
+    }
+
+    .sidebarGroupList {
+      display: flex;
+      flex-direction: column;
     }
 
     .mainPanel {
@@ -860,6 +874,7 @@
 <script>
 let codigoActual = {}
 let articulos = JSON.parse(localStorage.getItem("articulosGuardados") || "[]")
+let materiasOrden = JSON.parse(localStorage.getItem("materiasOrden") || "{}")
 let normativaSeleccionada = null
 let materiaSeleccionada = null
 let resultadosBusqueda = []
@@ -881,11 +896,54 @@ let zoomActual = 1
 let pinchStartDistance = null
 let pinchStartZoom = 1
 let articuloArrastradoId = null
+let materiaArrastrada = null
 
 function valorOrdenArticulo(a) {
   if (typeof a.orden === "number") return a.orden
   if (typeof a.numero === "number") return a.numero
   return 0
+}
+
+function guardarOrdenMaterias() {
+  localStorage.setItem("materiasOrden", JSON.stringify(materiasOrden))
+}
+
+function siguienteOrdenMateria(normativa) {
+  const ordenes = materiasOrden[normativa]
+    ? Object.values(materiasOrden[normativa]).filter(n => typeof n === "number")
+    : []
+
+  if (!ordenes.length) return 1
+  return Math.max(...ordenes) + 1
+}
+
+function asegurarOrdenMateria(normativa, materia) {
+  if (!materiasOrden[normativa]) materiasOrden[normativa] = {}
+  if (typeof materiasOrden[normativa][materia] !== "number") {
+    materiasOrden[normativa][materia] = siguienteOrdenMateria(normativa)
+    guardarOrdenMaterias()
+  }
+}
+
+function ordenarMaterias(nombres, normativa) {
+  nombres.forEach(nombre => asegurarOrdenMateria(normativa, nombre))
+  return [...nombres].sort(
+    (a, b) => (materiasOrden[normativa][a] ?? 0) - (materiasOrden[normativa][b] ?? 0)
+  )
+}
+
+function aplicarOrdenMateriasDesdeDOM(lista, normativa) {
+  if (!lista) return
+  const items = Array.from(lista.querySelectorAll(".sidebarItem"))
+  if (!items.length) return
+
+  if (!materiasOrden[normativa]) materiasOrden[normativa] = {}
+
+  items.forEach((item, index) => {
+    materiasOrden[normativa][item.dataset.materia] = index + 1
+  })
+
+  guardarOrdenMaterias()
 }
 
 function siguienteOrdenPara(normativa, materia) {
@@ -966,6 +1024,60 @@ function aplicarOrdenDesdeDOM(contenedorLista, normativa, materia) {
 
   guardarLocal()
   ordenarYMostrar()
+}
+
+function activarArrastreMateria(item, lista, normativa) {
+  item.draggable = true
+
+  item.addEventListener("dragstart", e => {
+    materiaArrastrada = item.dataset.materia
+    item.classList.add("arrastrando")
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = "move"
+      e.dataTransfer.setData("text/plain", materiaArrastrada)
+    }
+  })
+
+  item.addEventListener("dragover", e => {
+    e.preventDefault()
+    if (e.dataTransfer) e.dataTransfer.dropEffect = "move"
+    if (!materiaArrastrada || item.dataset.materia === materiaArrastrada) return
+
+    const rect = item.getBoundingClientRect()
+    const margenCambio = Math.max(10, rect.height * 0.35)
+    const limiteArriba = rect.top + margenCambio
+    const limiteAbajo = rect.bottom - margenCambio
+    const posicionY = e.clientY
+
+    let moverDespues = null
+    if (posicionY <= limiteArriba) {
+      moverDespues = false
+    } else if (posicionY >= limiteAbajo) {
+      moverDespues = true
+    } else {
+      return
+    }
+
+    const arrastrandoElem = lista.querySelector(
+      `.sidebarItem[data-materia="${materiaArrastrada}"][data-normativa="${normativa}"]`
+    )
+
+    if (!arrastrandoElem || arrastrandoElem === item) return
+
+    if (moverDespues) {
+      lista.insertBefore(arrastrandoElem, item.nextSibling)
+    } else {
+      lista.insertBefore(arrastrandoElem, item)
+    }
+  })
+
+  item.addEventListener("drop", e => e.preventDefault())
+
+  item.addEventListener("dragend", () => {
+    item.classList.remove("arrastrando")
+    aplicarOrdenMateriasDesdeDOM(lista, normativa)
+    materiaArrastrada = null
+  })
 }
 
 function activarArrastreArticulo(box, normativa, materia) {
@@ -1516,6 +1628,8 @@ function agregarArticulo() {
 
   const norm = document.getElementById("normativa").value
 
+  asegurarOrdenMateria(norm, mat)
+
   articulos.push({
     id: Date.now(),
     numero: num,
@@ -1561,15 +1675,24 @@ function ordenarYMostrar() {
   const ordenNormativas = ["civil", "penal"]
   ordenNormativas.forEach(norm => {
     const materiasObj = agrupado[norm]
-    const nombresMaterias = Object.keys(materiasObj || {}).sort()
+    const nombresMaterias = Object.keys(materiasObj || {})
     if (!nombresMaterias.length) return
+
+    const grupo = document.createElement("div")
+    grupo.className = "sidebarGroup"
 
     const tituloGrupo = document.createElement("div")
     tituloGrupo.className = "sidebarGroupTitle"
     tituloGrupo.textContent = norm === "civil" ? "Código Civil" : "Código Penal"
-    sidebar.appendChild(tituloGrupo)
+    grupo.appendChild(tituloGrupo)
 
-    nombresMaterias.forEach(m => {
+    const listaMaterias = document.createElement("div")
+    listaMaterias.className = "sidebarGroupList"
+    grupo.appendChild(listaMaterias)
+
+    const nombresOrdenados = ordenarMaterias(nombresMaterias, norm)
+
+    nombresOrdenados.forEach(m => {
       const item = document.createElement("div")
       item.className = "sidebarItem"
       item.textContent = m
@@ -1592,9 +1715,13 @@ function ordenarYMostrar() {
         tieneSeleccionValida = true
       }
 
-      sidebar.appendChild(item)
+      activarArrastreMateria(item, listaMaterias, norm)
+
+      listaMaterias.appendChild(item)
       combos.push({ normativa: norm, materia: m })
     })
+
+    sidebar.appendChild(grupo)
   })
 
   if (!combos.length) {
@@ -1669,6 +1796,15 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
       }
     })
 
+    if (
+      materiasOrden[normativa] &&
+      typeof materiasOrden[normativa][nombreActual] === "number"
+    ) {
+      materiasOrden[normativa][nuevo] = materiasOrden[normativa][nombreActual]
+      delete materiasOrden[normativa][nombreActual]
+      guardarOrdenMaterias()
+    }
+
     nombreActual = nuevo
     materiaSeleccionada = nuevo
     guardarLocal()
@@ -1723,7 +1859,7 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
   const borrarMat = document.createElement("button")
   borrarMat.className = "btn-small"
   borrarMat.textContent = "Borrar materia"
-  borrarMat.onclick = () => borrarMateria(nombreActual)
+  borrarMat.onclick = () => borrarMateria(nombreActual, normativa)
 
   controles.appendChild(colorInput)
   controles.appendChild(borrarMat)
@@ -1915,8 +2051,15 @@ function borrarArticulo(id) {
   ordenarYMostrar()
 }
 
-function borrarMateria(nombre) {
-  articulos = articulos.filter(a => a.materia !== nombre)
+function borrarMateria(nombre, normativa = null) {
+  articulos = articulos.filter(a => {
+    if (normativa) return a.materia !== nombre || a.normativa !== normativa
+    return a.materia !== nombre
+  })
+  if (normativa && materiasOrden[normativa]) {
+    delete materiasOrden[normativa][nombre]
+    guardarOrdenMaterias()
+  }
   guardarLocal()
   normativaSeleccionada = null
   materiaSeleccionada = null
