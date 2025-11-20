@@ -1013,6 +1013,15 @@ function activarArrastreArticulo(box, normativa, materia) {
   box.draggable = true
 
   box.addEventListener("dragstart", e => {
+    if (esCampoEditable(e.target)) {
+      box.draggable = false
+      setTimeout(() => {
+        box.draggable = true
+      }, 0)
+      e.preventDefault()
+      return
+    }
+
     articuloArrastradoId = box.dataset.id
     box.classList.add("arrastrando")
     if (e.dataTransfer) {
