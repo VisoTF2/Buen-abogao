@@ -26,6 +26,7 @@
       --search-highlight-mark: #dbeafe;
       --search-highlight-mark-active: #bfdbfe;
       --zoom-scale: 1;
+      --panel-min-height: clamp(560px, 78vh, 860px);
     }
 
     body.oscuro {
@@ -62,6 +63,13 @@
     .app-root {
       min-height: 100vh;
       touch-action: pan-y;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: calc(100vh - 80px);
     }
 
     .zoom-canvas {
@@ -258,12 +266,19 @@
     .btn-note-delete:hover { background: #4b5563; }
 
     .documentos-panel {
-      margin: 26px 0 30px;
-      padding: 18px 20px;
+      margin: 8px 0 0;
+      padding: 14px 16px 22px;
       border: 1px solid var(--border);
       border-radius: 14px;
       background: linear-gradient(135deg, rgba(30,58,138,0.06), rgba(30,58,138,0.01));
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 480px;
+      min-height: var(--panel-min-height);
+      max-height: var(--panel-min-height);
+      align-self: stretch;
+      overflow: hidden;
     }
 
     .documentos-head {
@@ -346,6 +361,9 @@
       gap: 16px;
       margin-top: 14px;
       align-items: stretch;
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
     }
 
     .documentos-lista {
@@ -439,11 +457,13 @@
       border-radius: 12px;
       background: var(--card);
       min-height: 260px;
+      max-height: 100%;
       padding: 12px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
       display: flex;
       flex-direction: column;
       gap: 10px;
+      overflow: hidden;
     }
 
     .documentos-preview h4 {
@@ -465,7 +485,7 @@
 
     .documento-iframe {
       width: 100%;
-      height: 420px;
+      height: clamp(320px, 45vh, 420px);
       border: 1px solid var(--border);
       border-radius: 10px;
       background: var(--article-bg);
@@ -480,7 +500,7 @@
       border-radius: 10px;
       border: 1px solid var(--border);
       background: var(--article-bg);
-      max-height: 420px;
+      max-height: clamp(320px, 45vh, 440px);
       overflow-y: auto;
     }
 
@@ -500,8 +520,8 @@
 
       .documento-iframe,
       .documento-texto {
-        height: 320px;
-        max-height: 320px;
+        height: clamp(280px, 40vh, 360px);
+        max-height: 360px;
       }
     }
 
@@ -720,19 +740,28 @@
 
 .layout {
   display: flex;
-  align-items: flex-start;
-  gap: 20px;
+  align-items: stretch;
+  gap: 18px;
+  height: 100%;
+  min-height: var(--panel-min-height);
 }
 
 .sidebarMaterias {
-  width: 260px;
+  width: 240px;
   background: var(--card);
-  padding: 14px;
+  padding: 14px 14px 18px;
   border-radius: 14px;
   box-shadow: 0 6px 16px rgba(0,0,0,0.1);
   overflow-y: auto;
   border: 1px solid var(--border);
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  min-height: var(--panel-min-height);
+  max-height: var(--panel-min-height);
+  height: 100%;
+  overflow: auto;
 }
 
 .sidebarGroupTitle {
@@ -785,7 +814,11 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
+      align-self: stretch;
+      min-height: 100%;
+      height: 100%;
+      min-height: 0;
     }
 
     .form-articulo {
@@ -808,6 +841,7 @@
 }
     .contenidoArticulos {
       margin-top: 10px;
+      flex: 1 0 auto;
     }
 
     .materia-wrap {
@@ -976,7 +1010,7 @@
       font-weight: bold;
       text-align: center;
     }
-/* Fuerza a que sidebar y el panel principal mantengan proporción */
+/* Evita que la barra de materias se estire más allá de su contenido */
 .layout {
   align-items: stretch;
 }
@@ -984,7 +1018,7 @@
 /* Sidebar: tamaño fijo en grandes pantallas */
 .sidebarMaterias {
   flex-shrink: 0;
-  width: 260px;
+  width: 240px;
 }
 
 /* Panel principal ocupa todo el espacio restante */
