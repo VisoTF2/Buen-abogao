@@ -216,14 +216,25 @@
 
     .btn-primary:hover { background: var(--accent-light); }
 
+    .btn-small,
+    .btn-note,
+    .btn-note-delete {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 150px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+
     .btn-small {
       background: #dc2626;
       color: white;
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      transition: 0.2s;
     }
 
     .btn-small:hover { background: #b91c1c; }
@@ -231,27 +242,20 @@
     .btn-note {
       background: var(--accent);
       color: white;
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
       margin-top: 10px;
       margin-right: 10px;
-      font-size: 13px;
-      transition: 0.2s;
     }
+
+    .btn-note:hover { background: var(--accent-light); }
 
     .btn-note-delete {
       background: #6b7280;
       color: white;
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
       margin-top: 10px;
       margin-right: 10px;
-      font-size: 13px;
     }
+
+    .btn-note-delete:hover { background: #4b5563; }
 
     .buscador-flotante {
       position: absolute;
