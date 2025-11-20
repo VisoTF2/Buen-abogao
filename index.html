@@ -65,14 +65,16 @@
       transition: 0.25s ease;
       width: 100%;
       min-height: 100vh;
-      overflow-x: hidden;
-      overflow-y: auto;
+      overflow: hidden;
     }
 
     .app-root {
       min-height: 100vh;
       touch-action: pan-y;
       overflow-x: hidden;
+      overflow-y: auto;
+      scrollbar-gutter: stable both-edges;
+      overscroll-behavior: contain;
     }
 
     .zoom-canvas {
