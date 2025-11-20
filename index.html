@@ -257,6 +257,225 @@
 
     .btn-note-delete:hover { background: #4b5563; }
 
+    .documentos-panel {
+      margin: 18px 0 28px;
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(30,58,138,0.06), rgba(30,58,138,0.01));
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .documentos-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .documentos-title {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .documentos-title h3 {
+      margin: 0;
+      font-size: 19px;
+      color: var(--accent);
+    }
+
+    .documentos-title span {
+      font-size: 14px;
+      color: #4b5563;
+    }
+
+    body.oscuro .documentos-title span { color: #e5e7eb; }
+
+    .documentos-acciones {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .documentos-btn {
+      background: var(--accent);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s ease, transform 0.12s ease;
+    }
+
+    .documentos-btn:hover { background: var(--accent-light); }
+
+    .documentos-btn:active { transform: translateY(1px); }
+
+    .documentos-btn.arrastrando {
+      background: var(--accent-light);
+      box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+    }
+
+    .documentos-hint {
+      font-size: 13px;
+      color: #4b5563;
+      padding: 10px 12px;
+      background: rgba(30, 58, 138, 0.06);
+      border: 1px solid rgba(30, 58, 138, 0.12);
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    body.oscuro .documentos-hint {
+      color: #e5e7eb;
+      background: rgba(96, 165, 250, 0.12);
+      border-color: rgba(96, 165, 250, 0.22);
+    }
+
+    .documentos-body {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .documentos-lista {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 160px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .documento-item {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--article-bg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .documento-item strong {
+      font-size: 14px;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .documento-item small {
+      color: #6b7280;
+    }
+
+    body.oscuro .documento-item small { color: #d1d5db; }
+
+    .documento-ver {
+      background: white;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease;
+      flex-shrink: 0;
+    }
+
+    .documento-ver:hover {
+      background: rgba(30, 58, 138, 0.08);
+      border-color: var(--accent-light);
+    }
+
+    .documento-ver:active { transform: translateY(1px); }
+
+    body.oscuro .documento-ver { background: #111827; }
+
+    .documentos-preview {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      min-height: 260px;
+      padding: 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .documentos-preview h4 {
+      margin: 0;
+      font-size: 15px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .documentos-vacio {
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    body.oscuro .documentos-vacio { color: #d1d5db; }
+
+    .documento-iframe {
+      width: 100%;
+      height: 420px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--article-bg);
+    }
+
+    .documento-texto {
+      white-space: pre-wrap;
+      line-height: 1.6;
+      font-size: 14px;
+      color: var(--text);
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--article-bg);
+      max-height: 420px;
+      overflow-y: auto;
+    }
+
+    .documento-alerta {
+      padding: 12px;
+      border-radius: 10px;
+      background: rgba(220, 38, 38, 0.08);
+      border: 1px solid rgba(220, 38, 38, 0.18);
+      color: #991b1b;
+      font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+      .documentos-body {
+        grid-template-columns: 1fr;
+      }
+
+      .documento-iframe,
+      .documento-texto {
+        height: 320px;
+        max-height: 320px;
+      }
+    }
+
     .buscador-flotante {
       position: relative;
       display: none;
@@ -816,6 +1035,37 @@
       <div class="sidebarMaterias" id="sidebarMaterias"></div>
 
       <div class="mainPanel">
+        <div class="documentos-panel">
+          <div class="documentos-head">
+            <div class="documentos-title">
+              <h3>Subir documentos</h3>
+              <span>Adjunta archivos PDF o Word y visualízalos sin salir de la página.</span>
+            </div>
+            <div class="documentos-acciones">
+              <input
+                type="file"
+                id="documentoInput"
+                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                hidden
+              >
+              <button class="documentos-btn" onclick="document.getElementById('documentoInput').click()" type="button">
+                📄 Seleccionar archivo
+              </button>
+              <div class="documentos-hint">Puedes arrastrar el archivo sobre el botón o tocar para elegir.</div>
+            </div>
+          </div>
+
+          <div class="documentos-body">
+            <div class="documentos-lista" id="listaDocumentos">
+              <div class="documentos-vacio">Aún no hay documentos cargados.</div>
+            </div>
+            <div class="documentos-preview" id="visorDocumentos">
+              <h4>Vista previa</h4>
+              <div class="documentos-vacio">Selecciona un documento para verlo aquí mismo.</div>
+            </div>
+          </div>
+        </div>
+
         <div class="form-articulo" style="position: relative;">
           <h2>Agregar Artículo</h2>
           <button
@@ -882,6 +1132,7 @@
 
   </div>
 
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
 let codigoActual = {}
 let articulos = JSON.parse(localStorage.getItem("articulosGuardados") || "[]")
@@ -891,11 +1142,15 @@ let materiaSeleccionada = null
 let resultadosBusqueda = []
 let indiceResultado = 0
 let ultimoTerminoBusqueda = ""
+let documentosCargados = []
 const elementosMarcados = new Set()
 const buscadorInput = document.getElementById("buscadorInput")
 const menuContextual = document.getElementById("menuContextual")
 let objetivoContextual = null
 const appRoot = document.getElementById("appRoot")
+const documentoInput = document.getElementById("documentoInput")
+const listaDocumentos = document.getElementById("listaDocumentos")
+const visorDocumentos = document.getElementById("visorDocumentos")
 
 const ZOOM_STEP = 0.05
 const MIN_ZOOM = 1.00
@@ -905,6 +1160,204 @@ let pinchStartDistance = null
 let pinchStartZoom = 1
 let articuloArrastradoId = null
 let materiaArrastrada = null
+
+documentoInput?.addEventListener("change", e => {
+  const archivo = e.target.files?.[0]
+  if (archivo) {
+    procesarDocumento(archivo)
+  }
+  e.target.value = ""
+})
+
+const botonDocumentos = document.querySelector(".documentos-btn")
+
+if (botonDocumentos) {
+  ;["dragenter", "dragover"].forEach(evento => {
+    botonDocumentos.addEventListener(evento, e => {
+      e.preventDefault()
+      e.stopPropagation()
+      botonDocumentos.classList.add("arrastrando")
+    })
+  })
+
+  ;["dragleave", "drop"].forEach(evento => {
+    botonDocumentos.addEventListener(evento, e => {
+      e.preventDefault()
+      e.stopPropagation()
+      botonDocumentos.classList.remove("arrastrando")
+    })
+  })
+
+  botonDocumentos.addEventListener("drop", e => {
+    const archivo = e.dataTransfer?.files?.[0]
+    if (archivo) procesarDocumento(archivo)
+  })
+}
+
+function obtenerExtension(nombre = "") {
+  const partes = nombre.split(".")
+  return partes.length > 1 ? partes.pop().toLowerCase() : ""
+}
+
+async function procesarDocumento(archivo) {
+  const extension = obtenerExtension(archivo.name)
+  const id = `${Date.now()}-${Math.random().toString(16).slice(2)}`
+  const base = {
+    id,
+    nombre: archivo.name,
+    extension,
+    url: "",
+    texto: "",
+    mensaje: ""
+  }
+
+  try {
+    if (extension === "pdf") {
+      base.url = URL.createObjectURL(archivo)
+    } else if (extension === "docx") {
+      base.texto = await extraerTextoDocx(archivo)
+    } else if (extension === "doc") {
+      base.mensaje = "Vista previa limitada: descárgalo para abrirlo."
+      base.url = URL.createObjectURL(archivo)
+    } else {
+      base.mensaje = "Formato no soportado para vista previa."
+      base.url = URL.createObjectURL(archivo)
+    }
+
+    documentosCargados = [base, ...documentosCargados.filter(d => d.nombre !== base.nombre)]
+    renderDocumentos()
+    mostrarDocumento(base.id)
+  } catch (err) {
+    console.error("No se pudo procesar el documento", err)
+    base.mensaje = "No se pudo leer el documento."
+    documentosCargados = [base, ...documentosCargados]
+    renderDocumentos()
+    mostrarDocumento(base.id)
+  }
+}
+
+async function extraerTextoDocx(archivo) {
+  if (typeof JSZip === "undefined") {
+    throw new Error("JSZip no está disponible para leer .docx")
+  }
+
+  const buffer = await archivo.arrayBuffer()
+  const zip = await JSZip.loadAsync(buffer)
+  const documento = zip.file("word/document.xml")
+
+  if (!documento) {
+    throw new Error("El archivo no contiene texto legible")
+  }
+
+  const xml = await documento.async("text")
+  const parser = new DOMParser()
+  const dom = parser.parseFromString(xml, "application/xml")
+  const parrafos = Array.from(dom.getElementsByTagName("w:p"))
+
+  const texto = parrafos
+    .map(p => {
+      const runs = p.getElementsByTagName("w:t")
+      let acumulado = ""
+      for (let i = 0; i < runs.length; i++) {
+        acumulado += runs[i].textContent
+      }
+      return acumulado.trim()
+    })
+    .filter(Boolean)
+    .join("\n\n")
+
+  return texto || "No se encontró texto en el documento"
+}
+
+function renderDocumentos() {
+  if (!listaDocumentos) return
+
+  listaDocumentos.innerHTML = ""
+
+  if (!documentosCargados.length) {
+    const vacio = document.createElement("div")
+    vacio.className = "documentos-vacio"
+    vacio.textContent = "Aún no hay documentos cargados."
+    listaDocumentos.appendChild(vacio)
+    return
+  }
+
+  documentosCargados.forEach(doc => {
+    const item = document.createElement("div")
+    item.className = "documento-item"
+
+    const info = document.createElement("div")
+    info.style.flex = "1"
+
+    const nombre = document.createElement("strong")
+    nombre.textContent = doc.nombre
+
+    const tipo = document.createElement("div")
+    tipo.innerHTML = `<small>${doc.extension ? doc.extension.toUpperCase() : "Archivo"}</small>`
+
+    info.appendChild(nombre)
+    info.appendChild(tipo)
+
+    const ver = document.createElement("button")
+    ver.className = "documento-ver"
+    ver.type = "button"
+    ver.textContent = "Ver"
+    ver.addEventListener("click", () => mostrarDocumento(doc.id))
+
+    item.appendChild(info)
+    item.appendChild(ver)
+    listaDocumentos.appendChild(item)
+  })
+}
+
+function mostrarDocumento(id) {
+  if (!visorDocumentos) return
+
+  const doc = documentosCargados.find(d => d.id === id)
+  visorDocumentos.innerHTML = ""
+
+  const titulo = document.createElement("h4")
+  titulo.textContent = doc ? doc.nombre : "Vista previa"
+  visorDocumentos.appendChild(titulo)
+
+  if (!doc) {
+    const vacio = document.createElement("div")
+    vacio.className = "documentos-vacio"
+    vacio.textContent = "Selecciona un documento para verlo aquí."
+    visorDocumentos.appendChild(vacio)
+    return
+  }
+
+  if (doc.extension === "pdf" && doc.url) {
+    const iframe = document.createElement("iframe")
+    iframe.className = "documento-iframe"
+    iframe.src = doc.url
+    iframe.title = `Vista previa de ${doc.nombre}`
+    visorDocumentos.appendChild(iframe)
+  } else if (doc.extension === "docx" && doc.texto) {
+    const texto = document.createElement("div")
+    texto.className = "documento-texto"
+    texto.textContent = doc.texto
+    visorDocumentos.appendChild(texto)
+  } else {
+    const alerta = document.createElement("div")
+    alerta.className = "documento-alerta"
+    alerta.textContent = doc.mensaje || "No se pudo generar vista previa."
+    visorDocumentos.appendChild(alerta)
+  }
+
+  if (doc.url) {
+    const descarga = document.createElement("a")
+    descarga.href = doc.url
+    descarga.download = doc.nombre
+    descarga.textContent = "Descargar original"
+    descarga.style.fontWeight = "700"
+    descarga.style.color = "var(--accent)"
+    descarga.style.textDecoration = "none"
+    descarga.style.marginTop = "6px"
+    visorDocumentos.appendChild(descarga)
+  }
+}
 
 function valorOrdenArticulo(a) {
   if (typeof a.orden === "number") return a.orden
@@ -2088,6 +2541,7 @@ function borrarMateria(nombre, normativa = null) {
   ordenarYMostrar()
 }
 
+renderDocumentos()
 ordenarYMostrar()
 </script>
 </body>
