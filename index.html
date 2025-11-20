@@ -249,9 +249,9 @@
     }
 
     .buscador-flotante {
-      position: fixed;
-      top: 18px;
-      right: 22px;
+      position: absolute;
+      top: 66px;
+      right: 18px;
       display: none;
       align-items: center;
       gap: 10px;
@@ -260,7 +260,10 @@
       border: 1px solid var(--border);
       border-radius: 10px;
       box-shadow: 0 6px 18px rgba(0,0,0,0.18);
-      z-index: 50;
+      z-index: 20;
+      width: min(520px, calc(100% - 48px));
+      justify-content: space-between;
+      flex-wrap: wrap;
     }
 
     .buscador-flotante.activo {
@@ -268,7 +271,8 @@
     }
 
     .buscador-input {
-      min-width: 280px;
+      min-width: 220px;
+      flex: 1 1 220px;
       padding: 10px 12px;
       border-radius: 8px;
       border: 2px solid var(--border);
@@ -280,6 +284,7 @@
     .buscador-info {
       font-size: 13px;
       color: #6b7280;
+      white-space: nowrap;
     }
 
     .buscador-cerrar {
@@ -717,6 +722,12 @@
     width: 100% !important;
   }
 
+  .buscador-flotante {
+    position: static;
+    width: 100%;
+    margin-top: 10px;
+  }
+
   .form-row {
     grid-template-columns: 1fr !important;
   }
@@ -740,17 +751,6 @@
   </header>
 
   <div class="zoom-canvas">
-
-  <div class="buscador-flotante" id="buscadorFlotante">
-    <input
-      type="text"
-      id="buscadorInput"
-      class="buscador-input"
-      placeholder="Buscar en materias y artículos"
-    >
-    <div class="buscador-info" id="buscadorInfo">Usa Enter para saltar al siguiente</div>
-    <button class="buscador-cerrar" onclick="cerrarBuscador()" aria-label="Cerrar buscador">✕</button>
-  </div>
 
   <div class="menu-contextual" id="menuContextual" role="menu">
     <h4>Acciones</h4>
@@ -792,6 +792,17 @@
             </svg>
             <span>Buscar</span>
           </button>
+
+          <div class="buscador-flotante" id="buscadorFlotante">
+            <input
+              type="text"
+              id="buscadorInput"
+              class="buscador-input"
+              placeholder="Buscar en materias y artículos"
+            >
+            <div class="buscador-info" id="buscadorInfo">Usa Enter para saltar al siguiente</div>
+            <button class="buscador-cerrar" onclick="cerrarBuscador()" aria-label="Cerrar buscador">✕</button>
+          </div>
 
           <div class="form-row">
             <div>
