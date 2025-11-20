@@ -302,13 +302,21 @@
     .buscador-input {
       min-width: 220px;
       flex: 1 1 auto;
-      padding: 0;
+      padding: 4px 0 4px 6px;
       border-radius: 8px;
       border: none;
       background: transparent;
       color: var(--text);
       font-size: 15px;
       caret-color: var(--accent);
+    }
+
+    .buscador-input::placeholder {
+      color: rgba(17, 24, 39, 0.55);
+    }
+
+    body.oscuro .buscador-input::placeholder {
+      color: rgba(229, 231, 235, 0.7);
     }
 
     .buscador-input:focus {
