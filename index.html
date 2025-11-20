@@ -1700,8 +1700,6 @@ function ordenarYMostrar() {
       item.dataset.materia = m
       item.style.borderLeftColor = obtenerColorMateria(m)
 
-      item.addEventListener("mousedown", e => e.preventDefault())
-
       item.addEventListener("click", () => {
         normativaSeleccionada = norm
         materiaSeleccionada = m
