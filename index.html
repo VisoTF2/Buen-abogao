@@ -14,6 +14,18 @@
       --accent: #1e3a8a;
       --accent-light: #3b5ccc;
       --article-bg: #f8fafc;
+      --focus-contrast: #000;
+      --focus-surface: rgba(0, 0, 0, 0.02);
+      --materia-underline: #000;
+      --selection-bg: #dbeafe;
+      --selection-text: #0f172a;
+      --search-highlight-outline: #93c5fd;
+      --search-highlight-glow: rgba(147, 197, 253, 0.35);
+      --search-highlight-outline-active: #60a5fa;
+      --search-highlight-glow-active: rgba(96, 165, 250, 0.45);
+      --search-highlight-mark: #dbeafe;
+      --search-highlight-mark-active: #bfdbfe;
+      --zoom-scale: 1;
     }
 
     body.oscuro {
@@ -24,6 +36,17 @@
       --accent: #3b82f6;
       --accent-light: #60a5fa;
       --article-bg: #1c2128;
+      --focus-contrast: #fff;
+      --focus-surface: rgba(255, 255, 255, 0.08);
+      --materia-underline: #e6edf3;
+      --selection-bg: rgba(96, 165, 250, 0.32);
+      --selection-text: #e6edf3;
+      --search-highlight-outline: #60a5fa;
+      --search-highlight-glow: rgba(96, 165, 250, 0.35);
+      --search-highlight-outline-active: #93c5fd;
+      --search-highlight-glow-active: rgba(147, 197, 253, 0.45);
+      --search-highlight-mark: rgba(96, 165, 250, 0.32);
+      --search-highlight-mark-active: rgba(96, 165, 250, 0.5);
     }
 
     body {
@@ -33,6 +56,17 @@
       background: var(--bg);
       color: var(--text);
       transition: 0.25s ease;
+    }
+
+    .app-root {
+      min-height: 100vh;
+      touch-action: pan-y;
+    }
+
+    .zoom-canvas {
+      transform: scale(var(--zoom-scale));
+      transform-origin: top center;
+      transition: transform 0.18s ease;
     }
 
     header {
@@ -102,13 +136,13 @@
     textarea:focus,
     .articulo-contenido:focus {
       outline: none !important;
-      border-color: #000 !important;
+      border-color: var(--focus-contrast) !important;
       box-shadow: none !important;
     }
 
     select:focus {
       outline: none !important;
-      border-color: #000 !important;
+      border-color: var(--focus-contrast) !important;
       box-shadow: none !important;
     }
 
@@ -120,11 +154,11 @@
     .materia-title {
       font-size: 21px;
       font-weight: bold;
-      border-bottom: 2px solid #000;
+      border-bottom: 2px solid var(--materia-underline);
       padding-bottom: 6px;
       flex: 1;
       cursor: text;
-      caret-color: #000 !important;
+      caret-color: var(--focus-contrast) !important;
     }
 
     body.oscuro .nota-box {
@@ -215,75 +249,139 @@
     }
 
     .buscador-flotante {
-      position: fixed;
-      top: 18px;
-      right: 22px;
+      position: absolute;
+      top: 64px;
+      right: 18px;
       display: none;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       padding: 10px 12px;
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
-      z-index: 50;
+      border-radius: 14px;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+      z-index: 20;
+      width: min(420px, calc(100% - 48px));
     }
 
     .buscador-flotante.activo {
       display: flex;
     }
 
-    .buscador-input {
-      min-width: 280px;
+    .buscador-campos {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      min-width: 240px;
+      justify-content: center;
+    }
+
+    .buscador-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       padding: 10px 12px;
-      border-radius: 8px;
-      border: 2px solid var(--border);
-      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--article-bg);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .buscador-input-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--accent);
+      opacity: 0.9;
+      flex-shrink: 0;
+    }
+
+    .buscador-input {
+      border: none;
+      background: transparent;
       color: var(--text);
       font-size: 15px;
+      padding: 0;
+      width: 100%;
+      outline: none;
+      line-height: 1.4;
+    }
+
+    .buscador-input::placeholder {
+      color: rgba(17, 24, 39, 0.55);
+    }
+
+    body.oscuro .buscador-input::placeholder {
+      color: rgba(230, 237, 243, 0.65);
     }
 
     .buscador-info {
-      font-size: 13px;
-      color: #6b7280;
+      font-size: 12px;
+      color: rgba(17, 24, 39, 0.6);
+      line-height: 1.3;
+      white-space: nowrap;
+      padding-left: 2px;
+    }
+
+    body.oscuro .buscador-info {
+      color: rgba(230, 237, 243, 0.7);
     }
 
     .buscador-cerrar {
-      background: none;
-      border: none;
+      background: var(--article-bg);
+      border: 1px solid var(--border);
       color: var(--text);
       cursor: pointer;
-      font-size: 18px;
-      padding: 4px 6px;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 0;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      line-height: 1;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      transition: background 0.15s ease, transform 0.1s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .buscador-cerrar:hover {
+      background: var(--selection-bg);
+    }
+
+    .buscador-cerrar:active {
+      transform: translateY(1px);
     }
 
     .resaltado-busqueda {
-      outline: 2px solid #facc15;
-      box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.35);
+      outline: 2px solid var(--search-highlight-outline);
+      box-shadow: 0 0 0 4px var(--search-highlight-glow);
     }
 
     .resaltado-busqueda-activo {
-      outline: 3px solid #eab308;
-      box-shadow: 0 0 0 5px rgba(234, 179, 8, 0.45);
+      outline: 3px solid var(--search-highlight-outline-active);
+      box-shadow: 0 0 0 5px var(--search-highlight-glow-active);
     }
 
     .resaltado-busqueda-marca {
-      background: rgba(254, 240, 138, 0.9);
+      background: var(--search-highlight-mark);
       color: inherit;
       padding: 0;
       border-radius: 2px;
-      box-shadow: none;
+      box-shadow: 0 0 0 1px var(--search-highlight-outline);
       letter-spacing: normal;
       white-space: pre-wrap;
     }
 
     .resaltado-busqueda-marca-activa {
-      background: rgba(253, 224, 71, 0.95);
-      box-shadow: 0 0 0 1px rgba(234, 179, 8, 0.65);
+      background: var(--search-highlight-mark-active);
+      color: inherit;
+      box-shadow: 0 0 0 1px var(--search-highlight-outline-active);
     }
 
     ::selection {
-      background: #fef08a;
+      background: var(--selection-bg);
       color: inherit;
     }
 
@@ -347,7 +445,66 @@
     .nota-box,
     .articulo-titulo-texto {
       cursor: text;
-      caret-color: #000 !important;
+      caret-color: var(--focus-contrast) !important;
+    }
+
+    .zoom-panel {
+      position: fixed;
+      right: 22px;
+      bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      z-index: 60;
+      font-weight: 600;
+    }
+
+    .zoom-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--accent);
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .zoom-btn:hover {
+      background: var(--accent-light);
+    }
+
+    .zoom-btn:active {
+      transform: translateY(1px);
+    }
+
+    .zoom-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+      background: var(--border);
+      color: var(--text);
+    }
+
+    .zoom-value {
+      min-width: 58px;
+      text-align: center;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: var(--article-bg);
+      border: 1px solid var(--border);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      color: var(--text);
     }
 
     @keyframes fadeIn {
@@ -496,10 +653,8 @@
 
     .articulo-titulo-texto {
       flex: 0 0 auto;
-      display: inline-flex;
-      align-items: center;
-      width: fit-content;
-      min-width: max-content;
+      display: inline-block;
+      white-space: pre-wrap;
       border: none;
       border-radius: 0;
       padding: 0;
@@ -535,8 +690,8 @@
     }
 
     .articulo-contenido:focus {
-      border-color: #000;
-      background: rgba(0,0,0,0.02);
+      border-color: var(--focus-contrast);
+      background: var(--focus-surface);
       outline: none;
     }
 
@@ -561,15 +716,15 @@
   padding-bottom: 6px;
   flex: 1;
   cursor: text;
-  border-bottom: 2px solid #000;
+  border-bottom: 2px solid var(--materia-underline);
   transition: color 0.25s ease;
-  caret-color: #000 !important;
+  caret-color: var(--focus-contrast) !important;
 }
 
 .materia-title:focus {
   outline: none !important;
   box-shadow: none !important;
-  border-bottom: 2px solid #000 !important;
+  border-bottom: 2px solid var(--materia-underline) !important;
 }
 
     .nota-resizer {
@@ -625,6 +780,22 @@
     width: 100% !important;
   }
 
+  .buscador-flotante {
+    position: static;
+    width: 100%;
+    margin-top: 10px;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .buscador-campos {
+    min-width: 0;
+  }
+
+  .buscador-info {
+    white-space: normal;
+  }
+
   .form-row {
     grid-template-columns: 1fr !important;
   }
@@ -641,21 +812,13 @@
 </head>
 
 <body>
+  <div class="app-root" id="appRoot">
   <header>
     Buen abogao <br>
     <button class="modo" onclick="toggleModo()">Modo oscuro</button>
   </header>
 
-  <div class="buscador-flotante" id="buscadorFlotante">
-    <input
-      type="text"
-      id="buscadorInput"
-      class="buscador-input"
-      placeholder="Buscar en materias y artículos"
-    >
-    <div class="buscador-info" id="buscadorInfo">Usa Enter para saltar al siguiente</div>
-    <button class="buscador-cerrar" onclick="cerrarBuscador()" aria-label="Cerrar buscador">✕</button>
-  </div>
+  <div class="zoom-canvas">
 
   <div class="menu-contextual" id="menuContextual" role="menu">
     <h4>Acciones</h4>
@@ -698,6 +861,25 @@
             <span>Buscar</span>
           </button>
 
+          <div class="buscador-flotante" id="buscadorFlotante">
+            <div class="buscador-campos">
+              <div class="buscador-input-wrap">
+                <svg class="buscador-input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M10.5 4.5a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z" stroke-width="2" stroke-linecap="round" />
+                  <path d="M15 15l4 4" stroke-width="2" stroke-linecap="round" />
+                </svg>
+                <input
+                  type="text"
+                  id="buscadorInput"
+                  class="buscador-input"
+                  placeholder="Buscar en materias y artículos"
+                >
+              </div>
+              <div class="buscador-info" id="buscadorInfo">Usa Enter para saltar al siguiente</div>
+            </div>
+            <button class="buscador-cerrar" onclick="cerrarBuscador()" aria-label="Cerrar buscador">✕</button>
+          </div>
+
           <div class="form-row">
             <div>
               <label>Seleccionar normativa</label>
@@ -728,6 +910,16 @@
 
   </div>
 
+  </div>
+
+  </div>
+
+<div class="zoom-panel" aria-label="Controles de zoom">
+  <button class="zoom-btn" id="zoomOutBtn" title="Alejar (Ctrl + -)" aria-label="Alejar">−</button>
+  <div class="zoom-value" id="zoomValue">100%</div>
+  <button class="zoom-btn" id="zoomInBtn" title="Acercar (Ctrl + +)" aria-label="Acercar">+</button>
+</div>
+
 <script>
 let codigoActual = {}
 let articulos = JSON.parse(localStorage.getItem("articulosGuardados") || "[]")
@@ -740,6 +932,38 @@ const elementosMarcados = new Set()
 const buscadorInput = document.getElementById("buscadorInput")
 const menuContextual = document.getElementById("menuContextual")
 let objetivoContextual = null
+const zoomValue = document.getElementById("zoomValue")
+const zoomInBtn = document.getElementById("zoomInBtn")
+const zoomOutBtn = document.getElementById("zoomOutBtn")
+const appRoot = document.getElementById("appRoot")
+
+const ZOOM_STEP = 0.05
+const MIN_ZOOM = 0.85
+const MAX_ZOOM = 1.25
+let zoomActual = 1
+let pinchStartDistance = null
+let pinchStartZoom = 1
+
+function actualizarEstadoZoom() {
+  if (zoomValue) zoomValue.textContent = `${Math.round(zoomActual * 100)}%`
+  if (zoomInBtn) zoomInBtn.disabled = zoomActual >= MAX_ZOOM - 0.001
+  if (zoomOutBtn) zoomOutBtn.disabled = zoomActual <= MIN_ZOOM + 0.001
+}
+
+function aplicarZoom(nivel) {
+  const limitado = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, nivel))
+  zoomActual = limitado
+  document.documentElement.style.setProperty("--zoom-scale", limitado.toFixed(3))
+  actualizarEstadoZoom()
+}
+
+function distanciaEntreToques(touches) {
+  if (touches.length < 2) return 0
+  const [a, b] = touches
+  const dx = a.clientX - b.clientX
+  const dy = a.clientY - b.clientY
+  return Math.hypot(dx, dy)
+}
 
 function esCampoEditable(elem) {
   if (!elem) return null
@@ -872,6 +1096,71 @@ document.addEventListener("keydown", e => {
 
 window.addEventListener("resize", ocultarMenuContextual)
 window.addEventListener("scroll", ocultarMenuContextual, true)
+
+if (zoomInBtn && zoomOutBtn) {
+  zoomInBtn.addEventListener("click", () => aplicarZoom(zoomActual + ZOOM_STEP))
+  zoomOutBtn.addEventListener("click", () => aplicarZoom(zoomActual - ZOOM_STEP))
+}
+
+document.addEventListener(
+  "wheel",
+  e => {
+    if (!e.ctrlKey) return
+    e.preventDefault()
+    const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP
+    aplicarZoom(zoomActual + delta)
+  },
+  { passive: false }
+)
+
+document.addEventListener("keydown", e => {
+  const ctrl = e.ctrlKey || e.metaKey
+  if (!ctrl) return
+
+  if (e.key === "+" || e.key === "=") {
+    e.preventDefault()
+    aplicarZoom(zoomActual + ZOOM_STEP)
+  } else if (e.key === "-" || e.key === "_") {
+    e.preventDefault()
+    aplicarZoom(zoomActual - ZOOM_STEP)
+  } else if (e.key === "0") {
+    e.preventDefault()
+    aplicarZoom(1)
+  }
+})
+
+if (appRoot) {
+  appRoot.addEventListener("touchstart", e => {
+    if (e.touches.length === 2) {
+      pinchStartDistance = distanciaEntreToques(e.touches)
+      pinchStartZoom = zoomActual
+    }
+  })
+
+  appRoot.addEventListener(
+    "touchmove",
+    e => {
+      if (e.touches.length === 2 && pinchStartDistance) {
+        e.preventDefault()
+        const nuevaDistancia = distanciaEntreToques(e.touches)
+        const factor = pinchStartDistance ? nuevaDistancia / pinchStartDistance : 1
+        aplicarZoom(pinchStartZoom * factor)
+      }
+    },
+    { passive: false }
+  )
+
+  const limpiarPinch = e => {
+    if (e.touches && e.touches.length >= 2) return
+    pinchStartDistance = null
+    pinchStartZoom = zoomActual
+  }
+
+  appRoot.addEventListener("touchend", limpiarPinch)
+  appRoot.addEventListener("touchcancel", limpiarPinch)
+}
+
+aplicarZoom(zoomActual)
 
 function abrirBuscador() {
   const panel = document.getElementById("buscadorFlotante")
@@ -1312,6 +1601,7 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
   tituloM.textContent = materia
   const colorMateria = obtenerColorMateria(materia)
   tituloM.style.color = colorMateria
+  tituloM.style.setProperty("--materia-underline", colorMateria)
 
   // Nombre actual que se va actualizando en vivo
   let nombreActual = materia
@@ -1358,6 +1648,7 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
   colorInput.addEventListener("input", () => {
     const nuevoColor = colorInput.value
     tituloM.style.color = nuevoColor
+    tituloM.style.setProperty("--materia-underline", nuevoColor)
 
     const tarjetas = contenedor.querySelectorAll(".articulo")
     tarjetas.forEach(t => {
