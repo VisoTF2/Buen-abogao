@@ -19,6 +19,12 @@
       --materia-underline: #000;
       --selection-bg: #dbeafe;
       --selection-text: #0f172a;
+      --search-highlight-outline: #93c5fd;
+      --search-highlight-glow: rgba(147, 197, 253, 0.35);
+      --search-highlight-outline-active: #60a5fa;
+      --search-highlight-glow-active: rgba(96, 165, 250, 0.45);
+      --search-highlight-mark: #dbeafe;
+      --search-highlight-mark-active: #bfdbfe;
     }
 
     body.oscuro {
@@ -34,6 +40,12 @@
       --materia-underline: #e6edf3;
       --selection-bg: rgba(96, 165, 250, 0.32);
       --selection-text: #e6edf3;
+      --search-highlight-outline: #60a5fa;
+      --search-highlight-glow: rgba(96, 165, 250, 0.35);
+      --search-highlight-outline-active: #93c5fd;
+      --search-highlight-glow-active: rgba(147, 197, 253, 0.45);
+      --search-highlight-mark: rgba(96, 165, 250, 0.32);
+      --search-highlight-mark-active: rgba(96, 165, 250, 0.5);
     }
 
     body {
@@ -268,28 +280,29 @@
     }
 
     .resaltado-busqueda {
-      outline: 2px solid #facc15;
-      box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.35);
+      outline: 2px solid var(--search-highlight-outline);
+      box-shadow: 0 0 0 4px var(--search-highlight-glow);
     }
 
     .resaltado-busqueda-activo {
-      outline: 3px solid #eab308;
-      box-shadow: 0 0 0 5px rgba(234, 179, 8, 0.45);
+      outline: 3px solid var(--search-highlight-outline-active);
+      box-shadow: 0 0 0 5px var(--search-highlight-glow-active);
     }
 
     .resaltado-busqueda-marca {
-      background: rgba(254, 240, 138, 0.9);
-      color: inherit;
+      background: var(--search-highlight-mark);
+      color: var(--selection-text);
       padding: 0;
       border-radius: 2px;
-      box-shadow: none;
+      box-shadow: 0 0 0 1px var(--search-highlight-outline);
       letter-spacing: normal;
       white-space: pre-wrap;
     }
 
     .resaltado-busqueda-marca-activa {
-      background: rgba(253, 224, 71, 0.95);
-      box-shadow: 0 0 0 1px rgba(234, 179, 8, 0.65);
+      background: var(--search-highlight-mark-active);
+      color: var(--selection-text);
+      box-shadow: 0 0 0 1px var(--search-highlight-outline-active);
     }
 
     ::selection {
