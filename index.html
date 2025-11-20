@@ -264,7 +264,7 @@
     .btn-note-delete:hover { background: #4b5563; }
 
 .documentos-panel {
-      margin: 26px 0 30px;
+      margin: 26px 0 16px;
       padding: 18px 20px 36px;
       border: 1px solid var(--border);
       border-radius: 14px;
@@ -731,7 +731,7 @@
 
 .layout {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 20px;
   height: 100%;
 }
@@ -739,7 +739,7 @@
 .sidebarMaterias {
   width: 260px;
   background: var(--card);
-  padding: 14px 14px 10px;
+  padding: 14px 14px 20px;
   border-radius: 14px;
   box-shadow: 0 6px 16px rgba(0,0,0,0.1);
   overflow-y: auto;
@@ -747,7 +747,8 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  align-self: flex-start;
+  align-self: stretch;
+  min-height: 100%;
 }
 
 .sidebarGroupTitle {
@@ -996,7 +997,7 @@
     }
 /* Evita que la barra de materias se estire más allá de su contenido */
 .layout {
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 /* Sidebar: tamaño fijo en grandes pantallas */
