@@ -580,7 +580,7 @@
       border-left: 6px solid var(--accent);
       margin-top: 14px;
       box-shadow: 0 3px 8px rgba(0,0,0,0.07);
-      cursor: pointer;
+      cursor: grab;
       position: relative;
       transition: 0.15s ease;
     }
@@ -588,6 +588,20 @@
     .articulo:hover {
       transform: scale(1.015);
       box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+    }
+
+    .articulo:active {
+      cursor: grabbing;
+    }
+
+    .articulo.arrastrando {
+      opacity: 0.9;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+    }
+
+    .articulo.drag-over {
+      outline: 2px dashed var(--accent-light);
+      outline-offset: 6px;
     }
 
     .articulo-titulo {
@@ -871,6 +885,22 @@ const MAX_ZOOM = 1.25
 let zoomActual = 1
 let pinchStartDistance = null
 let pinchStartZoom = 1
+let articuloArrastradoId = null
+
+function valorOrdenArticulo(a) {
+  if (typeof a.orden === "number") return a.orden
+  if (typeof a.numero === "number") return a.numero
+  return 0
+}
+
+function siguienteOrdenPara(normativa, materia) {
+  const ordenes = articulos
+    .filter(a => a.normativa === normativa && a.materia === materia)
+    .map(valorOrdenArticulo)
+
+  if (!ordenes.length) return 1
+  return Math.max(...ordenes) + 1
+}
 
 function actualizarEstadoZoom() {
   if (zoomValue) zoomValue.textContent = `${Math.round(zoomActual * 100)}%`
@@ -923,6 +953,82 @@ function mostrarMenuContextual(event) {
 function ocultarMenuContextual() {
   menuContextual.classList.remove("visible")
   objetivoContextual = null
+}
+
+function aplicarOrdenDesdeDOM(contenedorLista, normativa, materia) {
+  if (!contenedorLista) return
+
+  const idsEnOrden = Array.from(contenedorLista.querySelectorAll(".articulo"))
+    .map(el => Number(el.dataset.id))
+    .filter(Boolean)
+
+  idsEnOrden.forEach((id, index) => {
+    const art = articulos.find(a => a.id === id)
+    if (art && art.normativa === normativa && art.materia === materia) {
+      art.orden = index + 1
+    }
+  })
+
+  guardarLocal()
+  ordenarYMostrar()
+}
+
+function activarArrastreArticulo(box, normativa, materia) {
+  box.draggable = true
+
+  box.addEventListener("dragstart", e => {
+    articuloArrastradoId = box.dataset.id
+    box.classList.add("arrastrando")
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = "move"
+      e.dataTransfer.setData("text/plain", box.dataset.id)
+    }
+  })
+
+  box.addEventListener("dragenter", () => {
+    if (box.dataset.id === articuloArrastradoId) return
+    box.classList.add("drag-over")
+  })
+
+  box.addEventListener("dragleave", () => {
+    box.classList.remove("drag-over")
+  })
+
+  box.addEventListener("dragover", e => {
+    e.preventDefault()
+    if (e.dataTransfer) e.dataTransfer.dropEffect = "move"
+
+    const objetivo = e.currentTarget
+    if (!articuloArrastradoId || objetivo.dataset.id === articuloArrastradoId) return
+
+    const rect = objetivo.getBoundingClientRect()
+    const desplazarDespues = e.clientY - rect.top > rect.height / 2
+    const contenedor = objetivo.parentElement
+    const arrastrandoElem = contenedor.querySelector(
+      `.articulo[data-id="${articuloArrastradoId}"]`
+    )
+
+    if (!arrastrandoElem || arrastrandoElem === objetivo) return
+
+    if (desplazarDespues) {
+      contenedor.insertBefore(arrastrandoElem, objetivo.nextSibling)
+    } else {
+      contenedor.insertBefore(arrastrandoElem, objetivo)
+    }
+  })
+
+  box.addEventListener("drop", e => {
+    e.preventDefault()
+    box.classList.remove("drag-over")
+  })
+
+  box.addEventListener("dragend", () => {
+    box.classList.remove("arrastrando")
+    box.classList.remove("drag-over")
+    const contenedor = box.parentElement
+    aplicarOrdenDesdeDOM(contenedor, normativa, materia)
+    articuloArrastradoId = null
+  })
 }
 
 async function copiarSeleccion(event) {
@@ -1409,7 +1515,8 @@ function agregarArticulo() {
     normativa: norm,
     nota: "",
     color: obtenerColorMateria(mat),
-    tituloPersonalizado: ""
+    tituloPersonalizado: "",
+    orden: siguienteOrdenPara(norm, mat)
   })
 
   normativaSeleccionada = norm
@@ -1615,7 +1722,9 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
   wrap.appendChild(controles)
   contenedor.appendChild(wrap)
 
-  items.sort((a, b) => a.numero - b.numero).forEach(a => {
+  const listaOrdenada = [...items].sort((a, b) => valorOrdenArticulo(a) - valorOrdenArticulo(b))
+
+  listaOrdenada.forEach(a => {
     const box = document.createElement("div")
     box.className = "articulo"
     box.style.borderLeftColor = a.color
@@ -1779,6 +1888,8 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
         }
       }
     })
+
+    activarArrastreArticulo(box, normativa, materia)
 
     contenedor.appendChild(box)
   })
