@@ -67,6 +67,8 @@
       transform: scale(var(--zoom-scale));
       transform-origin: top center;
       transition: transform 0.18s ease;
+      width: 100%;
+      min-width: 100vw;
     }
 
     header {
@@ -76,6 +78,8 @@
       text-align: center;
       font-size: 28px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .modo {
@@ -745,12 +749,11 @@
 
 <body>
   <div class="app-root" id="appRoot">
+  <div class="zoom-canvas">
   <header>
     Buen abogao <br>
     <button class="modo" onclick="toggleModo()">Modo oscuro</button>
   </header>
-
-  <div class="zoom-canvas">
 
   <div class="menu-contextual" id="menuContextual" role="menu">
     <h4>Acciones</h4>
@@ -862,7 +865,7 @@ const zoomOutBtn = document.getElementById("zoomOutBtn")
 const appRoot = document.getElementById("appRoot")
 
 const ZOOM_STEP = 0.05
-const MIN_ZOOM = 0.85
+const MIN_ZOOM = 1.00
 const MAX_ZOOM = 1.25
 let zoomActual = 1
 let pinchStartDistance = null
