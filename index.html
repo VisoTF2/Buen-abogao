@@ -77,37 +77,58 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0 14px 32px;
+      padding: 0 0 32px;
       box-sizing: border-box;
-    }
-
-    .zoom-canvas {
       transform: scale(var(--zoom-scale));
       transform-origin: top center;
       transition: transform 0.18s ease;
+      width: 100%;
+    }
+
+    .zoom-canvas {
       display: flex;
       justify-content: center;
       width: 100%;
       max-width: 1200px;
+      padding: 0 14px;
+      box-sizing: border-box;
+      margin-top: 18px;
     }
 
     header {
-      position: relative;
+      position: sticky;
+      top: 0;
       z-index: 10;
       background: var(--accent);
       color: white;
-      padding: 24px;
+      padding: 20px 0;
       text-align: center;
       font-size: 28px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.2);
-      width: min(1100px, calc(100% - 28px));
-      border-radius: 16px;
+      width: 100%;
+      border-radius: 0;
       box-sizing: border-box;
-      margin: 18px auto 12px;
+      margin: 0;
+    }
+
+    .header-inner {
+      width: min(1100px, calc(100% - 40px));
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .header-title {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
     }
 
     .modo {
-      margin-top: 12px;
+      margin-top: 0;
       background: white;
       color: var(--accent);
       border-radius: 8px;
@@ -774,8 +795,10 @@
 <body>
   <div class="app-root" id="appRoot">
   <header>
-    Buen abogao <br>
-    <button class="modo" onclick="toggleModo()">Modo oscuro</button>
+    <div class="header-inner">
+      <div class="header-title">Buen abogao</div>
+      <button class="modo" onclick="toggleModo()">Modo oscuro</button>
+    </div>
   </header>
 
   <div class="zoom-canvas">
