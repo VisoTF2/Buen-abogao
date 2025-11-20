@@ -67,8 +67,8 @@
       transform: scale(var(--zoom-scale));
       transform-origin: top center;
       transition: transform 0.18s ease;
-      width: 100%;
-      min-width: 100vw;
+      width: calc(100vw / var(--zoom-scale));
+      min-width: calc(100vw / var(--zoom-scale));
     }
 
     header {
