@@ -291,7 +291,7 @@
 
     .resaltado-busqueda-marca {
       background: var(--search-highlight-mark);
-      color: var(--selection-text);
+      color: inherit;
       padding: 0;
       border-radius: 2px;
       box-shadow: 0 0 0 1px var(--search-highlight-outline);
@@ -301,7 +301,7 @@
 
     .resaltado-busqueda-marca-activa {
       background: var(--search-highlight-mark-active);
-      color: var(--selection-text);
+      color: inherit;
       box-shadow: 0 0 0 1px var(--search-highlight-outline-active);
     }
 
@@ -519,10 +519,8 @@
 
     .articulo-titulo-texto {
       flex: 0 0 auto;
-      display: inline-flex;
-      align-items: center;
-      width: fit-content;
-      min-width: max-content;
+      display: inline-block;
+      white-space: pre-wrap;
       border: none;
       border-radius: 0;
       padding: 0;
