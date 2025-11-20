@@ -258,7 +258,7 @@
     .btn-note-delete:hover { background: #4b5563; }
 
     .documentos-panel {
-      margin: 18px 0 28px;
+      margin: 26px 0 30px;
       padding: 18px 20px;
       border: 1px solid var(--border);
       border-radius: 14px;
@@ -342,20 +342,21 @@
 
     .documentos-body {
       display: grid;
-      grid-template-columns: 280px 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 16px;
-      margin-top: 10px;
+      margin-top: 14px;
+      align-items: stretch;
     }
 
     .documentos-lista {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 10px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      min-height: 160px;
+      gap: 10px;
+      min-height: 260px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
     }
 
@@ -367,7 +368,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 12px;
     }
 
     .documento-item strong {
@@ -384,10 +385,16 @@
 
     body.oscuro .documento-item small { color: #d1d5db; }
 
-    .documento-ver {
-      background: white;
+    .documento-acciones {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .documento-ver,
+    .documento-eliminar {
       border: 1px solid var(--border);
-      color: var(--text);
       border-radius: 8px;
       padding: 8px 10px;
       cursor: pointer;
@@ -396,14 +403,36 @@
       flex-shrink: 0;
     }
 
+    .documento-ver {
+      background: white;
+      color: var(--text);
+    }
+
     .documento-ver:hover {
       background: rgba(30, 58, 138, 0.08);
       border-color: var(--accent-light);
     }
 
-    .documento-ver:active { transform: translateY(1px); }
+    .documento-eliminar {
+      background: #fef2f2;
+      color: #b91c1c;
+      border-color: rgba(220, 38, 38, 0.4);
+    }
+
+    .documento-eliminar:hover {
+      background: #fee2e2;
+      border-color: rgba(239, 68, 68, 0.7);
+    }
+
+    .documento-ver:active,
+    .documento-eliminar:active { transform: translateY(1px); }
 
     body.oscuro .documento-ver { background: #111827; }
+
+    body.oscuro .documento-eliminar {
+      background: rgba(239, 68, 68, 0.14);
+      color: #fca5a5;
+    }
 
     .documentos-preview {
       border: 1px solid var(--border);
@@ -1035,37 +1064,6 @@
       <div class="sidebarMaterias" id="sidebarMaterias"></div>
 
       <div class="mainPanel">
-        <div class="documentos-panel">
-          <div class="documentos-head">
-            <div class="documentos-title">
-              <h3>Subir documentos</h3>
-              <span>Adjunta archivos PDF o Word y visualízalos sin salir de la página.</span>
-            </div>
-            <div class="documentos-acciones">
-              <input
-                type="file"
-                id="documentoInput"
-                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                hidden
-              >
-              <button class="documentos-btn" onclick="document.getElementById('documentoInput').click()" type="button">
-                📄 Seleccionar archivo
-              </button>
-              <div class="documentos-hint">Puedes arrastrar el archivo sobre el botón o tocar para elegir.</div>
-            </div>
-          </div>
-
-          <div class="documentos-body">
-            <div class="documentos-lista" id="listaDocumentos">
-              <div class="documentos-vacio">Aún no hay documentos cargados.</div>
-            </div>
-            <div class="documentos-preview" id="visorDocumentos">
-              <h4>Vista previa</h4>
-              <div class="documentos-vacio">Selecciona un documento para verlo aquí mismo.</div>
-            </div>
-          </div>
-        </div>
-
         <div class="form-articulo" style="position: relative;">
           <h2>Agregar Artículo</h2>
           <button
@@ -1120,6 +1118,37 @@
 
           <button class="btn-primary" onclick="agregarArticulo()">Agregar Artículo</button>
           <div id="errorBox"></div>
+        </div>
+
+        <div class="documentos-panel">
+          <div class="documentos-head">
+            <div class="documentos-title">
+              <h3>Subir documentos</h3>
+              <span>Adjunta archivos PDF o Word y visualízalos sin salir de la página.</span>
+            </div>
+            <div class="documentos-acciones">
+              <input
+                type="file"
+                id="documentoInput"
+                accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                hidden
+              >
+              <button class="documentos-btn" onclick="document.getElementById('documentoInput').click()" type="button">
+                📄 Seleccionar archivo
+              </button>
+              <div class="documentos-hint">Puedes arrastrar el archivo sobre el botón o tocar para elegir.</div>
+            </div>
+          </div>
+
+          <div class="documentos-body">
+            <div class="documentos-lista" id="listaDocumentos">
+              <div class="documentos-vacio">Aún no hay documentos cargados.</div>
+            </div>
+            <div class="documentos-preview" id="visorDocumentos">
+              <h4>Vista previa</h4>
+              <div class="documentos-vacio">Selecciona un documento para verlo aquí mismo.</div>
+            </div>
+          </div>
         </div>
 
         <div class="contenidoArticulos" id="contenidoArticulos"></div>
@@ -1298,16 +1327,44 @@ function renderDocumentos() {
     info.appendChild(nombre)
     info.appendChild(tipo)
 
+    const acciones = document.createElement("div")
+    acciones.className = "documento-acciones"
+
     const ver = document.createElement("button")
     ver.className = "documento-ver"
     ver.type = "button"
     ver.textContent = "Ver"
     ver.addEventListener("click", () => mostrarDocumento(doc.id))
 
+    const eliminar = document.createElement("button")
+    eliminar.className = "documento-eliminar"
+    eliminar.type = "button"
+    eliminar.textContent = "Eliminar"
+    eliminar.addEventListener("click", () => eliminarDocumento(doc.id))
+
+    acciones.appendChild(ver)
+    acciones.appendChild(eliminar)
+
     item.appendChild(info)
-    item.appendChild(ver)
+    item.appendChild(acciones)
     listaDocumentos.appendChild(item)
   })
+}
+
+function eliminarDocumento(id) {
+  const doc = documentosCargados.find(d => d.id === id)
+  documentosCargados = documentosCargados.filter(d => d.id !== id)
+
+  if (doc?.url) {
+    try { URL.revokeObjectURL(doc.url) } catch (e) { /* noop */ }
+  }
+
+  renderDocumentos()
+
+  const vistaActual = visorDocumentos?.querySelector("h4")?.textContent
+  if (doc && vistaActual === doc.nombre) {
+    mostrarDocumento(documentosCargados[0]?.id)
+  }
 }
 
 function mostrarDocumento(id) {
