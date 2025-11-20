@@ -731,7 +731,7 @@
 
 .layout {
   display: flex;
-  align-items: stretch;
+  align-items: flex-start;
   gap: 20px;
   height: 100%;
 }
@@ -739,7 +739,7 @@
 .sidebarMaterias {
   width: 260px;
   background: var(--card);
-  padding: 14px;
+  padding: 14px 14px 10px;
   border-radius: 14px;
   box-shadow: 0 6px 16px rgba(0,0,0,0.1);
   overflow-y: auto;
@@ -747,7 +747,7 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  align-self: stretch;
+  align-self: flex-start;
 }
 
 .sidebarGroupTitle {
@@ -994,9 +994,9 @@
       font-weight: bold;
       text-align: center;
     }
-/* Fuerza a que sidebar y el panel principal mantengan proporción */
+/* Evita que la barra de materias se estire más allá de su contenido */
 .layout {
-  align-items: stretch;
+  align-items: flex-start;
 }
 
 /* Sidebar: tamaño fijo en grandes pantallas */
