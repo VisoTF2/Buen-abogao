@@ -359,7 +359,7 @@
 
     .documentos-body {
       display: grid;
-      grid-template-columns: 0.6fr 1.4fr;
+      grid-template-columns: minmax(0, 0.55fr) minmax(0, 1.45fr);
       gap: 14px;
       margin-top: 14px;
       align-items: stretch;
@@ -378,6 +378,7 @@
       gap: 10px;
       min-height: 260px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      min-width: 0;
     }
 
     .documento-item {
@@ -389,6 +390,15 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      min-width: 0;
+    }
+
+    .documento-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+      min-width: 0;
     }
 
     .documento-item strong {
@@ -397,6 +407,8 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      display: block;
+      max-width: 100%;
     }
 
     .documento-item small {
@@ -467,6 +479,7 @@
       gap: 10px;
       overflow: hidden;
       flex: 1 1 380px;
+      min-width: 0;
     }
 
     .documentos-preview h4 {
@@ -1384,7 +1397,7 @@ function renderDocumentos() {
     item.className = "documento-item"
 
     const info = document.createElement("div")
-    info.style.flex = "1"
+    info.className = "documento-info"
 
     const nombre = document.createElement("strong")
     nombre.textContent = doc.nombre
