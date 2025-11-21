@@ -26,7 +26,7 @@
       --search-highlight-mark: #dbeafe;
       --search-highlight-mark-active: #bfdbfe;
       --zoom-scale: 1;
-      --panel-min-height: clamp(420px, 65vh, 620px);
+      --panel-min-height: clamp(440px, 68vh, 680px);
     }
 
     body.oscuro {
@@ -455,7 +455,7 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       background: var(--card);
-      min-height: 260px;
+      min-height: 320px;
       max-height: 100%;
       padding: 12px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
@@ -463,6 +463,7 @@
       flex-direction: column;
       gap: 10px;
       overflow: hidden;
+      flex: 1 1 380px;
     }
 
     .documentos-preview h4 {
@@ -484,7 +485,7 @@
 
     .documento-iframe {
       width: 100%;
-      height: clamp(260px, 36vh, 330px);
+      height: clamp(360px, 60vh, 720px);
       border: 1px solid var(--border);
       border-radius: 10px;
       background: var(--article-bg);
@@ -499,7 +500,7 @@
       border-radius: 10px;
       border: 1px solid var(--border);
       background: var(--article-bg);
-      max-height: clamp(260px, 36vh, 360px);
+      max-height: clamp(360px, 60vh, 760px);
       overflow-y: auto;
     }
 
@@ -519,8 +520,8 @@
 
       .documento-iframe,
       .documento-texto {
-        height: clamp(240px, 34vh, 320px);
-        max-height: 360px;
+        height: clamp(320px, 56vh, 640px);
+        max-height: 680px;
       }
     }
 
