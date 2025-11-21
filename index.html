@@ -1448,11 +1448,12 @@ function eliminarDocumento(id) {
   }
 }
 
-function mostrarDocumento(id) {
+function mostrarDocumento(id, terminoBusqueda = "", indiceCoincidencia = null) {
   if (!visorDocumentos) return
 
   const doc = documentosCargados.find(d => d.id === id)
   visorDocumentos.innerHTML = ""
+  visorDocumentos.dataset.docActual = doc?.id || ""
 
   const titulo = document.createElement("h4")
   titulo.textContent = doc ? doc.nombre : "Vista previa"
@@ -1466,10 +1467,10 @@ function mostrarDocumento(id) {
     return
   }
 
-  if (doc.extension === "pdf" && doc.texto) {
+  if ((doc.extension === "pdf" || doc.extension === "docx") && doc.texto) {
     const texto = document.createElement("div")
     texto.className = "documento-texto"
-    texto.textContent = doc.texto
+    aplicarResaltadoEnTexto(doc.texto, texto, terminoBusqueda, indiceCoincidencia)
     visorDocumentos.appendChild(texto)
   } else if (doc.extension === "pdf" && doc.url) {
     const iframe = document.createElement("iframe")
@@ -1477,11 +1478,6 @@ function mostrarDocumento(id) {
     iframe.src = doc.url
     iframe.title = `Vista previa de ${doc.nombre}`
     visorDocumentos.appendChild(iframe)
-  } else if (doc.extension === "docx" && doc.texto) {
-    const texto = document.createElement("div")
-    texto.className = "documento-texto"
-    texto.textContent = doc.texto
-    visorDocumentos.appendChild(texto)
   } else {
     const alerta = document.createElement("div")
     alerta.className = "documento-alerta"
@@ -1499,6 +1495,48 @@ function mostrarDocumento(id) {
     descarga.style.textDecoration = "none"
     descarga.style.marginTop = "6px"
     visorDocumentos.appendChild(descarga)
+  }
+}
+
+function aplicarResaltadoEnTexto(textoFuente, contenedor, termino, indiceActivo) {
+  const terminoLimpio = (termino || "").trim().toLowerCase()
+
+  if (!terminoLimpio) {
+    contenedor.textContent = textoFuente
+    return
+  }
+
+  const textoPlano = textoFuente || ""
+  const textoMin = textoPlano.toLowerCase()
+  let pos = textoMin.indexOf(terminoLimpio)
+  let ultimoCorte = 0
+  let contador = 0
+
+  if (pos === -1) {
+    contenedor.textContent = textoPlano
+    return
+  }
+
+  while (pos !== -1) {
+    if (pos > ultimoCorte) {
+      contenedor.appendChild(document.createTextNode(textoPlano.slice(ultimoCorte, pos)))
+    }
+
+    const marca = document.createElement("span")
+    marca.className = "resaltado-busqueda-marca"
+    marca.textContent = textoPlano.slice(pos, pos + terminoLimpio.length)
+    if (indiceActivo !== null && contador === indiceActivo) {
+      marca.classList.add("resaltado-busqueda-activo")
+    }
+    contenedor.appendChild(marca)
+
+    ultimoCorte = pos + terminoLimpio.length
+    pos = textoMin.indexOf(terminoLimpio, ultimoCorte)
+    contador++
+  }
+
+  if (ultimoCorte < textoPlano.length) {
+    contenedor.appendChild(document.createTextNode(textoPlano.slice(ultimoCorte)))
   }
 }
 
@@ -1980,6 +2018,11 @@ function limpiarResaltadosBusqueda() {
   document.querySelectorAll(".resaltado-busqueda-activo").forEach(el =>
     el.classList.remove("resaltado-busqueda-activo")
   )
+
+  if (visorDocumentos?.dataset.docActual) {
+    const doc = documentosCargados.find(d => d.id === visorDocumentos.dataset.docActual)
+    if (doc) mostrarDocumento(doc.id)
+  }
 }
 
 function resaltarResultadoActual(mantenerFocoBuscador = false) {
@@ -1997,6 +2040,20 @@ function resaltarResultadoActual(mantenerFocoBuscador = false) {
 
   const actual = resultadosBusqueda[indiceResultado]
   const articulo = actual.articulo
+
+  if (actual.tipo === "documento") {
+    const doc = documentosCargados.find(d => d.id === actual.documentoId)
+    if (doc) {
+      mostrarDocumento(doc.id, ultimoTerminoBusqueda, actual.indiceDocumento)
+      const marcaActiva = visorDocumentos?.querySelector(".resaltado-busqueda-activo")
+      if (marcaActiva) {
+        marcaActiva.scrollIntoView({ behavior: "smooth", block: "center" })
+      } else {
+        visorDocumentos?.scrollIntoView({ behavior: "smooth", block: "center" })
+      }
+    }
+    return
+  }
 
   if (articulo && !articulo.classList.contains("abierto")) {
     articulo.classList.add("abierto")
@@ -2066,6 +2123,8 @@ function ejecutarBusqueda(termino) {
     marcarCoincidencias(contenido, limpio, art)
     registrarCoincidenciasNota(nota, limpio, art)
   })
+
+  documentosCargados.forEach(doc => registrarCoincidenciasDocumento(doc, limpio))
 
   if (!resultadosBusqueda.length) {
     info.textContent = "Sin resultados"
@@ -2166,6 +2225,29 @@ function registrarCoincidenciasNota(nota, termino, articulo) {
   }
 
   if (hayCoincidencias) articulo.classList.add("resaltado-busqueda")
+}
+
+function registrarCoincidenciasDocumento(doc, termino) {
+  if (!doc?.texto) return
+
+  const textoMin = doc.texto.toLowerCase()
+  const largo = termino.length
+  if (!largo) return
+
+  let pos = textoMin.indexOf(termino)
+  let coincidencia = 0
+
+  while (pos !== -1) {
+    resultadosBusqueda.push({
+      tipo: "documento",
+      documentoId: doc.id,
+      inicio: pos,
+      fin: pos + largo,
+      indiceDocumento: coincidencia
+    })
+    coincidencia++
+    pos = textoMin.indexOf(termino, pos + largo)
+  }
 }
 
 function irAlSiguienteResultado(mantenerFocoBuscador = false) {
