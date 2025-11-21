@@ -26,6 +26,8 @@
       --search-highlight-mark: #dbeafe;
       --search-highlight-mark-active: #bfdbfe;
       --zoom-scale: 1;
+      --layout-max-width: 1400px;
+      --layout-padding: 22px;
       --panel-min-height: clamp(440px, 68vh, 680px);
     }
 
@@ -109,11 +111,11 @@
     }
 
  .container {
-  width: 100%;
-  max-width: 1100px;
-  margin: 16px auto 22px;
+  width: min(96vw, var(--layout-max-width));
+  max-width: none;
+  margin: 18px auto 26px;
   background: var(--card);
-  padding: 18px 20px;
+  padding: var(--layout-padding);
   border-radius: 14px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.12);
   box-sizing: border-box; /* ← MUY IMPORTANTE */
@@ -741,13 +743,13 @@
 .layout {
   display: flex;
   align-items: stretch;
-  gap: 16px;
+  gap: 18px;
   height: 100%;
   min-height: var(--panel-min-height);
 }
 
 .sidebarMaterias {
-  width: 240px;
+  width: 270px;
   background: var(--card);
   padding: 14px 14px 18px;
   border-radius: 14px;
@@ -1017,7 +1019,7 @@
 /* Sidebar: tamaño fijo en grandes pantallas */
 .sidebarMaterias {
   flex-shrink: 0;
-  width: 240px;
+  width: 270px;
 }
 
 /* Panel principal ocupa todo el espacio restante */
