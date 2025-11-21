@@ -282,6 +282,12 @@
       overflow: hidden;
     }
 
+    .documentos-panel.colapsado {
+      min-height: 0;
+      padding: 12px 14px;
+      gap: 6px;
+    }
+
     .documentos-head {
       display: flex;
       justify-content: space-between;
@@ -289,6 +295,10 @@
       gap: 14px;
       flex-wrap: wrap;
       margin-bottom: 12px;
+    }
+
+    .documentos-panel.colapsado .documentos-head {
+      margin-bottom: 4px;
     }
 
     .documentos-title {
@@ -315,6 +325,26 @@
       align-items: center;
       gap: 10px;
       flex-wrap: wrap;
+    }
+
+    .documentos-toggle {
+      background: white;
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.12s ease;
+    }
+
+    .documentos-toggle:hover {
+      background: rgba(30, 58, 138, 0.08);
+      border-color: var(--accent-light);
+    }
+
+    .documentos-toggle:active {
+      transform: translateY(1px);
     }
 
     .documentos-btn {
@@ -466,6 +496,11 @@
       gap: 10px;
       overflow: hidden;
       flex: 1 1 380px;
+    }
+
+    .documentos-panel.colapsado .documentos-body,
+    .documentos-panel.colapsado .documentos-hint {
+      display: none;
     }
 
     .documentos-preview h4 {
@@ -1164,6 +1199,15 @@
               <span>Adjunta archivos PDF o Word y visualízalos sin salir de la página.</span>
             </div>
             <div class="documentos-acciones">
+              <button
+                class="documentos-toggle"
+                id="toggleDocumentos"
+                type="button"
+                aria-expanded="true"
+                aria-controls="documentosCuerpo"
+              >
+                Compactar documentos
+              </button>
               <input
                 type="file"
                 id="documentoInput"
@@ -1177,7 +1221,7 @@
             </div>
           </div>
 
-          <div class="documentos-body">
+          <div class="documentos-body" id="documentosCuerpo">
             <div class="documentos-lista" id="listaDocumentos">
               <div class="documentos-vacio">Aún no hay documentos cargados.</div>
             </div>
@@ -1215,6 +1259,8 @@ const appRoot = document.getElementById("appRoot")
 const documentoInput = document.getElementById("documentoInput")
 const listaDocumentos = document.getElementById("listaDocumentos")
 const visorDocumentos = document.getElementById("visorDocumentos")
+const toggleDocumentos = document.getElementById("toggleDocumentos")
+const documentosPanel = document.querySelector(".documentos-panel")
 
 const ZOOM_STEP = 0.05
 const MIN_ZOOM = 1.00
@@ -1257,6 +1303,18 @@ if (botonDocumentos) {
     if (archivo) procesarDocumento(archivo)
   })
 }
+
+function actualizarEstadoDocumentos(colapsado) {
+  if (!documentosPanel || !toggleDocumentos) return
+  documentosPanel.classList.toggle("colapsado", colapsado)
+  toggleDocumentos.setAttribute("aria-expanded", (!colapsado).toString())
+  toggleDocumentos.textContent = colapsado ? "Mostrar documentos" : "Compactar documentos"
+}
+
+toggleDocumentos?.addEventListener("click", () => {
+  const colapsado = !documentosPanel.classList.contains("colapsado")
+  actualizarEstadoDocumentos(colapsado)
+})
 
 function obtenerExtension(nombre = "") {
   const partes = nombre.split(".")
@@ -1404,6 +1462,10 @@ function eliminarDocumento(id) {
 
 function mostrarDocumento(id) {
   if (!visorDocumentos) return
+
+  if (documentosPanel?.classList.contains("colapsado")) {
+    actualizarEstadoDocumentos(false)
+  }
 
   const doc = documentosCargados.find(d => d.id === id)
   visorDocumentos.innerHTML = ""
