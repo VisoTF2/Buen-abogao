@@ -26,7 +26,9 @@
       --search-highlight-mark: #dbeafe;
       --search-highlight-mark-active: #bfdbfe;
       --zoom-scale: 1;
-      --panel-min-height: clamp(560px, 78vh, 860px);
+      --layout-max-width: 1400px;
+      --layout-padding: 22px;
+      --panel-min-height: clamp(440px, 68vh, 680px);
     }
 
     body.oscuro {
@@ -83,7 +85,7 @@
     header {
       background: var(--accent);
       color: white;
-      padding: 25px;
+      padding: 20px;
       text-align: center;
       font-size: 28px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.2);
@@ -109,11 +111,11 @@
     }
 
  .container {
-  width: 100%;
-  max-width: 1100px;
-  margin: 20px auto;
+  width: min(96vw, var(--layout-max-width));
+  max-width: none;
+  margin: 18px auto 26px;
   background: var(--card);
-  padding: 20px 24px;
+  padding: var(--layout-padding);
   border-radius: 14px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.12);
   box-sizing: border-box; /* ← MUY IMPORTANTE */
@@ -276,7 +278,6 @@
       flex-direction: column;
       flex: 1 1 480px;
       min-height: var(--panel-min-height);
-      max-height: var(--panel-min-height);
       align-self: stretch;
       overflow: hidden;
     }
@@ -358,7 +359,7 @@
     .documentos-body {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
+      gap: 14px;
       margin-top: 14px;
       align-items: stretch;
       flex: 1;
@@ -456,7 +457,7 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       background: var(--card);
-      min-height: 260px;
+      min-height: 320px;
       max-height: 100%;
       padding: 12px;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
@@ -464,6 +465,7 @@
       flex-direction: column;
       gap: 10px;
       overflow: hidden;
+      flex: 1 1 380px;
     }
 
     .documentos-preview h4 {
@@ -485,7 +487,7 @@
 
     .documento-iframe {
       width: 100%;
-      height: clamp(320px, 45vh, 420px);
+      height: clamp(360px, 60vh, 720px);
       border: 1px solid var(--border);
       border-radius: 10px;
       background: var(--article-bg);
@@ -500,7 +502,7 @@
       border-radius: 10px;
       border: 1px solid var(--border);
       background: var(--article-bg);
-      max-height: clamp(320px, 45vh, 440px);
+      max-height: clamp(360px, 60vh, 760px);
       overflow-y: auto;
     }
 
@@ -520,8 +522,8 @@
 
       .documento-iframe,
       .documento-texto {
-        height: clamp(280px, 40vh, 360px);
-        max-height: 360px;
+        height: clamp(320px, 56vh, 640px);
+        max-height: 680px;
       }
     }
 
@@ -747,7 +749,7 @@
 }
 
 .sidebarMaterias {
-  width: 240px;
+  width: 270px;
   background: var(--card);
   padding: 14px 14px 18px;
   border-radius: 14px;
@@ -759,8 +761,7 @@
   flex-direction: column;
   align-self: stretch;
   min-height: var(--panel-min-height);
-  max-height: var(--panel-min-height);
-  height: 100%;
+  height: auto;
   overflow: auto;
 }
 
@@ -885,7 +886,7 @@
       padding: 16px;
       border-radius: 10px;
       border-left: 6px solid var(--accent);
-      margin-top: 14px;
+      margin-top: 10px;
       box-shadow: 0 3px 8px rgba(0,0,0,0.07);
       cursor: grab;
       position: relative;
@@ -1018,7 +1019,7 @@
 /* Sidebar: tamaño fijo en grandes pantallas */
 .sidebarMaterias {
   flex-shrink: 0;
-  width: 240px;
+  width: 270px;
 }
 
 /* Panel principal ocupa todo el espacio restante */
