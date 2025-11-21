@@ -327,7 +327,8 @@
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      justify-content: center;
+      text-align: center;
       transition: background 0.2s ease, transform 0.12s ease;
     }
 
@@ -358,7 +359,7 @@
 
     .documentos-body {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: 0.6fr 1.4fr;
       gap: 14px;
       margin-top: 14px;
       align-items: stretch;
@@ -1171,7 +1172,7 @@
                 hidden
               >
               <button class="documentos-btn" onclick="document.getElementById('documentoInput').click()" type="button">
-                📄 Seleccionar archivo
+                Seleccionar archivo
               </button>
               <div class="documentos-hint">Puedes arrastrar el archivo sobre el botón o tocar para elegir.</div>
             </div>
@@ -1196,6 +1197,7 @@
 
   </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
 let codigoActual = {}
@@ -1215,6 +1217,11 @@ const appRoot = document.getElementById("appRoot")
 const documentoInput = document.getElementById("documentoInput")
 const listaDocumentos = document.getElementById("listaDocumentos")
 const visorDocumentos = document.getElementById("visorDocumentos")
+
+if (typeof pdfjsLib !== "undefined") {
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"
+}
 
 const ZOOM_STEP = 0.05
 const MIN_ZOOM = 1.00
@@ -1278,6 +1285,7 @@ async function procesarDocumento(archivo) {
   try {
     if (extension === "pdf") {
       base.url = URL.createObjectURL(archivo)
+      base.texto = await extraerTextoPdf(archivo)
     } else if (extension === "docx") {
       base.texto = await extraerTextoDocx(archivo)
     } else if (extension === "doc") {
@@ -1331,6 +1339,31 @@ async function extraerTextoDocx(archivo) {
     .join("\n\n")
 
   return texto || "No se encontró texto en el documento"
+}
+
+async function extraerTextoPdf(archivo) {
+  if (typeof pdfjsLib === "undefined") {
+    throw new Error("PDF.js no está disponible para leer el PDF")
+  }
+
+  const buffer = await archivo.arrayBuffer()
+  const pdf = await pdfjsLib.getDocument({ data: buffer }).promise
+  let texto = ""
+
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const pagina = await pdf.getPage(i)
+    const contenido = await pagina.getTextContent()
+    const linea = contenido.items
+      .map(item => (item.str || "").trim())
+      .filter(Boolean)
+      .join(" ")
+
+    if (linea) {
+      texto += linea + (i < pdf.numPages ? "\n\n" : "")
+    }
+  }
+
+  return texto.trim() || "No se encontró texto en el PDF"
 }
 
 function renderDocumentos() {
@@ -1420,7 +1453,12 @@ function mostrarDocumento(id) {
     return
   }
 
-  if (doc.extension === "pdf" && doc.url) {
+  if (doc.extension === "pdf" && doc.texto) {
+    const texto = document.createElement("div")
+    texto.className = "documento-texto"
+    texto.textContent = doc.texto
+    visorDocumentos.appendChild(texto)
+  } else if (doc.extension === "pdf" && doc.url) {
     const iframe = document.createElement("iframe")
     iframe.className = "documento-iframe"
     iframe.src = doc.url
