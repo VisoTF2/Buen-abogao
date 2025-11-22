@@ -5,8 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Buen abogao</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
   <style>
     :root {
+      --font-base: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      --font-code: "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
       --bg: #eef1f5;
       --text: #111827;
       --card: white;
@@ -53,18 +62,33 @@
     }
 
     body {
-      font-family: "Segoe UI", Arial, sans-serif;
+      font-family: var(--font-base);
       margin: 0;
       padding: 0;
       background: var(--bg);
       color: var(--text);
       transition: 0.25s ease;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
     .app-root {
       min-height: 100vh;
       touch-action: pan-y;
+    }
+
+    * {
+      font-family: inherit;
+    }
+
+    code,
+    pre,
+    .documento-texto code,
+    .articulo-contenido code {
+      font-family: var(--font-code);
+      font-size: 15px;
+      font-variant-ligatures: contextual;
     }
 
     .container {
@@ -162,8 +186,9 @@
     }
 
     .nota-box {
-      font-family: "Segoe UI Semibold", Arial, sans-serif !important;
+      font-family: var(--font-base) !important;
       font-size: 16px;
+      font-weight: 600;
     }
 
     .materia-title {
@@ -686,62 +711,6 @@
       color: inherit;
     }
 
-    .menu-contextual {
-      position: fixed;
-      z-index: 9999;
-      background: var(--card);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-      padding: 8px;
-      display: none;
-      min-width: 180px;
-    }
-
-    .menu-contextual.visible {
-      display: block;
-      animation: fadeIn 0.1s ease;
-    }
-
-    .menu-contextual h4 {
-      margin: 4px 8px 8px;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
-      opacity: 0.7;
-    }
-
-    .menu-contextual button {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 12px;
-      border: none;
-      border-radius: 8px;
-      background: transparent;
-      color: inherit;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s ease;
-    }
-
-    .menu-contextual button:hover {
-      background: rgba(30, 58, 138, 0.08);
-    }
-
-    .menu-contextual button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
-
-    .menu-contextual svg {
-      width: 16px;
-      height: 16px;
-      stroke: currentColor;
-    }
-
     .articulo-contenido,
     .nota-box,
     .articulo-titulo-texto {
@@ -780,7 +749,7 @@
 }
 
 .sidebarGroupTitle {
-  font-family: "Arial", sans-serif;
+  font-family: var(--font-base);
   font-weight: 700;
   font-size: 13px;
   text-transform: uppercase;
@@ -1087,26 +1056,6 @@
     <button class="modo" onclick="toggleModo()">Modo oscuro</button>
   </header>
 
-  <div class="menu-contextual" id="menuContextual" role="menu">
-    <h4>Acciones</h4>
-    <button type="button" data-accion="copiar" onclick="copiarSeleccion(event)">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="6.5" y="6.5" width="11" height="11" rx="2" stroke-width="1.8" />
-        <rect x="4.5" y="4.5" width="11" height="11" rx="2" stroke-width="1.8" />
-      </svg>
-      Copiar selección
-    </button>
-    <button type="button" data-accion="pegar" onclick="pegarDesdePortapapeles(event)">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="6" y="5" width="12" height="14" rx="2" stroke-width="1.8" />
-        <rect x="9" y="3" width="6" height="3" rx="1" stroke-width="1.8" />
-        <path d="M12 10v5" stroke-width="1.8" stroke-linecap="round" />
-        <path d="m9.5 12.5 2.5 2.5 2.5-2.5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-      </svg>
-      Pegar en el campo
-    </button>
-  </div>
-
   <div class="container">
 
     <div class="layout">
@@ -1224,8 +1173,6 @@ let ultimoTerminoBusqueda = ""
 let documentosCargados = []
 const elementosMarcados = new Set()
 const buscadorInput = document.getElementById("buscadorInput")
-const menuContextual = document.getElementById("menuContextual")
-let objetivoContextual = null
 const appRoot = document.getElementById("appRoot")
 const documentoInput = document.getElementById("documentoInput")
 const listaDocumentos = document.getElementById("listaDocumentos")
@@ -1619,30 +1566,6 @@ function esCampoEditable(elem) {
   return destino || (elem.isContentEditable ? elem : null)
 }
 
-function mostrarMenuContextual(event) {
-  ocultarMenuContextual()
-
-  const menuWidth = menuContextual.offsetWidth || 190
-  const menuHeight = menuContextual.offsetHeight || 120
-  const margen = 8
-  let x = event.clientX
-  let y = event.clientY
-
-  if (x + menuWidth > window.innerWidth) x = window.innerWidth - menuWidth - margen
-  if (y + menuHeight > window.innerHeight) y = window.innerHeight - menuHeight - margen
-  x = Math.max(margen, x)
-  y = Math.max(margen, y)
-
-  menuContextual.style.left = `${x}px`
-  menuContextual.style.top = `${y}px`
-  menuContextual.classList.add("visible")
-}
-
-function ocultarMenuContextual() {
-  menuContextual.classList.remove("visible")
-  objetivoContextual = null
-}
-
 function aplicarOrdenDesdeDOM(contenedorLista, normativa, materia) {
   if (!contenedorLista) return
 
@@ -1815,106 +1738,6 @@ function activarArrastreArticulo(box, normativa, materia) {
     articuloArrastradoId = null
   })
 }
-
-async function copiarSeleccion(event) {
-  if (event) event.stopPropagation()
-
-  const seleccion = window.getSelection()
-  const texto = seleccion && !seleccion.isCollapsed ? seleccion.toString() : ""
-
-  if (!texto) {
-    ocultarMenuContextual()
-    return
-  }
-
-  try {
-    await navigator.clipboard.writeText(texto)
-  } catch (err) {
-    const aux = document.createElement("textarea")
-    aux.value = texto
-    document.body.appendChild(aux)
-    aux.select()
-    document.execCommand("copy")
-    aux.remove()
-  }
-
-  ocultarMenuContextual()
-}
-
-async function pegarDesdePortapapeles(event) {
-  if (event) event.stopPropagation()
-  const destino = esCampoEditable(objetivoContextual)
-  if (!destino) {
-    ocultarMenuContextual()
-    return
-  }
-
-  try {
-    const texto = await navigator.clipboard.readText()
-    if (!texto) {
-      ocultarMenuContextual()
-      return
-    }
-
-    if (destino.tagName === "INPUT" || destino.tagName === "TEXTAREA") {
-      destino.focus({ preventScroll: true })
-      const start = destino.selectionStart ?? destino.value.length
-      const end = destino.selectionEnd ?? start
-      destino.value = destino.value.slice(0, start) + texto + destino.value.slice(end)
-      const pos = start + texto.length
-      destino.setSelectionRange(pos, pos)
-      destino.dispatchEvent(new Event("input", { bubbles: true }))
-    } else if (destino.isContentEditable) {
-      destino.focus({ preventScroll: true })
-      const sel = window.getSelection()
-      let range = sel.rangeCount ? sel.getRangeAt(0) : null
-      if (!range || !destino.contains(range.startContainer)) {
-        range = document.createRange()
-        range.selectNodeContents(destino)
-        range.collapse(false)
-        sel.removeAllRanges()
-        sel.addRange(range)
-      }
-
-      document.execCommand("insertText", false, texto)
-      destino.dispatchEvent(new Event("input", { bubbles: true }))
-    }
-  } catch (err) {
-    console.error("No se pudo pegar desde el portapapeles", err)
-  }
-
-  ocultarMenuContextual()
-}
-
-document.addEventListener("contextmenu", e => {
-  const seleccion = window.getSelection()
-  const haySeleccion = seleccion && !seleccion.isCollapsed && seleccion.toString().trim() !== ""
-  const destinoEditable = esCampoEditable(e.target)
-
-  if (!haySeleccion && !destinoEditable) return
-
-  objetivoContextual = destinoEditable || null
-
-  const botonCopiar = menuContextual.querySelector('[data-accion="copiar"]')
-  if (botonCopiar) botonCopiar.disabled = !haySeleccion
-
-  const botonPegar = menuContextual.querySelector('[data-accion="pegar"]')
-  if (botonPegar) botonPegar.disabled = !destinoEditable
-
-  e.preventDefault()
-  mostrarMenuContextual(e)
-})
-
-document.addEventListener("click", e => {
-  if (!menuContextual.contains(e.target)) ocultarMenuContextual()
-})
-
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape") ocultarMenuContextual()
-})
-
-window.addEventListener("resize", ocultarMenuContextual)
-window.addEventListener("scroll", ocultarMenuContextual, true)
 
 document.addEventListener(
   "wheel",
