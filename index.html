@@ -6,6 +6,8 @@
   <title>Buen abogao</title>
 
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap');
+
     :root {
       --bg: #eef1f5;
       --text: #111827;
@@ -724,13 +726,16 @@
 }
 
 .sidebarGroupTitle {
-  font-family: "Arial", sans-serif;
+  font-family: "Poppins", "Segoe UI", sans-serif;
   font-weight: 700;
   font-size: 13px;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
-  margin: 10px 4px 6px;
+  letter-spacing: 0.03em;
+  padding: 6px 0;
+  margin: 8px 6px 12px;
   color: var(--accent);
+  text-align: center;
+  border-radius: 10px;
 }
 
     .sidebarItem {
@@ -2224,7 +2229,7 @@ function ordenarYMostrar() {
 
   if (!combos.length) {
   // Sidebar vacío
-  sidebar.innerHTML = "<div class='sidebarGroupTitle'>Materias</div>";
+  sidebar.innerHTML = "<div class='sidebarGroupTitle'>Normativa</div>";
 
   // Panel principal vacío
   contenedorArticulos.innerHTML = `
