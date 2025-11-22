@@ -2795,6 +2795,25 @@ function guardarLocal() {
   localStorage.setItem("articulosGuardados", JSON.stringify(articulos))
 }
 
+function sincronizarEdiciones() {
+  document.querySelectorAll(".articulo").forEach(box => {
+    const id = Number(box.dataset.id)
+    const articulo = articulos.find(a => a.id === id)
+    if (!articulo) return
+
+    const tituloEl = box.querySelector(".articulo-titulo-texto")
+    if (tituloEl) articulo.tituloPersonalizado = tituloEl.textContent.trim()
+
+    const contenidoEl = box.querySelector(".articulo-contenido")
+    if (contenidoEl) articulo.contenidoEditado = contenidoEl.textContent
+
+    const notaEl = box.querySelector(".nota-box")
+    if (notaEl) articulo.nota = notaEl.value
+  })
+
+  guardarLocal()
+}
+
 function borrarArticulo(id) {
   articulos = articulos.filter(a => a.id !== id)
   guardarLocal()
@@ -2819,6 +2838,11 @@ function borrarMateria(nombre, normativa = null) {
 inicializarMenuContextual()
 renderDocumentos()
 ordenarYMostrar()
+
+window.addEventListener("beforeunload", sincronizarEdiciones)
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") sincronizarEdiciones()
+})
 </script>
 </body>
 </html>
