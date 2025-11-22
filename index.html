@@ -198,10 +198,16 @@
       transition: 0.2s;
     }
 
-    .buscador-btn {
+    .barra-superior {
       position: absolute;
       top: 18px;
       right: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .buscador-btn {
       background: var(--accent);
       color: white;
       border: none;
@@ -225,6 +231,34 @@
     .buscador-btn:hover { background: var(--accent-light); }
 
     .buscador-btn:active { transform: translateY(1px); }
+
+    .zoom-btn {
+      background: var(--card);
+      border: 2px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      width: 42px;
+      height: 38px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .zoom-btn + .zoom-btn {
+      margin-left: 6px;
+    }
+
+    .zoom-btn:hover {
+      background: var(--accent-light);
+      color: #fff;
+      border-color: var(--accent-light);
+    }
+
+    .zoom-btn:active { transform: translateY(1px); }
 
     .btn-primary:hover { background: var(--accent-light); }
 
@@ -1078,18 +1112,42 @@
       <div class="mainPanel">
         <div class="form-articulo" style="position: relative;">
           <h2>Agregar Artículo</h2>
-          <button
-            class="buscador-btn"
-            onclick="abrirBuscador()"
-            aria-label="Abrir buscador"
-            title="Buscar (Ctrl+F o F3)"
-          >
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M10.5 4.5a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z" stroke-width="2" stroke-linecap="round" />
-              <path d="M15 15l4 4" stroke-width="2" stroke-linecap="round" />
-            </svg>
-            <span>Buscar</span>
-          </button>
+
+          <div class="barra-superior" aria-label="Acciones rápidas">
+            <div aria-label="Controles de zoom">
+              <button
+                class="zoom-btn"
+                type="button"
+                onclick="aplicarZoom(zoomActual + ZOOM_STEP)"
+                aria-label="Aumentar zoom"
+                title="Aumentar zoom"
+              >
+                +
+              </button>
+              <button
+                class="zoom-btn"
+                type="button"
+                onclick="aplicarZoom(zoomActual - ZOOM_STEP)"
+                aria-label="Disminuir zoom"
+                title="Disminuir zoom"
+              >
+                −
+              </button>
+            </div>
+
+            <button
+              class="buscador-btn"
+              onclick="abrirBuscador()"
+              aria-label="Abrir buscador"
+              title="Buscar (Ctrl+F o F3)"
+            >
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M10.5 4.5a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z" stroke-width="2" stroke-linecap="round" />
+                <path d="M15 15l4 4" stroke-width="2" stroke-linecap="round" />
+              </svg>
+              <span>Buscar</span>
+            </button>
+          </div>
 
           <div class="buscador-flotante" id="buscadorFlotante" role="search">
             <div class="buscador-campo">
