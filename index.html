@@ -2399,6 +2399,8 @@ function toggleModo() {
 }
 
 function cargarNormativa() {
+  sincronizarEdiciones()
+
   const val = document.getElementById("normativa").value
   const archivo = val === "civil" ? "codigo_civil_pdf.json" : "codigo_penal_pdf.json"
 
@@ -2465,6 +2467,8 @@ function agregarArticulo() {
 }
 
 function ordenarYMostrar() {
+  sincronizarEdiciones()
+
   const sidebar = document.getElementById("sidebarMaterias")
   const contenedorArticulos = document.getElementById("contenidoArticulos")
 
@@ -2569,6 +2573,8 @@ function ordenarYMostrar() {
 }
 
 function mostrarArticulosDeMateria(normativa, materia, items) {
+  sincronizarEdiciones()
+
   const contenedor = document.getElementById("contenidoArticulos")
   contenedor.innerHTML = ""
 
