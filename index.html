@@ -5,8 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Buen abogao</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
   <style>
     :root {
+      --font-base: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      --font-code: "Fira Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
       --bg: #eef1f5;
       --text: #111827;
       --card: white;
@@ -53,18 +62,33 @@
     }
 
     body {
-      font-family: "Segoe UI", Arial, sans-serif;
+      font-family: var(--font-base);
       margin: 0;
       padding: 0;
       background: var(--bg);
       color: var(--text);
       transition: 0.25s ease;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
     .app-root {
       min-height: 100vh;
       touch-action: pan-y;
+    }
+
+    * {
+      font-family: inherit;
+    }
+
+    code,
+    pre,
+    .documento-texto code,
+    .articulo-contenido code {
+      font-family: var(--font-code);
+      font-size: 15px;
+      font-variant-ligatures: contextual;
     }
 
     .container {
@@ -162,8 +186,9 @@
     }
 
     .nota-box {
-      font-family: "Segoe UI Semibold", Arial, sans-serif !important;
+      font-family: var(--font-base) !important;
       font-size: 16px;
+      font-weight: 600;
     }
 
     .materia-title {
@@ -724,7 +749,7 @@
 }
 
 .sidebarGroupTitle {
-  font-family: "Arial", sans-serif;
+  font-family: var(--font-base);
   font-weight: 700;
   font-size: 13px;
   text-transform: uppercase;
