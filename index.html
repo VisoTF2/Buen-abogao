@@ -1236,6 +1236,7 @@
 <script>
 let codigoActual = {}
 let articulos = JSON.parse(localStorage.getItem("articulosGuardados") || "[]")
+  .map(a => ({ ...a, contenidoHTML: a.contenidoHTML ?? null }))
 let materiasOrden = JSON.parse(localStorage.getItem("materiasOrden") || "{}")
 let normativaSeleccionada = null
 let materiaSeleccionada = null
@@ -1249,6 +1250,14 @@ const appRoot = document.getElementById("appRoot")
 const documentoInput = document.getElementById("documentoInput")
 const listaDocumentos = document.getElementById("listaDocumentos")
 const visorDocumentos = document.getElementById("visorDocumentos")
+
+function escaparComoHTML(texto) {
+  if (texto === undefined || texto === null) return ""
+  return String(texto)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+}
 
 if (typeof pdfjsLib !== "undefined") {
   pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -2448,6 +2457,7 @@ function agregarArticulo() {
     materia: mat,
     contenido: cont,
     contenidoEditado: null,
+    contenidoHTML: null,
     normativa: norm,
     nota: "",
     color: obtenerColorMateria(mat),
@@ -2734,13 +2744,17 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
     const contenido = document.createElement("div")
     contenido.className = "articulo-contenido"
     contenido.contentEditable = "true"
-    contenido.textContent =
-      a.contenidoEditado !== undefined && a.contenidoEditado !== null
-        ? a.contenidoEditado
-        : a.contenido
+    const contenidoGuardado =
+      a.contenidoHTML ??
+      (a.contenidoEditado !== undefined && a.contenidoEditado !== null
+        ? escaparComoHTML(a.contenidoEditado)
+        : escaparComoHTML(a.contenido))
+
+    contenido.innerHTML = contenidoGuardado
 
     contenido.addEventListener("input", () => {
       a.contenidoEditado = contenido.textContent
+      a.contenidoHTML = contenido.innerHTML
       guardarLocal()
     })
 
@@ -2872,7 +2886,10 @@ function sincronizarEdiciones() {
     if (tituloEl) articulo.tituloPersonalizado = tituloEl.textContent.trim()
 
     const contenidoEl = box.querySelector(".articulo-contenido")
-    if (contenidoEl) articulo.contenidoEditado = contenidoEl.textContent
+    if (contenidoEl) {
+      articulo.contenidoEditado = contenidoEl.textContent
+      articulo.contenidoHTML = contenidoEl.innerHTML
+    }
 
     const notaEl = box.querySelector(".nota-box")
     if (notaEl) articulo.nota = notaEl.value
