@@ -198,10 +198,16 @@
       transition: 0.2s;
     }
 
-    .buscador-btn {
+    .barra-superior {
       position: absolute;
       top: 18px;
       right: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .buscador-btn {
       background: var(--accent);
       color: white;
       border: none;
@@ -225,6 +231,34 @@
     .buscador-btn:hover { background: var(--accent-light); }
 
     .buscador-btn:active { transform: translateY(1px); }
+
+    .zoom-btn {
+      background: var(--card);
+      border: 2px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      width: 42px;
+      height: 38px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .zoom-btn + .zoom-btn {
+      margin-left: 6px;
+    }
+
+    .zoom-btn:hover {
+      background: var(--accent-light);
+      color: #fff;
+      border-color: var(--accent-light);
+    }
+
+    .zoom-btn:active { transform: translateY(1px); }
 
     .btn-primary:hover { background: var(--accent-light); }
 
@@ -961,6 +995,43 @@
       display: none;
     }
 
+    .menu-contextual {
+      position: fixed;
+      z-index: 9999;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+      display: none;
+      flex-direction: column;
+      min-width: 170px;
+      padding: 6px;
+      gap: 6px;
+    }
+
+    .menu-contextual button {
+      width: 100%;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 8px;
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background 0.2s ease, transform 0.12s ease;
+    }
+
+    .menu-contextual button:hover:not(:disabled) { background: var(--accent-light); }
+
+    .menu-contextual button:active:not(:disabled) { transform: translateY(1px); }
+
+    .menu-contextual button:disabled {
+      background: var(--border);
+      color: #6b7280;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
     #errorBox {
       display: none;
       background: #dc2626;
@@ -1041,18 +1112,42 @@
       <div class="mainPanel">
         <div class="form-articulo" style="position: relative;">
           <h2>Agregar Artículo</h2>
-          <button
-            class="buscador-btn"
-            onclick="abrirBuscador()"
-            aria-label="Abrir buscador"
-            title="Buscar (Ctrl+F o F3)"
-          >
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <path d="M10.5 4.5a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z" stroke-width="2" stroke-linecap="round" />
-              <path d="M15 15l4 4" stroke-width="2" stroke-linecap="round" />
-            </svg>
-            <span>Buscar</span>
-          </button>
+
+          <div class="barra-superior" aria-label="Acciones rápidas">
+            <div aria-label="Controles de zoom">
+              <button
+                class="zoom-btn"
+                type="button"
+                onclick="aplicarZoom(zoomActual + ZOOM_STEP)"
+                aria-label="Aumentar zoom"
+                title="Aumentar zoom"
+              >
+                +
+              </button>
+              <button
+                class="zoom-btn"
+                type="button"
+                onclick="aplicarZoom(zoomActual - ZOOM_STEP)"
+                aria-label="Disminuir zoom"
+                title="Disminuir zoom"
+              >
+                −
+              </button>
+            </div>
+
+            <button
+              class="buscador-btn"
+              onclick="abrirBuscador()"
+              aria-label="Abrir buscador"
+              title="Buscar (Ctrl+F o F3)"
+            >
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M10.5 4.5a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z" stroke-width="2" stroke-linecap="round" />
+                <path d="M15 15l4 4" stroke-width="2" stroke-linecap="round" />
+              </svg>
+              <span>Buscar</span>
+            </button>
+          </div>
 
           <div class="buscador-flotante" id="buscadorFlotante" role="search">
             <div class="buscador-campo">
@@ -1141,6 +1236,7 @@
 <script>
 let codigoActual = {}
 let articulos = JSON.parse(localStorage.getItem("articulosGuardados") || "[]")
+  .map(a => ({ ...a, contenidoHTML: a.contenidoHTML ?? null }))
 let materiasOrden = JSON.parse(localStorage.getItem("materiasOrden") || "{}")
 let normativaSeleccionada = null
 let materiaSeleccionada = null
@@ -1154,6 +1250,14 @@ const appRoot = document.getElementById("appRoot")
 const documentoInput = document.getElementById("documentoInput")
 const listaDocumentos = document.getElementById("listaDocumentos")
 const visorDocumentos = document.getElementById("visorDocumentos")
+
+function escaparComoHTML(texto) {
+  if (texto === undefined || texto === null) return ""
+  return String(texto)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+}
 
 if (typeof pdfjsLib !== "undefined") {
   pdfjsLib.GlobalWorkerOptions.workerSrc =
@@ -1541,6 +1645,244 @@ function esCampoEditable(elem) {
     "input, textarea, [contenteditable=\"true\"], .articulo-contenido, .nota-box"
   )
   return destino || (elem.isContentEditable ? elem : null)
+}
+
+let menuContextual
+let botonCopiarMenu
+let botonPegarMenu
+let objetivoContextual
+
+function crearMenuContextual() {
+  const menu = document.createElement("div")
+  menu.className = "menu-contextual"
+
+  const copiar = document.createElement("button")
+  copiar.type = "button"
+  copiar.textContent = "Copiar"
+
+  const pegar = document.createElement("button")
+  pegar.type = "button"
+  pegar.textContent = "Pegar"
+
+  menu.appendChild(copiar)
+  menu.appendChild(pegar)
+
+  return { menu, copiar, pegar }
+}
+
+function ocultarMenuContextual() {
+  if (menuContextual) menuContextual.style.display = "none"
+  objetivoContextual = null
+}
+
+function seleccionPerteneceAlObjetivo(objetivo, seleccion) {
+  if (!seleccion) return false
+  if (!seleccion.anchorNode) return false
+  if (seleccion.anchorNode === objetivo) return true
+  return objetivo.contains(seleccion.anchorNode)
+}
+
+function textoSeleccionadoEnObjetivo(objetivo) {
+  if (!objetivo) return ""
+
+  if (objetivo instanceof HTMLInputElement || objetivo instanceof HTMLTextAreaElement) {
+    const inicio = objetivo.selectionStart ?? 0
+    const fin = objetivo.selectionEnd ?? 0
+    if (inicio !== fin) return objetivo.value.slice(inicio, fin)
+    return objetivo.value
+  }
+
+  const seleccion = window.getSelection()
+  if (seleccion && seleccion.toString().trim() && seleccionPerteneceAlObjetivo(objetivo, seleccion)) {
+    return seleccion.toString()
+  }
+
+  return objetivo.textContent || ""
+}
+
+function actualizarEstadoMenuContextual() {
+  if (!menuContextual) return
+
+  const hayObjetivo = Boolean(objetivoContextual)
+  const textoSeleccion = hayObjetivo ? textoSeleccionadoEnObjetivo(objetivoContextual).trim() : ""
+
+  const soporteClipboard = Boolean(navigator.clipboard)
+  const puedeCopiar = soporteClipboard && hayObjetivo && Boolean(textoSeleccion)
+  const puedePegar = soporteClipboard && hayObjetivo && Boolean(navigator.clipboard.readText)
+
+  botonCopiarMenu.disabled = !puedeCopiar
+  botonPegarMenu.disabled = !puedePegar
+}
+
+function mostrarMenuContextual(x, y) {
+  if (!menuContextual) return
+
+  menuContextual.style.display = "flex"
+
+  const ancho = menuContextual.offsetWidth
+  const alto = menuContextual.offsetHeight
+  const margen = 12
+
+  let posX = x
+  let posY = y
+
+  const maxX = window.innerWidth - ancho - margen
+  const maxY = window.innerHeight - alto - margen
+
+  posX = Math.min(posX, Math.max(margen, maxX))
+  posY = Math.min(posY, Math.max(margen, maxY))
+
+  menuContextual.style.left = `${posX}px`
+  menuContextual.style.top = `${posY}px`
+}
+
+function enfocarObjetivoParaPegar() {
+  if (!objetivoContextual) return
+  const seleccion = window.getSelection()
+
+  if (
+    objetivoContextual instanceof HTMLInputElement ||
+    objetivoContextual instanceof HTMLTextAreaElement
+  ) {
+    objetivoContextual.focus({ preventScroll: true })
+    return
+  }
+
+  if (seleccion && seleccionPerteneceAlObjetivo(objetivoContextual, seleccion)) return
+
+  const rango = document.createRange()
+  const ultimoNodo = objetivoContextual.lastChild
+  if (ultimoNodo) {
+    rango.setStartAfter(ultimoNodo)
+  } else {
+    rango.setStart(objetivoContextual, 0)
+  }
+  rango.collapse(true)
+
+  if (seleccion) {
+    seleccion.removeAllRanges()
+    seleccion.addRange(rango)
+  }
+
+  objetivoContextual.focus({ preventScroll: true })
+}
+
+function pegarEnObjetivo(texto) {
+  if (!objetivoContextual || !texto) return
+
+  if (objetivoContextual instanceof HTMLInputElement || objetivoContextual instanceof HTMLTextAreaElement) {
+    const inicio = objetivoContextual.selectionStart ?? objetivoContextual.value.length
+    const fin = objetivoContextual.selectionEnd ?? objetivoContextual.value.length
+    try {
+      objetivoContextual.setRangeText(texto, inicio, fin, "end")
+    } catch (error) {
+      const nuevoValor =
+        objetivoContextual.value.slice(0, inicio) + texto + objetivoContextual.value.slice(fin)
+
+      objetivoContextual.value = nuevoValor
+
+      const nuevaPos = inicio + texto.length
+      objetivoContextual.setSelectionRange(nuevaPos, nuevaPos)
+    }
+
+    objetivoContextual.dispatchEvent(new Event("input", { bubbles: true }))
+    return
+  }
+
+  enfocarObjetivoParaPegar()
+
+  const seleccion = window.getSelection()
+  if (seleccion && seleccion.rangeCount > 0) {
+    const rango = seleccion.getRangeAt(0)
+    const rangoClonado = rango.cloneRange()
+
+    const pudoInsertar =
+      typeof document.queryCommandSupported === "function" &&
+      document.queryCommandSupported("insertText")
+        ? document.execCommand("insertText", false, texto)
+        : false
+
+    if (!pudoInsertar) {
+      rangoClonado.deleteContents()
+      rangoClonado.insertNode(document.createTextNode(texto))
+      rangoClonado.collapse(false)
+      seleccion.removeAllRanges()
+      seleccion.addRange(rangoClonado)
+    }
+  } else {
+    objetivoContextual.textContent += texto
+  }
+
+  objetivoContextual.dispatchEvent(new Event("input", { bubbles: true }))
+}
+
+function inicializarMenuContextual() {
+  const { menu, copiar, pegar } = crearMenuContextual()
+  menuContextual = menu
+  botonCopiarMenu = copiar
+  botonPegarMenu = pegar
+
+  document.body.appendChild(menuContextual)
+
+  document.addEventListener("contextmenu", e => {
+    const editable = esCampoEditable(e.target)
+
+    if (!editable) {
+      ocultarMenuContextual()
+      return
+    }
+
+    e.preventDefault()
+    objetivoContextual = editable
+    actualizarEstadoMenuContextual()
+    mostrarMenuContextual(e.clientX, e.clientY)
+  })
+
+  botonCopiarMenu.addEventListener("click", async () => {
+    if (!objetivoContextual || !navigator.clipboard?.writeText) return
+
+    const texto = textoSeleccionadoEnObjetivo(objetivoContextual)
+    if (!texto.trim()) return
+
+    try {
+      await navigator.clipboard.writeText(texto)
+    } catch (error) {
+      console.error("No se pudo copiar", error)
+    }
+
+    ocultarMenuContextual()
+  })
+
+  botonPegarMenu.addEventListener("click", async () => {
+    if (!objetivoContextual || !navigator.clipboard?.readText) return
+
+    try {
+      const texto = await navigator.clipboard.readText()
+      pegarEnObjetivo(texto)
+    } catch (error) {
+      console.error("No se pudo pegar", error)
+    }
+
+    ocultarMenuContextual()
+  })
+
+  document.addEventListener(
+    "pointerdown",
+    e => {
+      if (e.button !== 0) return
+      if (!menuContextual || menuContextual.style.display === "none") return
+      if (!menuContextual.contains(e.target)) ocultarMenuContextual()
+    },
+    true
+  )
+
+  document.addEventListener("click", e => {
+    if (!menuContextual || menuContextual.style.display === "none") return
+    if (!menuContextual.contains(e.target)) ocultarMenuContextual()
+  })
+
+  window.addEventListener("resize", ocultarMenuContextual)
+  window.addEventListener("scroll", ocultarMenuContextual, true)
 }
 
 function aplicarOrdenDesdeDOM(contenedorLista, normativa, materia) {
@@ -2091,6 +2433,8 @@ function toggleModo() {
 }
 
 function cargarNormativa() {
+  sincronizarEdiciones()
+
   const val = document.getElementById("normativa").value
   const archivo = val === "civil" ? "codigo_civil_pdf.json" : "codigo_penal_pdf.json"
 
@@ -2137,7 +2481,8 @@ function agregarArticulo() {
     numero: num,
     materia: mat,
     contenido: cont,
-    contenidoEditado: "",
+    contenidoEditado: null,
+    contenidoHTML: null,
     normativa: norm,
     nota: "",
     color: obtenerColorMateria(mat),
@@ -2157,6 +2502,8 @@ function agregarArticulo() {
 }
 
 function ordenarYMostrar() {
+  sincronizarEdiciones()
+
   const sidebar = document.getElementById("sidebarMaterias")
   const contenedorArticulos = document.getElementById("contenidoArticulos")
 
@@ -2261,6 +2608,8 @@ function ordenarYMostrar() {
 }
 
 function mostrarArticulosDeMateria(normativa, materia, items) {
+  sincronizarEdiciones()
+
   const contenedor = document.getElementById("contenidoArticulos")
   contenedor.innerHTML = ""
 
@@ -2420,10 +2769,17 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
     const contenido = document.createElement("div")
     contenido.className = "articulo-contenido"
     contenido.contentEditable = "true"
-    contenido.textContent = a.contenidoEditado || a.contenido
+    const contenidoGuardado =
+      a.contenidoHTML ??
+      (a.contenidoEditado !== undefined && a.contenidoEditado !== null
+        ? escaparComoHTML(a.contenidoEditado)
+        : escaparComoHTML(a.contenido))
+
+    contenido.innerHTML = contenidoGuardado
 
     contenido.addEventListener("input", () => {
       a.contenidoEditado = contenido.textContent
+      a.contenidoHTML = contenido.innerHTML
       guardarLocal()
     })
 
@@ -2545,6 +2901,28 @@ function guardarLocal() {
   localStorage.setItem("articulosGuardados", JSON.stringify(articulos))
 }
 
+function sincronizarEdiciones() {
+  document.querySelectorAll(".articulo").forEach(box => {
+    const id = Number(box.dataset.id)
+    const articulo = articulos.find(a => a.id === id)
+    if (!articulo) return
+
+    const tituloEl = box.querySelector(".articulo-titulo-texto")
+    if (tituloEl) articulo.tituloPersonalizado = tituloEl.textContent.trim()
+
+    const contenidoEl = box.querySelector(".articulo-contenido")
+    if (contenidoEl) {
+      articulo.contenidoEditado = contenidoEl.textContent
+      articulo.contenidoHTML = contenidoEl.innerHTML
+    }
+
+    const notaEl = box.querySelector(".nota-box")
+    if (notaEl) articulo.nota = notaEl.value
+  })
+
+  guardarLocal()
+}
+
 function borrarArticulo(id) {
   articulos = articulos.filter(a => a.id !== id)
   guardarLocal()
@@ -2566,8 +2944,14 @@ function borrarMateria(nombre, normativa = null) {
   ordenarYMostrar()
 }
 
+inicializarMenuContextual()
 renderDocumentos()
 ordenarYMostrar()
+
+window.addEventListener("beforeunload", sincronizarEdiciones)
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") sincronizarEdiciones()
+})
 </script>
 </body>
 </html>
