@@ -2447,7 +2447,7 @@ function agregarArticulo() {
     numero: num,
     materia: mat,
     contenido: cont,
-    contenidoEditado: "",
+    contenidoEditado: null,
     normativa: norm,
     nota: "",
     color: obtenerColorMateria(mat),
@@ -2734,7 +2734,10 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
     const contenido = document.createElement("div")
     contenido.className = "articulo-contenido"
     contenido.contentEditable = "true"
-    contenido.textContent = a.contenidoEditado || a.contenido
+    contenido.textContent =
+      a.contenidoEditado !== undefined && a.contenidoEditado !== null
+        ? a.contenidoEditado
+        : a.contenido
 
     contenido.addEventListener("input", () => {
       a.contenidoEditado = contenido.textContent
