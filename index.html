@@ -1773,13 +1773,18 @@ function pegarEnObjetivo(texto) {
   if (objetivoContextual instanceof HTMLInputElement || objetivoContextual instanceof HTMLTextAreaElement) {
     const inicio = objetivoContextual.selectionStart ?? objetivoContextual.value.length
     const fin = objetivoContextual.selectionEnd ?? objetivoContextual.value.length
-    const nuevoValor =
-      objetivoContextual.value.slice(0, inicio) + texto + objetivoContextual.value.slice(fin)
+    try {
+      objetivoContextual.setRangeText(texto, inicio, fin, "end")
+    } catch (error) {
+      const nuevoValor =
+        objetivoContextual.value.slice(0, inicio) + texto + objetivoContextual.value.slice(fin)
 
-    objetivoContextual.value = nuevoValor
+      objetivoContextual.value = nuevoValor
 
-    const nuevaPos = inicio + texto.length
-    objetivoContextual.setSelectionRange(nuevaPos, nuevaPos)
+      const nuevaPos = inicio + texto.length
+      objetivoContextual.setSelectionRange(nuevaPos, nuevaPos)
+    }
+
     objetivoContextual.dispatchEvent(new Event("input", { bubbles: true }))
     return
   }
@@ -1789,11 +1794,21 @@ function pegarEnObjetivo(texto) {
   const seleccion = window.getSelection()
   if (seleccion && seleccion.rangeCount > 0) {
     const rango = seleccion.getRangeAt(0)
-    rango.deleteContents()
-    rango.insertNode(document.createTextNode(texto))
-    rango.collapse(false)
-    seleccion.removeAllRanges()
-    seleccion.addRange(rango)
+    const rangoClonado = rango.cloneRange()
+
+    const pudoInsertar =
+      typeof document.queryCommandSupported === "function" &&
+      document.queryCommandSupported("insertText")
+        ? document.execCommand("insertText", false, texto)
+        : false
+
+    if (!pudoInsertar) {
+      rangoClonado.deleteContents()
+      rangoClonado.insertNode(document.createTextNode(texto))
+      rangoClonado.collapse(false)
+      seleccion.removeAllRanges()
+      seleccion.addRange(rangoClonado)
+    }
   } else {
     objetivoContextual.textContent += texto
   }
@@ -1850,6 +1865,16 @@ function inicializarMenuContextual() {
 
     ocultarMenuContextual()
   })
+
+  document.addEventListener(
+    "pointerdown",
+    e => {
+      if (e.button !== 0) return
+      if (!menuContextual || menuContextual.style.display === "none") return
+      if (!menuContextual.contains(e.target)) ocultarMenuContextual()
+    },
+    true
+  )
 
   document.addEventListener("click", e => {
     if (!menuContextual || menuContextual.style.display === "none") return
