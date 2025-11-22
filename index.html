@@ -207,6 +207,55 @@
       gap: 10px;
     }
 
+    .donacion-footer {
+      margin-top: 26px;
+      padding: 18px 16px 22px;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(30, 58, 138, 0.04), rgba(30, 58, 138, 0.01));
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    body.oscuro .donacion-footer {
+      background: linear-gradient(135deg, rgba(96, 165, 250, 0.08), rgba(96, 165, 250, 0.02));
+    }
+
+    .donacion-texto {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .donacion-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 3px 12px rgba(30, 58, 138, 0.25);
+      transition: background 0.2s ease, transform 0.12s ease, box-shadow 0.2s ease;
+    }
+
+    .donacion-btn:hover {
+      background: var(--accent-light);
+      box-shadow: 0 6px 18px rgba(59, 92, 204, 0.28);
+    }
+
+    .donacion-btn:active {
+      transform: translateY(1px);
+    }
+
+    .donacion-info {
+      font-size: 14px;
+      color: #4b5563;
+    }
+
+    body.oscuro .donacion-info { color: #e5e7eb; }
+
     .buscador-btn {
       background: var(--accent);
       color: white;
@@ -1212,18 +1261,24 @@
             </div>
           </div>
 
-          <div class="documentos-body">
-            <div class="documentos-lista" id="listaDocumentos">
-              <div class="documentos-vacio">Aún no hay documentos cargados.</div>
-            </div>
-            <div class="documentos-preview" id="visorDocumentos">
-              <h4>Vista previa</h4>
-              <div class="documentos-vacio">Selecciona un documento para verlo aquí mismo.</div>
-            </div>
+        <div class="documentos-body">
+          <div class="documentos-lista" id="listaDocumentos">
+            <div class="documentos-vacio">Aún no hay documentos cargados.</div>
+          </div>
+          <div class="documentos-preview" id="visorDocumentos">
+            <h4>Vista previa</h4>
+            <div class="documentos-vacio">Selecciona un documento para verlo aquí mismo.</div>
           </div>
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="donacion-footer" aria-live="polite">
+    <div class="donacion-texto">Si esta herramienta te ayuda, puedes apoyarla con una donación bancaria.</div>
+    <button class="donacion-btn" type="button" onclick="manejarDonacion()">Donar a mi cuenta</button>
+    <div class="donacion-info" id="donacionInfo">Copiamos los datos de la cuenta al portapapeles para que puedas pegarlos en tu app bancaria.</div>
+  </div>
 
   </div>
 
@@ -1244,6 +1299,8 @@ let resultadosBusqueda = []
 let indiceResultado = 0
 let ultimoTerminoBusqueda = ""
 let documentosCargados = []
+const CUENTA_DONACION = "ES12 3456 7890 1234 5678 9012"
+const ENLACE_DONACION = ""
 const elementosMarcados = new Set()
 const buscadorInput = document.getElementById("buscadorInput")
 const appRoot = document.getElementById("appRoot")
@@ -1257,6 +1314,32 @@ function escaparComoHTML(texto) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
+}
+
+function copiarAlPortapapeles(texto) {
+  if (navigator.clipboard?.writeText) {
+    return navigator.clipboard.writeText(texto)
+  }
+
+  return new Promise((resolve, reject) => {
+    const area = document.createElement("textarea")
+    area.value = texto
+    area.style.position = "fixed"
+    area.style.top = "-9999px"
+    area.setAttribute("readonly", "")
+    document.body.appendChild(area)
+
+    area.select()
+
+    try {
+      const exito = document.execCommand("copy")
+      document.body.removeChild(area)
+      exito ? resolve() : reject(new Error("No se pudo copiar"))
+    } catch (err) {
+      document.body.removeChild(area)
+      reject(err)
+    }
+  })
 }
 
 if (typeof pdfjsLib !== "undefined") {
@@ -2942,6 +3025,22 @@ function borrarMateria(nombre, normativa = null) {
   normativaSeleccionada = null
   materiaSeleccionada = null
   ordenarYMostrar()
+}
+
+function manejarDonacion() {
+  const info = document.getElementById("donacionInfo")
+  const mensajeCuenta = `Cuenta bancaria: ${CUENTA_DONACION}`
+  const mensajeOk = "Cuenta copiada. Abre tu banco y pega el número para transferir."
+  const mensajeFallback = `${mensajeCuenta}. Copia estos datos si tu navegador no permite el copiado automático.`
+
+  copiarAlPortapapeles(CUENTA_DONACION)
+    .then(() => {
+      if (info) info.textContent = mensajeOk
+      if (ENLACE_DONACION) window.open(ENLACE_DONACION, "_blank", "noopener")
+    })
+    .catch(() => {
+      if (info) info.textContent = mensajeFallback
+    })
 }
 
 inicializarMenuContextual()
