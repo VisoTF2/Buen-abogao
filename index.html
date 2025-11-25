@@ -777,23 +777,41 @@
 }
 
 .btn-folder {
-  border: 1px dashed var(--border);
-  background: var(--card);
-  color: var(--text);
-  padding: 10px 12px;
-  border-radius: 10px;
-  font-weight: 700;
+  border: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  color: white;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-weight: 800;
   cursor: pointer;
   text-align: left;
-  transition: background 0.2s ease, transform 0.12s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.2px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+  transition: transform 0.12s ease, box-shadow 0.2s ease;
+}
+
+.btn-folder::before {
+  content: "✚";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 14px;
 }
 
 .btn-folder:hover {
-  background: var(--article-bg);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.18);
 }
 
 .btn-folder:active {
-  transform: translateY(1px);
+  transform: translateY(0);
 }
 
     .sidebarItem {
@@ -840,6 +858,11 @@
   margin-bottom: 12px;
 }
 
+.sidebarFolder.activa {
+  border-color: var(--accent);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+}
+
 .sidebarFolder header {
   display: flex;
   align-items: center;
@@ -852,6 +875,8 @@
   font-weight: 700;
   font-size: 15px;
   color: var(--accent);
+  cursor: pointer;
+  flex: 1;
 }
 
 .sidebarFolderSelect {
@@ -890,6 +915,28 @@
   background: var(--accent-light);
   color: white;
   border-color: var(--accent-light);
+}
+
+.sidebarFolderRenombrar {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: 0.15s ease;
+}
+
+.sidebarFolderRenombrar:hover {
+  background: var(--accent-light);
+  color: white;
+  border-color: var(--accent-light);
+}
+
+.sidebarFolderDrop {
+  border-color: var(--accent);
+  background: linear-gradient(180deg, rgba(30, 58, 138, 0.1), var(--article-bg));
 }
 
     .mainPanel {
@@ -1360,6 +1407,8 @@ let pinchStartDistance = null
 let pinchStartZoom = 1
 let articuloArrastradoId = null
 let materiaArrastrada = null
+let materiaArrastradaInfo = null
+let carpetaActivaId = null
 
 documentoInput?.addEventListener("change", e => {
   const archivo = e.target.files?.[0]
@@ -1684,6 +1733,18 @@ function crearCarpetaSidebar() {
   ordenarYMostrar()
 }
 
+function renombrarCarpeta(carpetaId) {
+  const carpeta = carpetasSidebar.find(c => c.id === carpetaId)
+  if (!carpeta) return
+
+  const nuevoNombre = prompt("Nuevo nombre de la carpeta", carpeta.nombre)?.trim()
+  if (!nuevoNombre || nuevoNombre === carpeta.nombre) return
+
+  carpeta.nombre = nuevoNombre
+  guardarCarpetas()
+  ordenarYMostrar()
+}
+
 function materiaEnCarpeta(normativa, materia) {
   return carpetasSidebar.find(carpeta =>
     (carpeta.materias || []).some(m => m.normativa === normativa && m.materia === materia)
@@ -1715,6 +1776,59 @@ function agregarMateriaACarpeta(carpetaId, normativa, materia) {
 
   guardarCarpetas()
   ordenarYMostrar()
+}
+
+function habilitarDropEnCarpeta(cajaCarpeta, carpeta) {
+  const limpiar = () => cajaCarpeta.classList.remove("sidebarFolderDrop")
+
+  const puedeRecibir = () => {
+    if (!materiaArrastradaInfo) return false
+    const { normativa, materia } = materiaArrastradaInfo
+    return !materiaEnCarpeta(normativa, materia)
+  }
+
+  ;["dragenter", "dragover"].forEach(evento => {
+    cajaCarpeta.addEventListener(evento, e => {
+      if (!puedeRecibir()) return
+      e.preventDefault()
+      cajaCarpeta.classList.add("sidebarFolderDrop")
+    })
+  })
+
+  cajaCarpeta.addEventListener("dragleave", limpiar)
+
+  cajaCarpeta.addEventListener("drop", e => {
+    if (!puedeRecibir()) return limpiar()
+    e.preventDefault()
+    const { normativa, materia } = materiaArrastradaInfo
+    agregarMateriaACarpeta(carpeta.id, normativa, materia)
+    limpiar()
+  })
+
+  cajaCarpeta.addEventListener("dragend", limpiar)
+}
+
+function mostrarCarpetaCompleta(carpeta, agrupado) {
+  const contenedor = document.getElementById("contenidoArticulos")
+  contenedor.innerHTML = ""
+
+  const encabezado = document.createElement("div")
+  encabezado.className = "materia-wrap"
+  encabezado.innerHTML = `<div class="materia-title" style="color: var(--accent);">${carpeta.nombre}</div>`
+  contenedor.appendChild(encabezado)
+
+  if (!carpeta.materias?.length) {
+    contenedor.innerHTML += `<p style="opacity:0.7; margin-top:4px;">Esta carpeta todavía no tiene listas.</p>`
+    return
+  }
+
+  carpeta.materias.forEach(({ normativa, materia }) => {
+    const lista = agrupado[normativa]?.[materia] || []
+    mostrarArticulosDeMateria(normativa, materia, lista, {
+      contenedorPersonalizado: contenedor,
+      apilar: true
+    })
+  })
 }
 
 function materiasAsignadasAcarpeta() {
@@ -2057,6 +2171,10 @@ function activarArrastreMateria(item, lista, normativa) {
 
   item.addEventListener("dragstart", e => {
     materiaArrastrada = item.dataset.materia
+    materiaArrastradaInfo = {
+      materia: item.dataset.materia,
+      normativa: item.dataset.normativa
+    }
     item.classList.add("arrastrando")
     if (e.dataTransfer) {
       e.dataTransfer.effectAllowed = "move"
@@ -2103,6 +2221,7 @@ function activarArrastreMateria(item, lista, normativa) {
     item.classList.remove("arrastrando")
     aplicarOrdenMateriasDesdeDOM(lista, normativa)
     materiaArrastrada = null
+    materiaArrastradaInfo = null
   })
 }
 
@@ -2665,7 +2784,7 @@ function ordenarYMostrar() {
   const botonCarpeta = document.createElement("button")
   botonCarpeta.type = "button"
   botonCarpeta.className = "btn-folder"
-  botonCarpeta.textContent = "+ Nueva carpeta"
+  botonCarpeta.textContent = "Nueva carpeta"
   botonCarpeta.onclick = crearCarpetaSidebar
 
   accionesSidebar.appendChild(botonCarpeta)
@@ -2718,7 +2837,9 @@ function ordenarYMostrar() {
       item.addEventListener("click", () => {
         normativaSeleccionada = norm
         materiaSeleccionada = m
+        carpetaActivaId = null
         sidebar.querySelectorAll(".sidebarItem").forEach(i => i.classList.remove("activa"))
+        sidebar.querySelectorAll(".sidebarFolder").forEach(i => i.classList.remove("activa"))
         item.classList.add("activa")
         mostrarArticulosDeMateria(norm, m, agrupado[norm][m])
       })
@@ -2747,11 +2868,21 @@ function ordenarYMostrar() {
     carpetasSidebar.forEach(carpeta => {
       const box = document.createElement("div")
       box.className = "sidebarFolder"
+      box.dataset.carpetaId = carpeta.id
 
       const header = document.createElement("header")
       const titulo = document.createElement("div")
       titulo.className = "sidebarFolderTitle"
       titulo.textContent = carpeta.nombre
+
+      const botonRenombrar = document.createElement("button")
+      botonRenombrar.type = "button"
+      botonRenombrar.className = "sidebarFolderRenombrar"
+      botonRenombrar.textContent = "Renombrar"
+      botonRenombrar.addEventListener("click", e => {
+        e.stopPropagation()
+        renombrarCarpeta(carpeta.id)
+      })
 
       const selector = document.createElement("select")
       selector.className = "sidebarFolderSelect"
@@ -2776,6 +2907,7 @@ function ordenarYMostrar() {
       })
 
       header.appendChild(titulo)
+      header.appendChild(botonRenombrar)
       header.appendChild(selector)
       box.appendChild(header)
 
@@ -2793,7 +2925,9 @@ function ordenarYMostrar() {
         item.addEventListener("click", () => {
           normativaSeleccionada = m.normativa
           materiaSeleccionada = m.materia
+          carpetaActivaId = null
           sidebar.querySelectorAll(".sidebarItem").forEach(i => i.classList.remove("activa"))
+          sidebar.querySelectorAll(".sidebarFolder").forEach(i => i.classList.remove("activa"))
           item.classList.add("activa")
           const lista = agrupado[m.normativa]?.[m.materia] || []
           mostrarArticulosDeMateria(m.normativa, m.materia, lista)
@@ -2812,6 +2946,25 @@ function ordenarYMostrar() {
       })
 
       box.appendChild(listaCarpeta)
+      box.addEventListener("click", e => {
+        if (e.target.closest("select") || e.target.closest("button")) return
+        carpetaActivaId = carpeta.id
+        sidebar.querySelectorAll(".sidebarItem").forEach(i => i.classList.remove("activa"))
+        sidebar.querySelectorAll(".sidebarFolder").forEach(i => i.classList.remove("activa"))
+        box.classList.add("activa")
+        mostrarCarpetaCompleta(carpeta, agrupado)
+      })
+
+      titulo.addEventListener("click", e => {
+        e.stopPropagation()
+        carpetaActivaId = carpeta.id
+        sidebar.querySelectorAll(".sidebarItem").forEach(i => i.classList.remove("activa"))
+        sidebar.querySelectorAll(".sidebarFolder").forEach(i => i.classList.remove("activa"))
+        box.classList.add("activa")
+        mostrarCarpetaCompleta(carpeta, agrupado)
+      })
+
+      habilitarDropEnCarpeta(box, carpeta)
       sidebar.appendChild(box)
     })
   }
@@ -2833,6 +2986,20 @@ function ordenarYMostrar() {
     return;
   }
 
+  const carpetaActiva = carpetaActivaId
+    ? carpetasSidebar.find(c => c.id === carpetaActivaId)
+    : null
+
+  if (carpetaActivaId && !carpetaActiva) carpetaActivaId = null
+
+  if (carpetaActiva) {
+    const elem = sidebar.querySelector(`.sidebarFolder[data-carpeta-id="${carpetaActivaId}"]`)
+    if (elem) elem.classList.add("activa")
+    mostrarCarpetaCompleta(carpetaActiva, agrupado)
+    reaplicarBusqueda()
+    return
+  }
+
   if (!tieneSeleccionValida) {
     normativaSeleccionada = combos[0].normativa
     materiaSeleccionada = combos[0].materia
@@ -2852,11 +3019,19 @@ function ordenarYMostrar() {
   reaplicarBusqueda()
 }
 
-function mostrarArticulosDeMateria(normativa, materia, items) {
+function mostrarArticulosDeMateria(normativa, materia, items, opciones = {}) {
   sincronizarEdiciones()
 
-  const contenedor = document.getElementById("contenidoArticulos")
-  contenedor.innerHTML = ""
+  const { contenedorPersonalizado = null, apilar = false } = opciones
+
+  const contenedor = contenedorPersonalizado || document.getElementById("contenidoArticulos")
+  if (!apilar) {
+    contenedor.innerHTML = ""
+  } else if (contenedor.childElementCount) {
+    const separador = document.createElement("div")
+    separador.style.height = "10px"
+    contenedor.appendChild(separador)
+  }
 
   const wrap = document.createElement("div")
   wrap.className = "materia-wrap"
