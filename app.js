@@ -413,6 +413,35 @@ function removerMateriaDeCarpetas(normativa, materia) {
   return cambio
 }
 
+function renombrarMateriaEnCarpetas(normativa, materiaAnterior, materiaNueva) {
+  let cambio = false
+
+  carpetas = carpetas.map(carpeta => {
+    const materias = (carpeta.materias || []).map(m => {
+      if (m.normativa === normativa && m.materia === materiaAnterior) {
+        cambio = true
+        return { ...m, materia: materiaNueva }
+      }
+      return m
+    })
+
+    const set = new Set()
+    const materiasUnicas = materias.filter(m => {
+      const key = `${m.normativa}||${m.materia}`
+      if (set.has(key)) {
+        cambio = true
+        return false
+      }
+      set.add(key)
+      return true
+    })
+
+    return { ...carpeta, materias: materiasUnicas }
+  })
+
+  if (cambio) guardarCarpetas()
+}
+
 function moverMateriaACarpeta(normativa, materia, carpetaId) {
   if (!carpetaId) return
   removerMateriaDeCarpetas(normativa, materia)
@@ -1632,6 +1661,8 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
         a.materia = nuevo
       }
     })
+
+    renombrarMateriaEnCarpetas(normativa, nombreActual, nuevo)
 
     document.querySelectorAll(".sidebarItem").forEach(item => {
       if (item.dataset.materia === nombreActual && item.dataset.normativa === normativa) {
