@@ -855,7 +855,6 @@
   padding: 4px 6px 6px;
   border-radius: 10px;
   border: 1px dashed transparent;
-  min-height: 52px;
 }
 
 .carpetaLista-drop {
@@ -1061,6 +1060,11 @@ body.oscuro .modal-close:hover {
   gap: 8px;
   padding: 8px 6px 10px;
   min-height: 96px;
+}
+
+.sidebarGroupList.carpetaLista {
+  padding: 6px 6px 8px;
+  min-height: 52px;
 }
 
 .sidebarGroupList.drop-activa {
