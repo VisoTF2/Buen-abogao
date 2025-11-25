@@ -915,12 +915,12 @@ body.oscuro .sidebarItemCarpeta {
 .modal-backdrop.visible { display: flex; }
 
 .modal-card {
-  --modal-gap: 12px;
+  --modal-gap: 10px;
   background: var(--card);
   color: var(--text);
   border-radius: 12px;
-  padding: 14px;
-  width: min(240px, 80vw);
+  padding: 12px 12px 10px;
+  width: min(230px, 80vw);
   box-shadow: 0 16px 32px rgba(0,0,0,0.22);
   border: 1px solid var(--border);
   display: flex;
@@ -933,13 +933,13 @@ body.oscuro .sidebarItemCarpeta {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 2px 0 0;
+  padding: 0;
 }
 
 .modal-title-wrap {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .modal-kicker {
@@ -977,7 +977,7 @@ body.oscuro .sidebarItemCarpeta {
 .modal-body {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   padding: 0;
 }
 
@@ -985,12 +985,13 @@ body.oscuro .sidebarItemCarpeta {
   font-weight: 700;
   font-size: 12px;
   letter-spacing: 0.01em;
+  margin: 0 0 4px;
 }
 
 .modal-card input {
   width: 100%;
   margin-top: 0;
-  padding: 10px 12px;
+  padding: 9px 11px;
   border-radius: 10px;
   border: 1px solid var(--border);
 }
@@ -998,7 +999,7 @@ body.oscuro .sidebarItemCarpeta {
 .modal-actions {
   display: flex;
   gap: 10px;
-  padding: 10px 0 0;
+  padding: 8px 0 0;
   border-top: 1px solid var(--border);
   margin-top: 2px;
 }
@@ -1006,7 +1007,7 @@ body.oscuro .sidebarItemCarpeta {
 .modal-actions button {
   flex: 1;
   min-width: 0;
-  padding: 11px 0;
+  padding: 10px 0;
   font-weight: 700;
   font-size: 15px;
   border-radius: 10px;
