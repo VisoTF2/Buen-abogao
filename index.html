@@ -184,47 +184,6 @@
 
     select { appearance: none; }
 
-    .normativa-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .normativa-row select {
-      flex: 1;
-      min-width: 180px;
-    }
-
-    .folder-create-btn {
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s ease, transform 0.12s ease;
-      white-space: nowrap;
-      box-shadow: 0 4px 14px rgba(30, 58, 138, 0.14);
-    }
-
-    .folder-create-btn:hover { background: var(--accent-light); }
-
-    .folder-create-btn:active { transform: translateY(1px); }
-
-    .normativa-hint {
-      margin: 8px 0 0;
-      color: #4b5563;
-      font-size: 13px;
-    }
-
-    body.oscuro .normativa-hint,
-    body.oscuro .carpetas-header p,
-    body.oscuro .carpetas-empty {
-      color: #d1d5db;
-    }
-
     .btn-primary {
       background: var(--accent);
       color: white;
@@ -422,132 +381,6 @@
     .documentos-btn.arrastrando {
       background: var(--accent-light);
       box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
-    }
-
-    .carpetas-section {
-      margin: 18px 0 10px;
-      padding: 14px 16px 18px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: linear-gradient(135deg, rgba(30,58,138,0.05), rgba(30,58,138,0.01));
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
-    }
-
-    .carpetas-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .carpetas-header h3 {
-      margin: 0;
-      color: var(--accent);
-    }
-
-    .carpetas-header p {
-      margin: 4px 0 0;
-      color: #4b5563;
-      max-width: 620px;
-    }
-
-    .carpetas-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 12px;
-      margin-top: 14px;
-    }
-
-    .carpeta-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
-    }
-
-    .carpeta-titulo,
-    .carpeta-lista-titulo {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 8px 10px;
-      font-weight: 700;
-      background: var(--article-bg);
-      cursor: text;
-    }
-
-    .carpeta-titulo:focus,
-    .carpeta-lista-titulo:focus,
-    .carpeta-lista-texto:focus {
-      outline: 2px solid var(--focus-contrast);
-      box-shadow: 0 0 0 3px var(--focus-surface);
-    }
-
-    .carpeta-listas {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .carpeta-lista {
-      border: 1px dashed var(--border);
-      border-radius: 10px;
-      padding: 10px;
-      background: var(--article-bg);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .carpeta-lista-texto {
-      min-height: 70px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 8px 10px;
-      background: var(--card);
-      line-height: 1.5;
-      cursor: text;
-    }
-
-    .carpeta-lista-texto:empty::before {
-      content: attr(data-placeholder);
-      color: #9ca3af;
-    }
-
-    .carpeta-acciones {
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    .carpeta-agregar-lista {
-      background: transparent;
-      border: 1px dashed var(--accent);
-      color: var(--accent);
-      padding: 10px 12px;
-      border-radius: 10px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.2s ease, transform 0.12s ease;
-    }
-
-    .carpeta-agregar-lista:hover {
-      background: rgba(59, 130, 246, 0.08);
-    }
-
-    .carpeta-agregar-lista:active { transform: translateY(1px); }
-
-    .carpetas-empty {
-      margin-top: 10px;
-      padding: 14px;
-      border: 1px dashed var(--border);
-      border-radius: 12px;
-      color: #4b5563;
-      text-align: center;
-      background: var(--article-bg);
     }
 
     .documentos-hint {
@@ -1342,16 +1175,10 @@
           <div class="form-row">
             <div>
               <label>Seleccionar normativa</label>
-              <div class="normativa-row">
-                <select id="normativa">
-                  <option value="civil">Código Civil</option>
-                  <option value="penal">Código Penal</option>
-                </select>
-                <button class="folder-create-btn" type="button" onclick="crearCarpeta()">
-                  Crear carpeta
-                </button>
-              </div>
-              <p class="normativa-hint">Organiza las listas creadas dentro de carpetas con títulos editables.</p>
+              <select id="normativa">
+                <option value="civil">Código Civil</option>
+                <option value="penal">Código Penal</option>
+              </select>
             </div>
 
             <div>
@@ -1367,17 +1194,6 @@
 
           <button class="btn-primary" onclick="agregarArticulo()">Agregar Artículo</button>
           <div id="errorBox"></div>
-        </div>
-
-        <div class="carpetas-section" aria-label="Carpetas de listas">
-          <div class="carpetas-header">
-            <div>
-              <h3>Carpetas de listas</h3>
-              <p>Guarda tus listas y edita nombres o contenidos sin salir del panel.</p>
-            </div>
-            <button class="folder-create-btn" type="button" onclick="crearCarpeta()">Crear carpeta</button>
-          </div>
-          <div class="carpetas-grid" id="carpetasContenedor"></div>
         </div>
 
         <div class="contenidoArticulos" id="contenidoArticulos"></div>
@@ -1444,7 +1260,6 @@ let codigoActual = {}
 let articulos = JSON.parse(localStorage.getItem("articulosGuardados") || "[]")
   .map(a => ({ ...a, contenidoHTML: a.contenidoHTML ?? null }))
 let materiasOrden = JSON.parse(localStorage.getItem("materiasOrden") || "{}")
-let carpetas = JSON.parse(localStorage.getItem("carpetasListas") || "[]")
 let normativaSeleccionada = null
 let materiaSeleccionada = null
 let resultadosBusqueda = []
@@ -1457,131 +1272,6 @@ const appRoot = document.getElementById("appRoot")
 const documentoInput = document.getElementById("documentoInput")
 const listaDocumentos = document.getElementById("listaDocumentos")
 const visorDocumentos = document.getElementById("visorDocumentos")
-
-function generarIdCarpeta() {
-  return Date.now() + Math.floor(Math.random() * 100000)
-}
-
-function guardarCarpetas() {
-  localStorage.setItem("carpetasListas", JSON.stringify(carpetas))
-}
-
-function crearCarpeta() {
-  const selectNormativa = document.getElementById("normativa")
-  const nombreNormativa = selectNormativa?.selectedOptions?.[0]?.textContent?.trim()
-  const base = nombreNormativa ? `Carpeta ${nombreNormativa}` : "Nueva carpeta"
-
-  const carpeta = {
-    id: generarIdCarpeta(),
-    nombre: base,
-    listas: []
-  }
-
-  carpetas.push(carpeta)
-  guardarCarpetas()
-  renderCarpetas()
-
-  document.getElementById("carpetasContenedor")?.scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-  })
-}
-
-function agregarListaACarpeta(idCarpeta) {
-  const carpeta = carpetas.find(c => c.id === idCarpeta)
-  if (!carpeta) return
-
-  const numeroLista = carpeta.listas.length + 1
-  carpeta.listas.push({
-    id: generarIdCarpeta(),
-    titulo: `Lista ${numeroLista}`,
-    texto: ""
-  })
-
-  guardarCarpetas()
-  renderCarpetas()
-}
-
-function renderCarpetas() {
-  const contenedor = document.getElementById("carpetasContenedor")
-  if (!contenedor) return
-
-  contenedor.innerHTML = ""
-
-  if (!carpetas.length) {
-    const vacio = document.createElement("div")
-    vacio.className = "carpetas-empty"
-    vacio.textContent = "Crea una carpeta para guardar tus listas personalizadas."
-    contenedor.appendChild(vacio)
-    return
-  }
-
-  carpetas.forEach(carpeta => {
-    const card = document.createElement("div")
-    card.className = "carpeta-card"
-
-    const titulo = document.createElement("div")
-    titulo.className = "carpeta-titulo"
-    titulo.contentEditable = "true"
-    titulo.textContent = carpeta.nombre || "Carpeta sin título"
-    titulo.addEventListener("input", () => {
-      carpeta.nombre = titulo.textContent.trim() || "Carpeta sin título"
-      guardarCarpetas()
-    })
-
-    const listas = document.createElement("div")
-    listas.className = "carpeta-listas"
-
-    if (!carpeta.listas?.length) {
-      const vacia = document.createElement("div")
-      vacia.className = "carpetas-empty"
-      vacia.textContent = "Añade listas para agrupar tu información."
-      listas.appendChild(vacia)
-    }
-
-    carpeta.listas?.forEach(lista => {
-      const listaCard = document.createElement("div")
-      listaCard.className = "carpeta-lista"
-
-      const tituloLista = document.createElement("div")
-      tituloLista.className = "carpeta-lista-titulo"
-      tituloLista.contentEditable = "true"
-      tituloLista.textContent = lista.titulo || "Lista sin título"
-      tituloLista.addEventListener("input", () => {
-        lista.titulo = tituloLista.textContent.trim() || "Lista sin título"
-        guardarCarpetas()
-      })
-
-      const textoLista = document.createElement("div")
-      textoLista.className = "carpeta-lista-texto"
-      textoLista.contentEditable = "true"
-      textoLista.dataset.placeholder = "Escribe el contenido editable de la lista"
-      textoLista.textContent = lista.texto || ""
-      textoLista.addEventListener("input", () => {
-        lista.texto = textoLista.innerText
-        guardarCarpetas()
-      })
-
-      listaCard.appendChild(tituloLista)
-      listaCard.appendChild(textoLista)
-      listas.appendChild(listaCard)
-    })
-
-    const acciones = document.createElement("div")
-    acciones.className = "carpeta-acciones"
-    const botonAgregarLista = document.createElement("button")
-    botonAgregarLista.className = "carpeta-agregar-lista"
-    botonAgregarLista.type = "button"
-    botonAgregarLista.textContent = "Agregar lista"
-    botonAgregarLista.addEventListener("click", () => agregarListaACarpeta(carpeta.id))
-    acciones.appendChild(botonAgregarLista)
-
-    card.appendChild(titulo)
-    card.appendChild(listas)
-    card.appendChild(acciones)
-    contenedor.appendChild(card)
-  })
-}
 
 function escaparComoHTML(texto) {
   if (texto === undefined || texto === null) return ""
@@ -3278,7 +2968,6 @@ function borrarMateria(nombre, normativa = null) {
 
 inicializarMenuContextual()
 renderDocumentos()
-renderCarpetas()
 ordenarYMostrar()
 
 window.addEventListener("beforeunload", sincronizarEdiciones)
