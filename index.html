@@ -161,12 +161,19 @@
 
   <div class="modal-backdrop" id="modalCarpeta" role="dialog" aria-modal="true">
     <div class="modal-card">
-      <div class="modal-header">
-        <h3 id="modalCarpetaTitulo">Nueva carpeta</h3>
+      <div class="modal-head">
+        <div class="modal-title-wrap">
+          <p class="modal-kicker">Carpeta</p>
+          <h3 id="modalCarpetaTitulo">Nueva carpeta</h3>
+        </div>
         <button class="modal-close" type="button" aria-label="Cerrar" onclick="cerrarModalCarpeta()">✕</button>
       </div>
-      <label for="inputNombreCarpeta">Nombre de la carpeta</label>
-      <input type="text" id="inputNombreCarpeta" placeholder="Ej. Culpabilidad">
+
+      <div class="modal-body">
+        <label for="inputNombreCarpeta">Nombre</label>
+        <input type="text" id="inputNombreCarpeta" placeholder="Ej. Culpabilidad">
+      </div>
+
       <div class="modal-actions">
         <button type="button" class="btn-secundario" id="modalCarpetaCancelar">Cancelar</button>
         <button type="button" class="btn-primary" id="modalCarpetaGuardar">Guardar</button>
