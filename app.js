@@ -3,6 +3,7 @@ let codigoActual = {}
 let articulos = JSON.parse(localStorage.getItem("articulosGuardados") || "[]")
   .map(a => ({ ...a, contenidoHTML: a.contenidoHTML ?? null }))
 let materiasOrden = JSON.parse(localStorage.getItem("materiasOrden") || "{}")
+let carpetas = JSON.parse(localStorage.getItem("carpetasMaterias") || "[]")
 let normativaSeleccionada = null
 let materiaSeleccionada = null
 let resultadosBusqueda = []
@@ -15,6 +16,10 @@ const appRoot = document.getElementById("appRoot")
 const documentoInput = document.getElementById("documentoInput")
 const listaDocumentos = document.getElementById("listaDocumentos")
 const visorDocumentos = document.getElementById("visorDocumentos")
+const modalCarpeta = document.getElementById("modalCarpeta")
+const modalCarpetaTitulo = document.getElementById("modalCarpetaTitulo")
+const inputNombreCarpeta = document.getElementById("inputNombreCarpeta")
+const modalCarpetaGuardar = document.getElementById("modalCarpetaGuardar")
 
 function escaparComoHTML(texto) {
   if (texto === undefined || texto === null) return ""
@@ -37,6 +42,9 @@ let pinchStartDistance = null
 let pinchStartZoom = 1
 let articuloArrastradoId = null
 let materiaArrastrada = null
+let materiaArrastradaNormativa = null
+let materiaArrastradaCarpetaId = null
+let carpetaEnEdicionId = null
 
 documentoInput?.addEventListener("change", e => {
   const archivo = e.target.files?.[0]
@@ -70,6 +78,17 @@ if (botonDocumentos) {
     if (archivo) procesarDocumento(archivo)
   })
 }
+
+modalCarpetaGuardar?.addEventListener("click", confirmarCarpeta)
+modalCarpeta?.addEventListener("click", e => {
+  if (e.target === modalCarpeta) cerrarModalCarpeta()
+})
+inputNombreCarpeta?.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    e.preventDefault()
+    confirmarCarpeta()
+  }
+})
 
 function obtenerExtension(nombre = "") {
   const partes = nombre.split(".")
@@ -365,6 +384,80 @@ function ordenarMaterias(nombres, normativa) {
   return [...nombres].sort(
     (a, b) => (materiasOrden[normativa][a] ?? 0) - (materiasOrden[normativa][b] ?? 0)
   )
+}
+
+function guardarCarpetas() {
+  localStorage.setItem("carpetasMaterias", JSON.stringify(carpetas))
+}
+
+function materiaEnCarpeta(normativa, materia) {
+  const carpeta = carpetas.find(c =>
+    c.materias?.some(m => m.materia === materia && m.normativa === normativa)
+  )
+  return carpeta ? carpeta.id : null
+}
+
+function removerMateriaDeCarpetas(normativa, materia) {
+  let cambio = false
+  carpetas = carpetas.map(carpeta => {
+    const materias = (carpeta.materias || []).filter(
+      m => !(m.materia === materia && m.normativa === normativa)
+    )
+    if (materias.length !== (carpeta.materias || []).length) cambio = true
+    return { ...carpeta, materias }
+  })
+
+  if (cambio) guardarCarpetas()
+  return cambio
+}
+
+function renombrarMateriaEnCarpetas(normativa, materiaAnterior, materiaNueva) {
+  let cambio = false
+
+  carpetas = carpetas.map(carpeta => {
+    const materias = (carpeta.materias || []).map(m => {
+      if (m.normativa === normativa && m.materia === materiaAnterior) {
+        cambio = true
+        return { ...m, materia: materiaNueva }
+      }
+      return m
+    })
+
+    const set = new Set()
+    const materiasUnicas = materias.filter(m => {
+      const key = `${m.normativa}||${m.materia}`
+      if (set.has(key)) {
+        cambio = true
+        return false
+      }
+      set.add(key)
+      return true
+    })
+
+    return { ...carpeta, materias: materiasUnicas }
+  })
+
+  if (cambio) guardarCarpetas()
+}
+
+function moverMateriaACarpeta(normativa, materia, carpetaId) {
+  if (!carpetaId) return
+  removerMateriaDeCarpetas(normativa, materia)
+  carpetas = carpetas.map(carpeta => {
+    if (carpeta.id !== carpetaId) return carpeta
+    const materias = [...(carpeta.materias || [])]
+    if (!materias.some(m => m.materia === materia && m.normativa === normativa)) {
+      materias.push({ normativa, materia })
+    }
+    return { ...carpeta, materias }
+  })
+  guardarCarpetas()
+  ordenarYMostrar()
+}
+
+function moverMateriaAFueraDeCarpeta(materia, normativa) {
+  const cambio = removerMateriaDeCarpetas(normativa, materia)
+  if (cambio) ordenarYMostrar()
 }
 
 function aplicarOrdenMateriasDesdeDOM(lista, normativa) {
@@ -673,6 +766,8 @@ function activarArrastreMateria(item, lista, normativa) {
 
   item.addEventListener("dragstart", e => {
     materiaArrastrada = item.dataset.materia
+    materiaArrastradaNormativa = normativa
+    materiaArrastradaCarpetaId = item.dataset.carpetaId || null
     item.classList.add("arrastrando")
     if (e.dataTransfer) {
       e.dataTransfer.effectAllowed = "move"
@@ -719,6 +814,8 @@ function activarArrastreMateria(item, lista, normativa) {
     item.classList.remove("arrastrando")
     aplicarOrdenMateriasDesdeDOM(lista, normativa)
     materiaArrastrada = null
+    materiaArrastradaNormativa = null
+    materiaArrastradaCarpetaId = null
   })
 }
 
@@ -1275,6 +1372,31 @@ function ordenarYMostrar() {
   sidebar.innerHTML = ""
   contenedorArticulos.innerHTML = ""
 
+  const accionesSidebar = document.createElement("div")
+  accionesSidebar.className = "sidebarAcciones"
+  const tituloSidebar = document.createElement("div")
+  tituloSidebar.className = "sidebarAccionesTitulo"
+  tituloSidebar.textContent = "Organiza tus materias"
+  const nuevaCarpetaBtn = document.createElement("button")
+  nuevaCarpetaBtn.className = "btn-carpeta"
+  nuevaCarpetaBtn.type = "button"
+  nuevaCarpetaBtn.textContent = "Nueva carpeta"
+  nuevaCarpetaBtn.addEventListener("click", () => abrirModalCarpeta())
+  accionesSidebar.appendChild(tituloSidebar)
+  accionesSidebar.appendChild(nuevaCarpetaBtn)
+  sidebar.appendChild(accionesSidebar)
+
+  const seccionCarpetas = document.createElement("div")
+  seccionCarpetas.className = "carpetasSection"
+  const tituloCarpetas = document.createElement("div")
+  tituloCarpetas.className = "sidebarGroupTitle"
+  tituloCarpetas.textContent = "Carpetas"
+  const listaCarpetas = document.createElement("div")
+  listaCarpetas.className = "carpetasLista"
+  seccionCarpetas.appendChild(tituloCarpetas)
+  seccionCarpetas.appendChild(listaCarpetas)
+  sidebar.appendChild(seccionCarpetas)
+
   const agrupado = { civil: {}, penal: {} }
 
   articulos.forEach(a => {
@@ -1285,6 +1407,20 @@ function ordenarYMostrar() {
 
   const combos = []
   let tieneSeleccionValida = false
+
+  carpetas.forEach(carpeta => {
+    (carpeta.materias || []).forEach(({ normativa, materia }) => {
+      if (!agrupado[normativa]?.[materia]) return
+      if (!combos.some(c => c.normativa === normativa && c.materia === materia)) {
+        combos.push({ normativa, materia, items: agrupado[normativa][materia] })
+      }
+      if (normativaSeleccionada === normativa && materiaSeleccionada === materia) {
+        tieneSeleccionValida = true
+      }
+    })
+  })
+
+  renderizarCarpetasSidebar(listaCarpetas, agrupado, sidebar)
 
   const ordenNormativas = ["civil", "penal"]
   ordenNormativas.forEach(norm => {
@@ -1302,9 +1438,34 @@ function ordenarYMostrar() {
 
     const listaMaterias = document.createElement("div")
     listaMaterias.className = "sidebarGroupList"
+
+    const habilitarDropSalida = elemento => {
+      elemento.addEventListener("dragover", e => {
+        if (!materiaArrastrada) return
+        e.preventDefault()
+        elemento.classList.add("drop-activa")
+        if (e.dataTransfer) e.dataTransfer.dropEffect = "move"
+      })
+
+      elemento.addEventListener("dragleave", () => {
+        elemento.classList.remove("drop-activa")
+      })
+
+      elemento.addEventListener("drop", e => {
+        if (!materiaArrastrada) return
+        e.preventDefault()
+        elemento.classList.remove("drop-activa")
+        const normOrigen = materiaArrastradaNormativa || norm
+        setTimeout(() => moverMateriaAFueraDeCarpeta(materiaArrastrada, normOrigen), 0)
+      })
+    }
+
+    habilitarDropSalida(listaMaterias)
     grupo.appendChild(listaMaterias)
 
-    const nombresOrdenados = ordenarMaterias(nombresMaterias, norm)
+    const nombresOrdenados = ordenarMaterias(nombresMaterias, norm).filter(
+      m => !materiaEnCarpeta(norm, m)
+    )
 
     nombresOrdenados.forEach(m => {
       const item = document.createElement("div")
@@ -1330,28 +1491,24 @@ function ordenarYMostrar() {
       activarArrastreMateria(item, listaMaterias, norm)
 
       listaMaterias.appendChild(item)
-      combos.push({ normativa: norm, materia: m })
+      if (!combos.some(c => c.normativa === norm && c.materia === m)) {
+        combos.push({ normativa: norm, materia: m })
+      }
     })
 
     sidebar.appendChild(grupo)
   })
 
   if (!combos.length) {
-  // Sidebar vacío
-  sidebar.innerHTML = "<div class='sidebarGroupTitle'>Normativa</div>";
+    contenedorArticulos.innerHTML = `
+      <div class="estado-vacio">
+        <h2>No hay materias aún</h2>
+        <p>Agrega artículos para crear automáticamente tu primera materia.</p>
+      </div>
+    `
 
-  // Panel principal vacío
-  contenedorArticulos.innerHTML = `
-    <h2 style="text-align:center; opacity:0.7; margin-top:40px;">
-      No hay materias aún
-    </h2>
-    <p style="text-align:center; opacity:0.5;">
-      Agrega artículos para crear automáticamente tu primera materia.
-    </p>
-  `;
-
-  return;
-}
+    return
+  }
 
   if (!tieneSeleccionValida) {
     normativaSeleccionada = combos[0].normativa
@@ -1370,6 +1527,104 @@ function ordenarYMostrar() {
 
   mostrarArticulosDeMateria(normativaSeleccionada, materiaSeleccionada, itemsSeleccionados)
   reaplicarBusqueda()
+}
+
+function renderizarCarpetasSidebar(contenedor, agrupado, sidebar) {
+  contenedor.innerHTML = ""
+
+  if (!carpetas.length) {
+    const vacio = document.createElement("div")
+    vacio.className = "carpetaVacia"
+    vacio.textContent = "Crea carpetas y arrastra tus materias aquí"
+    contenedor.appendChild(vacio)
+    return
+  }
+
+  carpetas.forEach(carpeta => {
+    const card = document.createElement("div")
+    card.className = "carpetaBox"
+    card.dataset.carpetaId = carpeta.id
+
+    const header = document.createElement("div")
+    header.className = "carpetaHeader"
+
+    const nombreBtn = document.createElement("button")
+    nombreBtn.className = "carpetaNombre"
+    nombreBtn.type = "button"
+    nombreBtn.textContent = carpeta.nombre || "Carpeta sin título"
+    nombreBtn.addEventListener("click", () => abrirModalCarpeta(carpeta.id))
+
+    const eliminarBtn = document.createElement("button")
+    eliminarBtn.className = "carpetaEliminar"
+    eliminarBtn.type = "button"
+    eliminarBtn.textContent = "Borrar"
+    eliminarBtn.addEventListener("click", () => eliminarCarpeta(carpeta.id))
+
+    header.appendChild(nombreBtn)
+    header.appendChild(eliminarBtn)
+    card.appendChild(header)
+
+    const lista = document.createElement("div")
+    lista.className = "sidebarGroupList carpetaLista"
+    lista.dataset.carpetaId = carpeta.id
+
+    const materiasDisponibles = (carpeta.materias || []).filter(m =>
+      agrupado[m.normativa]?.[m.materia]
+    )
+
+    lista.addEventListener("dragover", e => {
+      if (!materiaArrastrada) return
+      e.preventDefault()
+      lista.classList.add("carpetaLista-drop")
+      if (e.dataTransfer) e.dataTransfer.dropEffect = "move"
+    })
+
+    lista.addEventListener("dragleave", () => {
+      lista.classList.remove("carpetaLista-drop")
+    })
+
+    lista.addEventListener("drop", e => {
+      if (!materiaArrastrada || !materiaArrastradaNormativa) return
+      e.preventDefault()
+      lista.classList.remove("carpetaLista-drop")
+      moverMateriaACarpeta(materiaArrastradaNormativa, materiaArrastrada, carpeta.id)
+    })
+
+    if (!materiasDisponibles.length) {
+      const aviso = document.createElement("div")
+      aviso.className = "carpetaVacia"
+      aviso.textContent = "Arrastra materias aquí"
+      lista.appendChild(aviso)
+    } else {
+      materiasDisponibles.forEach(({ normativa, materia }) => {
+        const item = document.createElement("div")
+        item.className = "sidebarItem sidebarItemCarpeta"
+        item.textContent = materia
+        item.dataset.normativa = normativa
+        item.dataset.materia = materia
+        item.dataset.carpetaId = carpeta.id
+        item.style.borderLeftColor = obtenerColorMateria(materia)
+
+        if (normativaSeleccionada === normativa && materiaSeleccionada === materia) {
+          item.classList.add("activa")
+        }
+
+        item.addEventListener("click", () => {
+          normativaSeleccionada = normativa
+          materiaSeleccionada = materia
+          sidebar.querySelectorAll(".sidebarItem").forEach(i => i.classList.remove("activa"))
+          item.classList.add("activa")
+          mostrarArticulosDeMateria(normativa, materia, agrupado[normativa][materia])
+        })
+
+        activarArrastreMateria(item, lista, normativa)
+        lista.appendChild(item)
+      })
+    }
+
+    card.appendChild(lista)
+    contenedor.appendChild(card)
+  })
 }
 
 function mostrarArticulosDeMateria(normativa, materia, items) {
@@ -1402,6 +1657,8 @@ function mostrarArticulosDeMateria(normativa, materia, items) {
         a.materia = nuevo
       }
     })
+
+    renombrarMateriaEnCarpetas(normativa, nombreActual, nuevo)
 
     document.querySelectorAll(".sidebarItem").forEach(item => {
       if (item.dataset.materia === nombreActual && item.dataset.normativa === normativa) {
@@ -1699,6 +1956,11 @@ function borrarMateria(nombre, normativa = null) {
     if (normativa) return a.materia !== nombre || a.normativa !== normativa
     return a.materia !== nombre
   })
+  if (normativa) {
+    removerMateriaDeCarpetas(normativa, nombre)
+  } else {
+    ["civil", "penal"].forEach(norm => removerMateriaDeCarpetas(norm, nombre))
+  }
   if (normativa && materiasOrden[normativa]) {
     delete materiasOrden[normativa][nombre]
     guardarOrdenMaterias()
@@ -1706,6 +1968,51 @@ function borrarMateria(nombre, normativa = null) {
   guardarLocal()
   normativaSeleccionada = null
   materiaSeleccionada = null
+  ordenarYMostrar()
+}
+
+function abrirModalCarpeta(id = null) {
+  if (!modalCarpeta || !modalCarpetaTitulo || !inputNombreCarpeta) return
+  carpetaEnEdicionId = id
+  const carpeta = carpetas.find(c => c.id === id)
+  modalCarpetaTitulo.textContent = id ? "Editar carpeta" : "Nueva carpeta"
+  inputNombreCarpeta.value = carpeta?.nombre || ""
+  modalCarpeta.classList.add("visible")
+  setTimeout(() => inputNombreCarpeta.focus(), 50)
+}
+
+function cerrarModalCarpeta() {
+  if (!modalCarpeta || !inputNombreCarpeta) return
+  modalCarpeta.classList.remove("visible")
+  inputNombreCarpeta.value = ""
+  carpetaEnEdicionId = null
+}
+
+function confirmarCarpeta() {
+  if (!inputNombreCarpeta) return
+  const nombre = inputNombreCarpeta.value.trim()
+  if (!nombre) {
+    inputNombreCarpeta.focus()
+    return
+  }
+
+  if (carpetaEnEdicionId) {
+    carpetas = carpetas.map(c => (c.id === carpetaEnEdicionId ? { ...c, nombre } : c))
+  } else {
+    carpetas = [
+      ...carpetas,
+      { id: `carpeta-${Date.now()}-${Math.random().toString(16).slice(2)}`, nombre, materias: [] }
+    ]
+  }
+
+  guardarCarpetas()
+  cerrarModalCarpeta()
+  ordenarYMostrar()
+}
+
+function eliminarCarpeta(id) {
+  carpetas = carpetas.filter(c => c.id !== id)
+  guardarCarpetas()
   ordenarYMostrar()
 }
 
