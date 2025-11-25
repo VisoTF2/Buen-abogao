@@ -797,6 +797,9 @@
 .btn-carpeta:active { transform: translateY(1px); }
 
 .carpetasSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   margin-bottom: 12px;
 }
 
@@ -804,6 +807,12 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.sidebarGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 
