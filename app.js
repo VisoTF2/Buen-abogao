@@ -1434,7 +1434,6 @@ function ordenarYMostrar() {
     }
 
     habilitarDropSalida(listaMaterias)
-    habilitarDropSalida(grupo)
     grupo.appendChild(listaMaterias)
 
     const nombresOrdenados = ordenarMaterias(nombresMaterias, norm).filter(
