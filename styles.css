@@ -810,7 +810,7 @@
 .carpetaBox {
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 10px 10px 8px;
+  padding: 8px 9px 6px;
   background: var(--article-bg);
 }
 
@@ -820,7 +820,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 
@@ -851,10 +851,11 @@
 
 
 .carpetaLista {
-  gap: 8px;
-  padding: 4px 6px 6px;
+  gap: 6px;
+  padding: 4px 6px;
   border-radius: 10px;
   border: 1px dashed transparent;
+  align-items: stretch;
 }
 
 .carpetaLista-drop {
@@ -866,7 +867,11 @@
 .carpetaVacia {
   font-size: 13px;
   color: #6b7280;
-  padding: 8px;
+  padding: 6px 8px;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
 }
 
@@ -1063,8 +1068,8 @@ body.oscuro .modal-close:hover {
 }
 
 .sidebarGroupList.carpetaLista {
-  padding: 6px 6px 8px;
-  min-height: 52px;
+  padding: 4px 6px;
+  min-height: 40px;
 }
 
 .sidebarGroupList.drop-activa {
