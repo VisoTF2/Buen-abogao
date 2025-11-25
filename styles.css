@@ -958,9 +958,9 @@ body.oscuro .sidebarItemCarpeta {
 }
 
 .modal-close {
-  background: rgba(0,0,0,0.06);
+  background: var(--focus-surface);
   border: 1px solid var(--border);
-  color: #000;
+  color: var(--text);
   font-size: 14px;
   cursor: pointer;
   border-radius: 10px;
@@ -971,8 +971,12 @@ body.oscuro .sidebarItemCarpeta {
   transition: background 0.15s ease;
 }
 
-.modal-close:hover { background: rgba(0,0,0,0.12); }
+.modal-close:hover { background: rgba(0, 0, 0, 0.12); }
 .modal-close:active { transform: translateY(1px); }
+
+body.oscuro .modal-close:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
 
 .modal-body {
   display: flex;
