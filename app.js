@@ -781,15 +781,14 @@ function activarArrastreMateria(item, lista, normativa) {
     if (!materiaArrastrada || item.dataset.materia === materiaArrastrada) return
 
     const rect = item.getBoundingClientRect()
-    const margenCambio = Math.max(10, rect.height * 0.35)
-    const limiteArriba = rect.top + margenCambio
-    const limiteAbajo = rect.bottom - margenCambio
-    const posicionY = e.clientY
-
+    const posicionY = e.clientY - rect.top
+    const mitad = rect.height / 2
+    const tolerancia = Math.min(12, rect.height * 0.25)
     let moverDespues = null
-    if (posicionY <= limiteArriba) {
+
+    if (posicionY < mitad - tolerancia) {
       moverDespues = false
-    } else if (posicionY >= limiteAbajo) {
+    } else if (posicionY > mitad + tolerancia) {
       moverDespues = true
     } else {
       return
@@ -1577,6 +1576,23 @@ function renderizarCarpetasSidebar(contenedor, agrupado, sidebar) {
       e.preventDefault()
       lista.classList.add("carpetaLista-drop")
       if (e.dataTransfer) e.dataTransfer.dropEffect = "move"
+
+      const items = Array.from(lista.querySelectorAll(".sidebarItem"))
+      const arrastrandoElem = lista.querySelector(
+        `.sidebarItem[data-materia="${materiaArrastrada}"][data-normativa="${materiaArrastradaNormativa}"]`
+      )
+
+      if (!arrastrandoElem) return
+
+      const siguiente = items.find(
+        item => e.clientY < item.getBoundingClientRect().top + item.offsetHeight / 2
+      )
+
+      if (siguiente) {
+        lista.insertBefore(arrastrandoElem, siguiente)
+      } else {
+        lista.appendChild(arrastrandoElem)
+      }
     })
 
     lista.addEventListener("dragleave", () => {
