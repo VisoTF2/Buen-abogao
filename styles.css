@@ -1008,9 +1008,8 @@ body.oscuro .modal-close:hover {
 .modal-actions {
   display: flex;
   gap: 10px;
-  padding: 8px 0 0;
-  border-top: 1px solid var(--border);
-  margin-top: 2px;
+  padding: 4px 0 0;
+  margin-top: 0;
 }
 
 .modal-actions button {
