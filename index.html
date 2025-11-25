@@ -778,7 +778,7 @@
 
 .btn-folder {
   border: 1px solid var(--border);
-  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  background: var(--accent);
   color: white;
   padding: 12px 14px;
   border-radius: 12px;
@@ -812,6 +812,91 @@
 
 .btn-folder:active {
   transform: translateY(0);
+}
+
+.folderModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+.folderModal.abierto {
+  display: flex;
+}
+
+.folderModal__card {
+  background: var(--card);
+  color: var(--text);
+  border-radius: 14px;
+  padding: 18px 20px 16px;
+  width: min(380px, 100%);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--border);
+}
+
+.folderModal__title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.folderModal__label {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.folderModal__input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.folderModal__input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.folderModal__error {
+  color: #b91c1c;
+  font-weight: 600;
+  font-size: 13px;
+  min-height: 18px;
+  margin-top: 6px;
+}
+
+.folderModal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.folderModal__btn {
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--article-bg);
+  color: var(--text);
+}
+
+.folderModal__btn--primary {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
 }
 
     .sidebarItem {
@@ -1231,6 +1316,24 @@
 </head>
 
 <body>
+  <div class="folderModal" id="folderModal" aria-hidden="true">
+    <div class="folderModal__card" role="dialog" aria-modal="true" aria-labelledby="folderModalTitle">
+      <h3 class="folderModal__title" id="folderModalTitle">Nueva carpeta</h3>
+      <div class="folderModal__label">Nombre</div>
+      <input
+        id="folderModalInput"
+        class="folderModal__input"
+        type="text"
+        maxlength="60"
+        placeholder="Ej. Proceso ejecutivo"
+      />
+      <div class="folderModal__error" id="folderModalError"></div>
+      <div class="folderModal__actions">
+        <button type="button" class="folderModal__btn" id="folderModalCancel">Cancelar</button>
+        <button type="button" class="folderModal__btn folderModal__btn--primary" id="folderModalSave">Crear carpeta</button>
+      </div>
+    </div>
+  </div>
   <div class="app-root" id="appRoot">
   <div class="zoom-canvas">
   <header>
@@ -1385,6 +1488,14 @@ const appRoot = document.getElementById("appRoot")
 const documentoInput = document.getElementById("documentoInput")
 const listaDocumentos = document.getElementById("listaDocumentos")
 const visorDocumentos = document.getElementById("visorDocumentos")
+const folderModal = document.getElementById("folderModal")
+const folderModalTitle = document.getElementById("folderModalTitle")
+const folderModalInput = document.getElementById("folderModalInput")
+const folderModalError = document.getElementById("folderModalError")
+const folderModalSave = document.getElementById("folderModalSave")
+const folderModalCancel = document.getElementById("folderModalCancel")
+
+let carpetaEditandoId = null
 
 function escaparComoHTML(texto) {
   if (texto === undefined || texto === null) return ""
@@ -1719,31 +1830,83 @@ function guardarCarpetas() {
   localStorage.setItem("carpetasSidebar", JSON.stringify(carpetasSidebar))
 }
 
+function abrirModalCarpeta(modo = "crear", carpetaId = null) {
+  carpetaEditandoId = carpetaId
+  folderModal.dataset.modo = modo
+  folderModalTitle.textContent =
+    modo === "editar" ? "Renombrar carpeta" : "Nueva carpeta"
+  folderModalSave.textContent = modo === "editar" ? "Guardar nombre" : "Crear carpeta"
+
+  const valorActual =
+    modo === "editar"
+      ? carpetasSidebar.find(c => c.id === carpetaId)?.nombre || ""
+      : ""
+
+  folderModalInput.value = valorActual
+  folderModalError.textContent = ""
+  folderModal.setAttribute("aria-hidden", "false")
+  folderModal.classList.add("abierto")
+  folderModalInput.focus()
+  folderModalInput.select()
+}
+
+function cerrarModalCarpeta() {
+  carpetaEditandoId = null
+  folderModal.classList.remove("abierto")
+  folderModal.setAttribute("aria-hidden", "true")
+  folderModalInput.value = ""
+  folderModalError.textContent = ""
+}
+
+function confirmarModalCarpeta() {
+  const nombre = folderModalInput.value?.trim()
+  const modo = folderModal.dataset.modo
+
+  if (!nombre) {
+    folderModalError.textContent = "Ponle un nombre a la carpeta"
+    folderModalInput.focus()
+    return
+  }
+
+  if (modo === "editar") {
+    const carpeta = carpetasSidebar.find(c => c.id === carpetaEditandoId)
+    if (carpeta && carpeta.nombre !== nombre) {
+      carpeta.nombre = nombre
+      guardarCarpetas()
+      ordenarYMostrar()
+    }
+  } else {
+    carpetasSidebar.push({
+      id: `carpeta-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      nombre,
+      materias: []
+    })
+    guardarCarpetas()
+    ordenarYMostrar()
+  }
+
+  cerrarModalCarpeta()
+}
+
 function crearCarpetaSidebar() {
-  const nombre = prompt("Nombre de la carpeta")?.trim()
-  if (!nombre) return
-
-  carpetasSidebar.push({
-    id: Date.now(),
-    nombre,
-    materias: []
-  })
-
-  guardarCarpetas()
-  ordenarYMostrar()
+  abrirModalCarpeta("crear")
 }
 
 function renombrarCarpeta(carpetaId) {
-  const carpeta = carpetasSidebar.find(c => c.id === carpetaId)
-  if (!carpeta) return
-
-  const nuevoNombre = prompt("Nuevo nombre de la carpeta", carpeta.nombre)?.trim()
-  if (!nuevoNombre || nuevoNombre === carpeta.nombre) return
-
-  carpeta.nombre = nuevoNombre
-  guardarCarpetas()
-  ordenarYMostrar()
+  abrirModalCarpeta("editar", carpetaId)
 }
+
+folderModalCancel?.addEventListener("click", cerrarModalCarpeta)
+folderModalSave?.addEventListener("click", confirmarModalCarpeta)
+
+folderModalInput?.addEventListener("keydown", e => {
+  if (e.key === "Enter") return confirmarModalCarpeta()
+  if (e.key === "Escape") return cerrarModalCarpeta()
+})
+
+folderModal?.addEventListener("click", e => {
+  if (e.target === folderModal) cerrarModalCarpeta()
+})
 
 function materiaEnCarpeta(normativa, materia) {
   return carpetasSidebar.find(carpeta =>
