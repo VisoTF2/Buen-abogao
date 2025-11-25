@@ -1501,12 +1501,10 @@ function ordenarYMostrar() {
 
   if (!combos.length) {
     contenedorArticulos.innerHTML = `
-      <h2 style="text-align:center; opacity:0.7; margin-top:40px;">
-        No hay materias aún
-      </h2>
-      <p style="text-align:center; opacity:0.5;">
-        Agrega artículos para crear automáticamente tu primera materia.
-      </p>
+      <div class="estado-vacio">
+        <h2>No hay materias aún</h2>
+        <p>Agrega artículos para crear automáticamente tu primera materia.</p>
+      </div>
     `
 
     return
