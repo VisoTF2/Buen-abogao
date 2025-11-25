@@ -769,6 +769,33 @@
   color: var(--accent);
 }
 
+.sidebarActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.btn-folder {
+  border: 1px dashed var(--border);
+  background: var(--card);
+  color: var(--text);
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease, transform 0.12s ease;
+}
+
+.btn-folder:hover {
+  background: var(--article-bg);
+}
+
+.btn-folder:active {
+  transform: translateY(1px);
+}
+
     .sidebarItem {
       padding: 10px 12px;
       margin-bottom: 8px;
@@ -800,10 +827,70 @@
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.14);
     }
 
-    .sidebarGroupList {
-      display: flex;
-      flex-direction: column;
-    }
+.sidebarGroupList {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebarFolder {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  background: var(--article-bg);
+  margin-bottom: 12px;
+}
+
+.sidebarFolder header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.sidebarFolderTitle {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--accent);
+}
+
+.sidebarFolderSelect {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+}
+
+.sidebarFolderList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebarItemCarpeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sidebarItemCarpeta button {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.sidebarItemCarpeta button:hover {
+  background: var(--accent-light);
+  color: white;
+  border-color: var(--accent-light);
+}
 
     .mainPanel {
       flex: 1;
@@ -1238,6 +1325,7 @@ let codigoActual = {}
 let articulos = JSON.parse(localStorage.getItem("articulosGuardados") || "[]")
   .map(a => ({ ...a, contenidoHTML: a.contenidoHTML ?? null }))
 let materiasOrden = JSON.parse(localStorage.getItem("materiasOrden") || "{}")
+let carpetasSidebar = JSON.parse(localStorage.getItem("carpetasSidebar") || "[]")
 let normativaSeleccionada = null
 let materiaSeleccionada = null
 let resultadosBusqueda = []
@@ -1576,6 +1664,67 @@ function valorOrdenArticulo(a) {
 
 function guardarOrdenMaterias() {
   localStorage.setItem("materiasOrden", JSON.stringify(materiasOrden))
+}
+
+function guardarCarpetas() {
+  localStorage.setItem("carpetasSidebar", JSON.stringify(carpetasSidebar))
+}
+
+function crearCarpetaSidebar() {
+  const nombre = prompt("Nombre de la carpeta")?.trim()
+  if (!nombre) return
+
+  carpetasSidebar.push({
+    id: Date.now(),
+    nombre,
+    materias: []
+  })
+
+  guardarCarpetas()
+  ordenarYMostrar()
+}
+
+function materiaEnCarpeta(normativa, materia) {
+  return carpetasSidebar.find(carpeta =>
+    (carpeta.materias || []).some(m => m.normativa === normativa && m.materia === materia)
+  )
+}
+
+function quitarMateriaDeCarpeta(carpetaId, normativa, materia) {
+  const carpeta = carpetasSidebar.find(c => c.id === carpetaId)
+  if (!carpeta) return
+
+  carpeta.materias = (carpeta.materias || []).filter(
+    m => !(m.normativa === normativa && m.materia === materia)
+  )
+
+  guardarCarpetas()
+  ordenarYMostrar()
+}
+
+function agregarMateriaACarpeta(carpetaId, normativa, materia) {
+  const carpeta = carpetasSidebar.find(c => c.id === carpetaId)
+  if (!carpeta) return
+
+  const existe = (carpeta.materias || []).some(
+    m => m.normativa === normativa && m.materia === materia
+  )
+  if (existe) return
+
+  carpeta.materias = [...(carpeta.materias || []), { normativa, materia }]
+
+  guardarCarpetas()
+  ordenarYMostrar()
+}
+
+function materiasAsignadasAcarpeta() {
+  const set = new Set()
+  carpetasSidebar.forEach(carpeta => {
+    (carpeta.materias || []).forEach(m => {
+      set.add(`${m.normativa}|${m.materia}`)
+    })
+  })
+  return set
 }
 
 function siguienteOrdenMateria(normativa) {
@@ -2510,6 +2659,18 @@ function ordenarYMostrar() {
   sidebar.innerHTML = ""
   contenedorArticulos.innerHTML = ""
 
+  const accionesSidebar = document.createElement("div")
+  accionesSidebar.className = "sidebarActions"
+
+  const botonCarpeta = document.createElement("button")
+  botonCarpeta.type = "button"
+  botonCarpeta.className = "btn-folder"
+  botonCarpeta.textContent = "+ Nueva carpeta"
+  botonCarpeta.onclick = crearCarpetaSidebar
+
+  accionesSidebar.appendChild(botonCarpeta)
+  sidebar.appendChild(accionesSidebar)
+
   const agrupado = { civil: {}, penal: {} }
 
   articulos.forEach(a => {
@@ -2520,6 +2681,7 @@ function ordenarYMostrar() {
 
   const combos = []
   let tieneSeleccionValida = false
+  const materiasEnCarpetas = materiasAsignadasAcarpeta()
 
   const ordenNormativas = ["civil", "penal"]
   ordenNormativas.forEach(norm => {
@@ -2542,6 +2704,10 @@ function ordenarYMostrar() {
     const nombresOrdenados = ordenarMaterias(nombresMaterias, norm)
 
     nombresOrdenados.forEach(m => {
+      combos.push({ normativa: norm, materia: m })
+
+      if (materiasEnCarpetas.has(`${norm}|${m}`)) return
+
       const item = document.createElement("div")
       item.className = "sidebarItem"
       item.textContent = m
@@ -2565,28 +2731,107 @@ function ordenarYMostrar() {
       activarArrastreMateria(item, listaMaterias, norm)
 
       listaMaterias.appendChild(item)
-      combos.push({ normativa: norm, materia: m })
     })
 
     sidebar.appendChild(grupo)
   })
 
+  if (carpetasSidebar.length) {
+    const tituloCarpetas = document.createElement("div")
+    tituloCarpetas.className = "sidebarGroupTitle"
+    tituloCarpetas.textContent = "Carpetas"
+    sidebar.appendChild(tituloCarpetas)
+
+    const disponibles = combos.filter(c => !materiasEnCarpetas.has(`${c.normativa}|${c.materia}`))
+
+    carpetasSidebar.forEach(carpeta => {
+      const box = document.createElement("div")
+      box.className = "sidebarFolder"
+
+      const header = document.createElement("header")
+      const titulo = document.createElement("div")
+      titulo.className = "sidebarFolderTitle"
+      titulo.textContent = carpeta.nombre
+
+      const selector = document.createElement("select")
+      selector.className = "sidebarFolderSelect"
+
+      const optPlaceholder = document.createElement("option")
+      optPlaceholder.value = ""
+      optPlaceholder.textContent = "Agregar lista a la carpeta"
+      selector.appendChild(optPlaceholder)
+
+      disponibles.forEach(c => {
+        const opt = document.createElement("option")
+        opt.value = `${c.normativa}|${c.materia}`
+        opt.textContent = `${c.materia} (${c.normativa === "civil" ? "Civil" : "Penal"})`
+        selector.appendChild(opt)
+      })
+
+      selector.addEventListener("change", e => {
+        const val = e.target.value
+        if (!val) return
+        const [norm, mat] = val.split("|")
+        agregarMateriaACarpeta(carpeta.id, norm, mat)
+      })
+
+      header.appendChild(titulo)
+      header.appendChild(selector)
+      box.appendChild(header)
+
+      const listaCarpeta = document.createElement("div")
+      listaCarpeta.className = "sidebarFolderList"
+
+      (carpeta.materias || []).forEach(m => {
+        const item = document.createElement("div")
+        item.className = "sidebarItem sidebarItemCarpeta"
+        item.dataset.normativa = m.normativa
+        item.dataset.materia = m.materia
+        item.style.borderLeftColor = obtenerColorMateria(m.materia)
+        item.textContent = m.materia
+
+        item.addEventListener("click", () => {
+          normativaSeleccionada = m.normativa
+          materiaSeleccionada = m.materia
+          sidebar.querySelectorAll(".sidebarItem").forEach(i => i.classList.remove("activa"))
+          item.classList.add("activa")
+          const lista = agrupado[m.normativa]?.[m.materia] || []
+          mostrarArticulosDeMateria(m.normativa, m.materia, lista)
+        })
+
+        const btnQuitar = document.createElement("button")
+        btnQuitar.type = "button"
+        btnQuitar.textContent = "Sacar"
+        btnQuitar.addEventListener("click", e => {
+          e.stopPropagation()
+          quitarMateriaDeCarpeta(carpeta.id, m.normativa, m.materia)
+        })
+
+        item.appendChild(btnQuitar)
+        listaCarpeta.appendChild(item)
+      })
+
+      box.appendChild(listaCarpeta)
+      sidebar.appendChild(box)
+    })
+  }
+
   if (!combos.length) {
-  // Sidebar vacío
-  sidebar.innerHTML = "<div class='sidebarGroupTitle'>Normativa</div>";
+    sidebar.innerHTML = ""
+    sidebar.appendChild(accionesSidebar)
+    sidebar.innerHTML += "<div class='sidebarGroupTitle'>Normativa</div>"
 
-  // Panel principal vacío
-  contenedorArticulos.innerHTML = `
-    <h2 style="text-align:center; opacity:0.7; margin-top:40px;">
-      No hay materias aún
-    </h2>
-    <p style="text-align:center; opacity:0.5;">
-      Agrega artículos para crear automáticamente tu primera materia.
-    </p>
-  `;
+    contenedorArticulos.innerHTML = `
+      <h2 style="text-align:center; opacity:0.7; margin-top:40px;">
+        No hay materias aún
+      </h2>
+      <p style="text-align:center; opacity:0.5;">
+        Agrega artículos para crear automáticamente tu primera materia.
+      </p>
+    `;
 
-  return;
-}
+    return;
+  }
 
   if (!tieneSeleccionValida) {
     normativaSeleccionada = combos[0].normativa
