@@ -159,6 +159,27 @@
 
   </div>
 
+  <div class="modal-backdrop" id="modalCarpeta" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title-wrap">
+          <p class="modal-kicker">Carpeta</p>
+          <h3 id="modalCarpetaTitulo">Nueva carpeta</h3>
+        </div>
+        <button class="modal-close" type="button" aria-label="Cerrar" onclick="cerrarModalCarpeta()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <label for="inputNombreCarpeta">Nombre</label>
+        <input type="text" id="inputNombreCarpeta" placeholder="Ej. Culpabilidad">
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-primary" id="modalCarpetaGuardar">Guardar</button>
+      </div>
+    </div>
+  </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="app.js"></script>
