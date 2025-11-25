@@ -889,7 +889,7 @@ body.oscuro .sidebarItemCarpeta {
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  margin: 6px 4px 4px;
+  margin: 0;
   color: var(--accent);
 }
 
