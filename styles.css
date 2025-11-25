@@ -914,14 +914,14 @@ body.oscuro .sidebarItemCarpeta {
 .modal-card {
   background: var(--card);
   color: var(--text);
-  border-radius: 14px;
-  padding: 20px 22px 18px;
-  width: min(460px, 92vw);
+  border-radius: 12px;
+  padding: 16px 18px 14px;
+  width: min(380px, 90vw);
   box-shadow: 0 16px 32px rgba(0,0,0,0.24);
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .modal-header {
@@ -951,11 +951,15 @@ body.oscuro .sidebarItemCarpeta {
 
 .modal-actions {
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 4px;
+  gap: 10px;
+  margin-top: 2px;
   padding-top: 10px;
   border-top: 1px solid var(--border);
+}
+
+.modal-actions button {
+  flex: 1;
+  min-width: 0;
 }
 
 .btn-secundario {
@@ -966,7 +970,6 @@ body.oscuro .sidebarItemCarpeta {
   padding: 10px 12px;
   cursor: pointer;
   font-weight: 700;
-  min-width: 120px;
   transition: background 0.15s ease, transform 0.12s ease;
 }
 
@@ -975,7 +978,6 @@ body.oscuro .sidebarItemCarpeta {
 
 .modal-actions .btn-primary {
   width: auto;
-  min-width: 140px;
   padding-inline: 16px;
 }
     .sidebarItem:hover {
@@ -997,10 +999,19 @@ body.oscuro .sidebarItemCarpeta {
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.14);
     }
 
-    .sidebarGroupList {
-      display: flex;
-      flex-direction: column;
-    }
+.sidebarGroupList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 6px 10px;
+  min-height: 96px;
+}
+
+.sidebarGroupList.drop-activa {
+  outline: 2px dashed var(--accent);
+  outline-offset: 2px;
+  border-radius: 10px;
+}
 
     .mainPanel {
       flex: 1;

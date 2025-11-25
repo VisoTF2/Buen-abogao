@@ -1411,17 +1411,30 @@ function ordenarYMostrar() {
 
     const listaMaterias = document.createElement("div")
     listaMaterias.className = "sidebarGroupList"
-    listaMaterias.addEventListener("dragover", e => {
-      if (!materiaArrastrada) return
-      e.preventDefault()
-      if (e.dataTransfer) e.dataTransfer.dropEffect = "move"
-    })
-    listaMaterias.addEventListener("drop", e => {
-      if (!materiaArrastrada) return
-      e.preventDefault()
-      const normOrigen = materiaArrastradaNormativa || norm
-      setTimeout(() => moverMateriaAFueraDeCarpeta(materiaArrastrada, normOrigen), 0)
-    })
+
+    const habilitarDropSalida = elemento => {
+      elemento.addEventListener("dragover", e => {
+        if (!materiaArrastrada) return
+        e.preventDefault()
+        elemento.classList.add("drop-activa")
+        if (e.dataTransfer) e.dataTransfer.dropEffect = "move"
+      })
+
+      elemento.addEventListener("dragleave", () => {
+        elemento.classList.remove("drop-activa")
+      })
+
+      elemento.addEventListener("drop", e => {
+        if (!materiaArrastrada) return
+        e.preventDefault()
+        elemento.classList.remove("drop-activa")
+        const normOrigen = materiaArrastradaNormativa || norm
+        setTimeout(() => moverMateriaAFueraDeCarpeta(materiaArrastrada, normOrigen), 0)
+      })
+    }
+
+    habilitarDropSalida(listaMaterias)
+    habilitarDropSalida(grupo)
     grupo.appendChild(listaMaterias)
 
     const nombresOrdenados = ordenarMaterias(nombresMaterias, norm).filter(
