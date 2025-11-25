@@ -930,7 +930,7 @@ body.oscuro .sidebarItemCarpeta {
 
 
 .modal-card {
-  --modal-gap: 8px;
+  --modal-gap: 6px;
   background: var(--card);
   color: var(--text);
   border-radius: 12px;
@@ -1018,7 +1018,7 @@ body.oscuro .modal-close:hover {
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  padding: 4px 0 0;
+  padding: 0;
   margin-top: 0;
 }
 
