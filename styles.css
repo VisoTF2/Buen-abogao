@@ -1007,38 +1007,17 @@ body.oscuro .modal-close:hover {
 
 .modal-actions {
   display: flex;
-  gap: 10px;
-  padding: 4px 0 0;
+  justify-content: flex-end;
+  padding: 2px 0 0;
   margin-top: 0;
 }
-
-.modal-actions button {
-  flex: 1;
-  min-width: 0;
-  padding: 10px 0;
-  font-weight: 700;
-  font-size: 15px;
-  border-radius: 10px;
-}
-
-.btn-secundario {
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text);
-  border-radius: 12px;
-  padding: 10px 12px;
-  cursor: pointer;
-  font-weight: 700;
-  transition: background 0.15s ease, transform 0.12s ease;
-}
-
-.btn-secundario:hover { background: rgba(0, 0, 0, 0.04); }
-.btn-secundario:active { transform: translateY(1px); }
 
 .modal-actions .btn-primary {
   width: 100%;
-  padding-inline: 12px;
-  margin-top: 0;
+  padding: 10px 12px;
+  font-weight: 700;
+  font-size: 15px;
+  border-radius: 10px;
 }
     .sidebarItem:hover {
       transform: scale(1.02);

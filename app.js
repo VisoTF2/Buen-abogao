@@ -20,7 +20,6 @@ const modalCarpeta = document.getElementById("modalCarpeta")
 const modalCarpetaTitulo = document.getElementById("modalCarpetaTitulo")
 const inputNombreCarpeta = document.getElementById("inputNombreCarpeta")
 const modalCarpetaGuardar = document.getElementById("modalCarpetaGuardar")
-const modalCarpetaCancelar = document.getElementById("modalCarpetaCancelar")
 
 function escaparComoHTML(texto) {
   if (texto === undefined || texto === null) return ""
@@ -81,7 +80,6 @@ if (botonDocumentos) {
 }
 
 modalCarpetaGuardar?.addEventListener("click", confirmarCarpeta)
-modalCarpetaCancelar?.addEventListener("click", cerrarModalCarpeta)
 modalCarpeta?.addEventListener("click", e => {
   if (e.target === modalCarpeta) cerrarModalCarpeta()
 })
