@@ -758,37 +758,44 @@
   overflow: auto;
 }
 
+
 .sidebarAcciones {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 6px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--article-bg);
 }
 
 .sidebarAccionesTitulo {
   font-weight: 700;
-  font-size: 14px;
+  font-size: 15px;
   color: var(--accent);
+  text-align: center;
 }
 
 .btn-carpeta {
   background: var(--accent);
   color: #fff;
   border: none;
-  border-radius: 10px;
-  padding: 10px 12px;
+  border-radius: 12px;
+  padding: 12px 14px;
   font-weight: 700;
   cursor: pointer;
   font-size: 14px;
   transition: background 0.2s ease, transform 0.12s ease;
+  width: 100%;
 }
 
 .btn-carpeta:hover { background: var(--accent-light); }
 .btn-carpeta:active { transform: translateY(1px); }
 
 .carpetasSection {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .carpetasLista {
@@ -797,20 +804,23 @@
   gap: 10px;
 }
 
+
 .carpetaBox {
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px;
+  border-radius: 12px;
+  padding: 12px;
   background: var(--article-bg);
 }
+
 
 .carpetaHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
+
 
 .carpetaNombre {
   background: transparent;
@@ -822,20 +832,27 @@
   text-align: left;
 }
 
+
 .carpetaEliminar {
   border: 1px solid var(--border);
   background: var(--card);
   color: #ef4444;
-  border-radius: 8px;
-  padding: 6px 10px;
+  border-radius: 10px;
+  padding: 8px 12px;
   cursor: pointer;
   font-weight: 600;
+  transition: background 0.15s ease, transform 0.12s ease;
 }
+
+.carpetaEliminar:hover { background: rgba(239, 68, 68, 0.08); }
+.carpetaEliminar:active { transform: translateY(1px); }
+
 
 .carpetaLista {
   gap: 8px;
-  padding: 4px;
-  border-radius: 8px;
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px dashed transparent;
 }
 
 .carpetaLista-drop {
@@ -843,10 +860,12 @@
   background: rgba(59, 130, 246, 0.08);
 }
 
+
 .carpetaVacia {
   font-size: 13px;
   color: #6b7280;
   padding: 8px;
+  text-align: center;
 }
 
 .sidebarItemCarpeta {
@@ -895,20 +914,24 @@ body.oscuro .sidebarItemCarpeta {
 .modal-card {
   background: var(--card);
   color: var(--text);
-  border-radius: 12px;
-  padding: 16px;
-  width: min(420px, 92vw);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+  border-radius: 14px;
+  padding: 20px 22px 18px;
+  width: min(460px, 92vw);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.24);
   border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
 }
-
 .modal-close {
   background: transparent;
   border: none;
@@ -917,28 +940,44 @@ body.oscuro .sidebarItemCarpeta {
   cursor: pointer;
 }
 
+.modal-card label {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.modal-card input {
+  width: 100%;
+}
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 14px;
+  gap: 12px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
 }
 
 .btn-secundario {
   border: 1px solid var(--border);
   background: var(--card);
   color: var(--text);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 10px 12px;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
+  min-width: 120px;
+  transition: background 0.15s ease, transform 0.12s ease;
 }
+
+.btn-secundario:hover { background: rgba(0, 0, 0, 0.04); }
+.btn-secundario:active { transform: translateY(1px); }
 
 .modal-actions .btn-primary {
   width: auto;
-  min-width: 120px;
+  min-width: 140px;
+  padding-inline: 16px;
 }
-
     .sidebarItem:hover {
       transform: scale(1.02);
       box-shadow: 0 4px 10px rgba(0,0,0,0.12);
