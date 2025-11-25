@@ -916,13 +916,13 @@ body.oscuro .sidebarItemCarpeta {
   background: var(--card);
   color: var(--text);
   border-radius: 12px;
-  padding: 14px 16px 12px;
-  width: min(340px, 88vw);
+  padding: 12px 14px 12px;
+  width: min(320px, 88vw);
   box-shadow: 0 16px 32px rgba(0,0,0,0.24);
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .modal-header {
@@ -943,24 +943,27 @@ body.oscuro .sidebarItemCarpeta {
 
 .modal-card label {
   font-weight: 700;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .modal-card input {
   width: 100%;
+  margin-top: 2px;
 }
 
 .modal-actions {
   display: flex;
   gap: 10px;
-  margin-top: 4px;
-  padding-top: 10px;
+  margin-top: 2px;
+  padding-top: 8px;
   border-top: 1px solid var(--border);
 }
 
 .modal-actions button {
   flex: 1;
   min-width: 0;
+  padding: 12px;
+  font-weight: 700;
 }
 
 .btn-secundario {
@@ -979,7 +982,8 @@ body.oscuro .sidebarItemCarpeta {
 
 .modal-actions .btn-primary {
   width: 100%;
-  padding-inline: 14px;
+  padding-inline: 12px;
+  margin-top: 0;
 }
     .sidebarItem:hover {
       transform: scale(1.02);
