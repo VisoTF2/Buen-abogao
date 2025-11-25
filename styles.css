@@ -1025,7 +1025,7 @@ body.oscuro .modal-close:hover {
   display: flex;
   justify-content: flex-end;
   padding: 0;
-  margin-top: 0;
+  margin-top: 6px;
 }
 
 .modal-actions .btn-primary {
@@ -1034,6 +1034,7 @@ body.oscuro .modal-close:hover {
   font-weight: 700;
   font-size: 13px;
   border-radius: 8px;
+  margin-top: 0;
 }
     .sidebarItem:hover {
       transform: scale(1.02);
